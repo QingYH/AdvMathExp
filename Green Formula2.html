@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>格林公式：边界环量 ⇔ 内部旋度和 | 全部箭头逆时针方向</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at 20% 30%, #0a1220, #03060c);
+            font-family: 'Segoe UI', 'Poppins', 'Roboto', 'Noto Sans', system-ui, -apple-system, 'Microsoft YaHei', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .supreme-card {
+            max-width: 1500px;
+            width: 100%;
+            background: rgba(8, 18, 32, 0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(80, 180, 255, 0.2);
+            overflow: hidden;
+            padding: 1.2rem;
+        }
+
+        .title-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+            padding: 0 0.5rem;
+        }
+        h1 {
+            font-size: 1.6rem;
+            background: linear-gradient(135deg, #FFE5B4, #7BC9FF, #D9A7FF);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .math-badge {
+            background: #0a1428;
+            padding: 0.25rem 1rem;
+            border-radius: 40px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #9effcf;
+            border-left: 3px solid #3cf0b0;
+        }
+
+        .dashboard-flex {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+        }
+        .canvas-3d-box {
+            flex: 1.5;
+            min-width: 300px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 1.6rem;
+            padding: 0.7rem;
+            backdrop-filter: blur(2px);
+        }
+        .right-stack {
+            flex: 1.1;
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .theory-card {
+            background: rgba(16, 26, 42, 0.8);
+            border-radius: 1.6rem;
+            padding: 1rem 1.2rem;
+            backdrop-filter: blur(4px);
+            border-right: 3px solid #3b82f6;
+        }
+        .diagram-card {
+            background: rgba(10, 18, 32, 0.85);
+            border-radius: 1.6rem;
+            padding: 0.8rem;
+            backdrop-filter: blur(4px);
+            border: 1px solid #2c5a7a;
+        }
+        .diagram-title {
+            font-size: 0.8rem;
+            color: #c0e0ff;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+        .diagram-image-container {
+            display: block;
+            width: 100%;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            background: #071222;
+        }
+        .diagram-image-container img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 1rem;
+            object-fit: contain;
+        }
+        .diagram-note {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 6px;
+            font-size: 0.65rem;
+            flex-wrap: wrap;
+            color: #bbd6ff;
+        }
+
+        canvas#mainCanvas3D {
+            display: block;
+            width: 100%;
+            background: radial-gradient(circle at 30% 30%, #09182a, #01050b);
+            border-radius: 1.2rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            cursor: grab;
+        }
+        canvas#mainCanvas3D:active { cursor: grabbing; }
+
+        .control-bar-3d {
+            margin-top: 0.9rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.45);
+            padding: 0.6rem 1rem;
+            border-radius: 2rem;
+        }
+        .ctrl-group {
+            flex: 2;
+            min-width: 120px;
+        }
+        .ctrl-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: #d4ecff;
+        }
+        input {
+            flex: 1;
+            background: #1f3857;
+            height: 4px;
+            border-radius: 10px;
+            accent-color: #ff8c42;
+        }
+        .metric-chip {
+            background: #0c1628;
+            padding: 0.2rem 0.6rem;
+            border-radius: 32px;
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: #ffdd99;
+        }
+        button {
+            background: #2c628f;
+            border: none;
+            padding: 0.25rem 0.9rem;
+            border-radius: 30px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        .legend-3d {
+            margin-top: 0.7rem;
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 1rem;
+            padding: 0.5rem 0.8rem;
+        }
+        .legend-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            justify-content: space-between;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.65rem;
+            color: #ccdeff;
+        }
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+        }
+        .legend-color.circle { border-radius: 50%; }
+        .theory-text {
+            font-size: 0.88rem;
+            line-height: 1.45;
+            color: #eaf2ff;
+        }
+        .formula {
+            background: #071222;
+            padding: 0.1rem 0.4rem;
+            border-radius: 6px;
+            font-family: monospace;
+            color: #ffd966;
+        }
+        .highlight { color: #facc15; }
+        hr { margin: 10px 0; border-color: #2c5a7a; }
+        .stats-mini {
+            display: flex;
+            gap: 0.6rem;
+            margin: 0.7rem 0;
+            justify-content: center;
+        }
+        .stat-badge {
+            background: #071222;
+            border-radius: 20px;
+            padding: 0.2rem 0.6rem;
+            text-align: center;
+            font-size: 0.7rem;
+        }
+        @media (max-width: 900px) {
+            .title-bar h1 { font-size: 1.2rem; }
+            .theory-text { font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="supreme-card">
+    <div class="title-bar">
+        <h1>🌀 格林公式 · 边界环量 ⇔ 内部旋度总和 &nbsp; <span style="font-size:0.75rem;">∮<sub>C</sub> B·dl = ∬<sub>D</sub> (∇×B) dA</span></h1>
+        <div class="math-badge">洛伦兹力 | 半透明线圈 | 所有箭头逆时针方向 ✓</div>
+    </div>
+    <div class="dashboard-flex">
+        <!-- 左侧 3D 核心演示 -->
+        <div class="canvas-3d-box">
+            <canvas id="mainCanvas3D" width="800" height="480" style="width:100%; height:auto; aspect-ratio:800/480"></canvas>
+            <div class="control-bar-3d">
+                <div class="ctrl-group"><label>🌀 旋度 (∇×B) : <input type="range" id="curlSlider" min="0" max="1.5" step="0.01" value="0.92"><span id="curlShow" class="metric-chip">0.92</span></label></div>
+                <div class="ctrl-group"><label>💨 电子速度 : <input type="range" id="speedSlider" min="0.3" max="1.6" step="0.01" value="1.05"><span id="speedShow" class="metric-chip">1.05</span></label></div>
+                <button id="resetCameraBtn">⟳ 重置</button>
+            </div>
+            <div class="legend-3d">
+                <div class="legend-grid">
+                    <div class="legend-item"><div class="legend-color" style="background:#ffaa44;"></div>磁场线</div>
+                    <div class="legend-item"><div class="legend-color" style="background:#5d9eff;"></div>半透线圈</div>
+                    <div class="legend-item"><div class="legend-color circle" style="background:#ff5e7c;"></div>运动电子</div>
+                    <div class="legend-item"><div class="legend-color" style="background:#3bc985;"></div>旋度源</div>
+                    <div class="legend-item"><div class="legend-color" style="background:#ffaa77;"></div>洛伦兹力矢</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：理论 + 二维示意图（修正方向：全部逆时针 + 旋度更密集） -->
+        <div class="right-stack">
+            <div class="theory-card">
+                <div class="theory-text">
+                    <p style="font-weight:bold;">🧲 <span class="highlight">格林公式物理内核</span>：磁场环量 = 内部“涡旋”总和</p>
+                    <p>闭合线圈上的环量 <span class="formula">∮<sub>C</sub> B·dl</span> 等价于线圈内部所有微小旋度的积分 <span class="formula">∬<sub>D</sub> (∇×B) dS</span>。右侧2D图中：<strong class="highlight">边界曲线上的红色箭头（环量方向）</strong>与内部<strong class="highlight">每个绿色小圆圈上的亮黄色箭头方向</strong>均为<strong class="highlight">逆时针</strong>，直观体现格林公式的“求和”思想。</p>
+                    <div class="stats-mini">
+                        <div class="stat-badge"><span style="color:#ffb347;">∮ B·dl =</span> <span id="lineIntVal3d" class="metric-chip">---</span></div>
+                        <div class="stat-badge"><span style="color:#6fcf97;">∬ (∇×B)dS =</span> <span id="fluxIntVal3d" class="metric-chip">---</span></div>
+                        <div class="stat-badge"><span style="color:#ffaa88;">误差</span> <span id="errorVal3d" class="metric-chip">0%</span></div>
+                    </div>
+                    <p style="font-size:0.7rem;">⬅️ 左侧3D交互：调整旋度，实时验证格林公式；半透明线圈内电子受力可见。</p>
+                </div>
+            </div>
+            <div class="diagram-card">
+                <div class="diagram-title">📐 格林公式二维示意 | 边界环量 ∮ F·dr &nbsp; ⇔ &nbsp; 内部旋度通量 ∬ (∇×F) dA</div>
+                <!-- 替换为修正后的SVG：所有箭头逆时针 + 内部旋度更密集 -->
+                <div class="diagram-image-container">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 280'%3E%3Crect width='500' height='280' fill='%23071222'/%3E%3Cdefs%3E%3Cmarker id='arrowRed' markerWidth='10' markerHeight='10' refX='5' refY='5' orient='auto'%3E%3Cpath d='M0,0 L10,5 L0,10 Z' fill='%23ff4d4d'/%3E%3C/marker%3E%3Cmarker id='arrowYellow' markerWidth='10' markerHeight='10' refX='5' refY='5' orient='auto'%3E%3Cpath d='M0,0 L10,5 L0,10 Z' fill='%23ffcc44'/%3E%3C/marker%3E%3C/defs%3E%3C!-- 边界椭圆 (逆时针方向) --%3E%3Cellipse cx='250' cy='140' rx='140' ry='90' fill='none' stroke='%23ffaa66' stroke-width='2.5' stroke-dasharray='6,4' /%3E%3C!-- 边界红色箭头 (逆时针方向) 沿椭圆均匀分布 --%3E%3Cpath d='M 180,55 L 190,50 L 185,60' fill='%23ff4d4d' /%3E%3Cpath d='M 250,45 L 260,40 L 255,50' fill='%23ff4d4d' /%3E%3Cpath d='M 320,55 L 330,50 L 325,60' fill='%23ff4d4d' /%3E%3Cpath d='M 370,90 L 380,85 L 375,95' fill='%23ff4d4d' /%3E%3Cpath d='M 390,140 L 400,135 L 395,145' fill='%23ff4d4d' /%3E%3Cpath d='M 370,190 L 380,185 L 375,195' fill='%23ff4d4d' /%3E%3Cpath d='M 320,225 L 330,220 L 325,230' fill='%23ff4d4d' /%3E%3Cpath d='M 250,235 L 260,230 L 255,240' fill='%23ff4d4d' /%3E%3Cpath d='M 180,225 L 190,220 L 185,230' fill='%23ff4d4d' /%3E%3Cpath d='M 130,190 L 140,185 L 135,195' fill='%23ff4d4d' /%3E%3Cpath d='M 110,140 L 120,135 L 115,145' fill='%23ff4d4d' /%3E%3Cpath d='M 130,90 L 140,85 L 135,95' fill='%23ff4d4d' /%3E%3C!-- 内部旋度小圆圈 (密布) + 逆时针黄色箭头 --%3E%3C!-- 第一行 --%3E%3Ccircle cx='170' cy='115' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 178,107 L 185,105 L 182,113' fill='%23ffcc44' /%3E%3Ccircle cx='210' cy='105' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 218,97 L 225,95 L 222,103' fill='%23ffcc44' /%3E%3Ccircle cx='250' cy='100' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 258,92 L 265,90 L 262,98' fill='%23ffcc44' /%3E%3Ccircle cx='290' cy='105' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 298,97 L 305,95 L 302,103' fill='%23ffcc44' /%3E%3Ccircle cx='330' cy='115' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 338,107 L 345,105 L 342,113' fill='%23ffcc44' /%3E%3C!-- 第二行 --%3E%3Ccircle cx='140' cy='140' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 148,132 L 155,130 L 152,138' fill='%23ffcc44' /%3E%3Ccircle cx='180' cy='140' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 188,132 L 195,130 L 192,138' fill='%23ffcc44' /%3E%3Ccircle cx='220' cy='140' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 228,132 L 235,130 L 232,138' fill='%23ffcc44' /%3E%3Ccircle cx='260' cy='140' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 268,132 L 275,130 L 272,138' fill='%23ffcc44' /%3E%3Ccircle cx='300' cy='140' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 308,132 L 315,130 L 312,138' fill='%23ffcc44' /%3E%3Ccircle cx='340' cy='140' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 348,132 L 355,130 L 352,138' fill='%23ffcc44' /%3E%3Ccircle cx='360' cy='140' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 368,132 L 375,130 L 372,138' fill='%23ffcc44' /%3E%3C!-- 第三行 --%3E%3Ccircle cx='170' cy='165' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 178,157 L 185,155 L 182,163' fill='%23ffcc44' /%3E%3Ccircle cx='210' cy='175' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 218,167 L 225,165 L 222,173' fill='%23ffcc44' /%3E%3Ccircle cx='250' cy='180' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 258,172 L 265,170 L 262,178' fill='%23ffcc44' /%3E%3Ccircle cx='290' cy='175' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 298,167 L 305,165 L 302,173' fill='%23ffcc44' /%3E%3Ccircle cx='330' cy='165' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 338,157 L 345,155 L 342,163' fill='%23ffcc44' /%3E%3C!-- 第四行 (下边缘) --%3E%3Ccircle cx='200' cy='195' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 208,187 L 215,185 L 212,193' fill='%23ffcc44' /%3E%3Ccircle cx='250' cy='205' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 258,197 L 265,195 L 262,203' fill='%23ffcc44' /%3E%3Ccircle cx='300' cy='195' r='12' fill='rgba(70,200,120,0.15)' stroke='%237effb3' stroke-width='1.8'/%3E%3Cpath d='M 308,187 L 315,185 L 312,193' fill='%23ffcc44' /%3E%3C!-- 额外更密集的补充 (间隙填充) --%3E%3Ccircle cx='150' cy='125' r='10' fill='rgba(70,200,120,0.1)' stroke='%237effb3' stroke-width='1.4'/%3E%3Cpath d='M 157,118 L 163,117 L 160,124' fill='%23ffcc44' /%3E%3Ccircle cx='350' cy='125' r='10' fill='rgba(70,200,120,0.1)' stroke='%237effb3' stroke-width='1.4'/%3E%3Cpath d='M 357,118 L 363,117 L 360,124' fill='%23ffcc44' /%3E%3Ccircle cx='150' cy='155' r='10' fill='rgba(70,200,120,0.1)' stroke='%237effb3' stroke-width='1.4'/%3E%3Cpath d='M 157,148 L 163,147 L 160,154' fill='%23ffcc44' /%3E%3Ccircle cx='350' cy='155' r='10' fill='rgba(70,200,120,0.1)' stroke='%237effb3' stroke-width='1.4'/%3E%3Cpath d='M 357,148 L 363,147 L 360,154' fill='%23ffcc44' /%3E%3Ccircle cx='190' cy='115' r='10' fill='rgba(70,200,120,0.1)' stroke='%237effb3' stroke-width='1.4'/%3E%3Cpath d='M 197,108 L 203,107 L 200,114' fill='%23ffcc44' /%3E%3Ccircle cx='310' cy='115' r='10' fill='rgba(70,200,120,0.1)' stroke='%237effb3' stroke-width='1.4'/%3E%3Cpath d='M 317,108 L 323,107 L 320,114' fill='%23ffcc44' /%3E%3Ccircle cx='230' cy='190' r='10' fill='rgba(70,200,120,0.1)' stroke='%237effb3' stroke-width='1.4'/%3E%3Cpath d='M 237,183 L 243,182 L 240,189' fill='%23ffcc44' /%3E%3Ccircle cx='270' cy='190' r='10' fill='rgba(70,200,120,0.1)' stroke='%237effb3' stroke-width='1.4'/%3E%3Cpath d='M 277,183 L 283,182 L 280,189' fill='%23ffcc44' /%3E%3C!-- 大箭头指示逆时针方向 --%3E%3Cpath d='M 370,70 L 385,60 L 380,78' fill='%23aaffaa' /%3E%3Cpath d='M 400,110 L 410,125 L 394,118' fill='%23aaffaa' /%3E%3Cpath d='M 380,190 L 395,200 L 378,200' fill='%23aaffaa' /%3E%3Ctext x='140' y='70' fill='%23facc15' font-size='14' font-family='monospace' font-weight='bold'%3E∮ F·dr (边界环量)%3C/text%3E%3Ctext x='280' y='250' fill='%236fcf97' font-size='14' font-family='monospace' font-weight='bold'%3E∬ (∇×F) dA (内部旋度)%3C/text%3E%3Ctext x='130' y='260' fill='%23ddd' font-size='12' font-family='monospace'%3E格林公式: 边界积分 = 内部旋度通量%3C/text%3E%3Ctext x='115' y='275' fill='%23ffdd88' font-size='10' font-family='monospace'%3E✓ 所有箭头逆时针方向 (旋度密集)%3C/text%3E%3C/svg%3E"
+                         alt="格林公式二维示意图：所有箭头逆时针方向，旋度更密集" />
+                </div>
+                <div class="diagram-note">
+                    <span>🔴 红色箭头: 边界切向分量 (逆时针)</span>
+                    <span>🟡 亮黄色箭头: 局部旋度方向 (逆时针，与边界一致)</span>
+                    <span>🟢 内部旋度已加密</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Three.js 库 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+    (function() {
+        // ======================= 1. 3D 场景部分 =======================
+        const canvasEl = document.getElementById('mainCanvas3D');
+        const width3d = 800, height3d = 480;
+        const scene = new THREE.Scene();
+        scene.background = null;
+        scene.fog = new THREE.FogExp2(0x03060c, 0.01);
+        const camera = new THREE.PerspectiveCamera(44, width3d/height3d, 0.1, 1000);
+        camera.position.set(3.5, 2.4, 5.0);
+        camera.lookAt(0, 0, 0);
+        const renderer = new THREE.WebGLRenderer({ canvas: canvasEl, alpha: false, antialias: true });
+        renderer.setSize(width3d, height3d);
+        renderer.setClearColor(0x03060c, 1.0);
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.06;
+        controls.autoRotate = false;
+        
+        const rectCorners = [
+            new THREE.Vector3(-1.45, -1.05, 0),
+            new THREE.Vector3( 1.45, -1.05, 0),
+            new THREE.Vector3( 1.45,  1.05, 0),
+            new THREE.Vector3(-1.45,  1.05, 0)
+        ];
+        function generateLoopPoints(corners, seg=28) {
+            let pts = [];
+            for (let i=0; i<corners.length; i++) {
+                let p1 = corners[i], p2 = corners[(i+1)%corners.length];
+                for (let s=0; s<=seg; s++) {
+                    let t = s/seg;
+                    pts.push(new THREE.Vector3(p1.x*(1-t)+p2.x*t, p1.y*(1-t)+p2.y*t, 0));
+                }
+            }
+            return pts;
+        }
+        const loopRaw = generateLoopPoints(rectCorners, 30);
+        const curve = new THREE.CatmullRomCurve3(loopRaw);
+        const tubeGeo = new THREE.TubeGeometry(curve, 240, 0.085, 12, true);
+        const coilMat = new THREE.MeshStandardMaterial({ color: 0x5d9eff, metalness: 0.7, roughness: 0.35, transparent: true, opacity: 0.45, emissive: 0x113355 });
+        const thickCoil = new THREE.Mesh(tubeGeo, coilMat);
+        scene.add(thickCoil);
+        const wireMat = new THREE.MeshBasicMaterial({ color: 0x8abfff, wireframe: true, transparent: true, opacity: 0.2 });
+        const coilWire = new THREE.Mesh(tubeGeo, wireMat);
+        scene.add(coilWire);
+        
+        let electrons = [];
+        const electronGroup = new THREE.Group();
+        scene.add(electronGroup);
+        const ELECTRON_COUNT = 22;
+        let electronSpeedFactor = 1.0;
+        function getCurvePos(t) { return curve.getPoint(t); }
+        function initElectrons() {
+            while(electronGroup.children.length) electronGroup.remove(electronGroup.children[0]);
+            electrons = [];
+            for (let i=0; i<ELECTRON_COUNT; i++) {
+                const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.065, 32, 32), new THREE.MeshStandardMaterial({ color: 0xff5e7c, emissive: 0xcc3a5a, emissiveIntensity: 0.85 }));
+                electronGroup.add(sphere);
+                electrons.push({ mesh: sphere, progress: i / ELECTRON_COUNT });
+            }
+        }
+        function updateElectrons(delta) {
+            let deltaMove = delta * 0.8 * electronSpeedFactor;
+            electrons.forEach(e => {
+                e.progress += deltaMove;
+                if (e.progress > 1) e.progress -= 1;
+                e.mesh.position.copy(getCurvePos(e.progress));
+            });
+        }
+        
+        let forceArrowGroup = new THREE.Group();
+        scene.add(forceArrowGroup);
+        function getBField(x,y,alpha) { return new THREE.Vector2(-alpha * y, alpha * x); }
+        function updateForceArrows(alpha, vSpeed) {
+            while(forceArrowGroup.children.length) forceArrowGroup.remove(forceArrowGroup.children[0]);
+            for (let i=0; i<=36; i++) {
+                let t = i/36;
+                let pos = getCurvePos(t);
+                let t2 = Math.min(1, t+0.02);
+                let posN = getCurvePos(t2);
+                let tangent = new THREE.Vector2(posN.x-pos.x, posN.y-pos.y);
+                if (tangent.length()<0.001) continue;
+                tangent.normalize();
+                let B = getBField(pos.x, pos.y, alpha);
+                let cross = Math.abs(tangent.x * B.y - tangent.y * B.x) * vSpeed;
+                let perp = new THREE.Vector3(-tangent.y, tangent.x, 0).normalize();
+                let scale = Math.min(0.4, cross * 0.5);
+                if (scale > 0.04) {
+                    let dir = perp.clone().multiplyScalar(cross>0?0.3:-0.3);
+                    let arrow = new THREE.ArrowHelper(new THREE.Vector3(dir.x, dir.y, 0).normalize(), new THREE.Vector3(pos.x, pos.y, 0), scale, 0xffaa77, 0.2, 0.1);
+                    forceArrowGroup.add(arrow);
+                }
+            }
+        }
+        
+        let fieldLineGroup = new THREE.Group();
+        scene.add(fieldLineGroup);
+        function drawFieldLines(alpha) {
+            while(fieldLineGroup.children.length) fieldLineGroup.remove(fieldLineGroup.children[0]);
+            const seeds = [];
+            for (let x=-2.2; x<=2.2; x+=0.55) for (let y=-1.7; y<=1.7; y+=0.55) if(Math.hypot(x,y)>0.6) seeds.push(new THREE.Vector2(x,y));
+            seeds.forEach(seed => {
+                let fwd = [seed.clone()], pos = seed.clone();
+                for (let step=0; step<70; step++) {
+                    let B = getBField(pos.x, pos.y, alpha);
+                    let len = Math.hypot(B.x, B.y);
+                    if(len<1e-6) break;
+                    let dir = new THREE.Vector2(B.x/len, B.y/len);
+                    let nxt = new THREE.Vector2(pos.x+dir.x*0.045, pos.y+dir.y*0.045);
+                    if(Math.abs(nxt.x)>2.8||Math.abs(nxt.y)>2.3) break;
+                    fwd.push(nxt); pos = nxt;
+                }
+                let back = [], posb = seed.clone();
+                for (let step=0; step<70; step++) {
+                    let B = getBField(posb.x, posb.y, alpha);
+                    let len = Math.hypot(B.x,B.y);
+                    if(len<1e-6) break;
+                    let dir = new THREE.Vector2(-B.x/len, -B.y/len);
+                    let nxt = new THREE.Vector2(posb.x+dir.x*0.045, posb.y+dir.y*0.045);
+                    if(Math.abs(nxt.x)>2.8||Math.abs(nxt.y)>2.3) break;
+                    back.unshift(nxt); posb = nxt;
+                }
+                let all = [...back, ...fwd];
+                if(all.length>3) {
+                    const verts = [];
+                    all.forEach(p=>{ verts.push(p.x, p.y, 0); });
+                    const geom = new THREE.BufferGeometry();
+                    geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(verts), 3));
+                    const line = new THREE.Line(geom, new THREE.LineBasicMaterial({ color: 0xffaa44, transparent: true, opacity: 0.65 }));
+                    fieldLineGroup.add(line);
+                }
+            });
+        }
+        
+        let curlViz = new THREE.Group();
+        scene.add(curlViz);
+        function updateCurlViz(intensity) {
+            while(curlViz.children.length) curlViz.remove(curlViz.children[0]);
+            for(let i=1;i<=4;i++) {
+                let rad = 0.5+i*0.28;
+                let pts = [];
+                for(let a=0;a<=Math.PI*2;a+=0.1) pts.push(new THREE.Vector3(rad*Math.cos(a), rad*Math.sin(a), 0));
+                const geom = new THREE.BufferGeometry().setFromPoints(pts);
+                const col = new THREE.Color().setHSL(0.32+intensity*0.2,1,0.55);
+                const ring = new THREE.LineLoop(geom, new THREE.LineBasicMaterial({ color: col, transparent: true, opacity: 0.55+intensity*0.2 }));
+                curlViz.add(ring);
+            }
+            const partCount=180, posArr=new Float32Array(partCount*3);
+            for(let i=0;i<partCount;i++){ let a=Math.random()*Math.PI*2, r=Math.random()*1.5; posArr[i*3]=Math.cos(a)*r; posArr[i*3+1]=Math.sin(a)*r; }
+            const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(posArr,3));
+            const pMat = new THREE.PointsMaterial({ color: 0x3bc985, size: 0.025, transparent: true });
+            curlViz.add(new THREE.Points(pGeo, pMat));
+        }
+        
+        const rectArea = (1.45-(-1.45))*(1.05-(-1.05));
+        function computeLineIntegral(alpha, sub=70) {
+            let integ=0;
+            for(let i=0;i<rectCorners.length;i++){
+                let p1=rectCorners[i], p2=rectCorners[(i+1)%rectCorners.length];
+                for(let s=0;s<sub;s++){
+                    let t1=s/sub, t2=(s+1)/sub;
+                    let x1=p1.x*(1-t1)+p2.x*t1, y1=p1.y*(1-t1)+p2.y*t1;
+                    let x2=p1.x*(1-t2)+p2.x*t2, y2=p1.y*(1-t2)+p2.y*t2;
+                    let Bmid=getBField((x1+x2)/2,(y1+y2)/2, alpha);
+                    integ += Bmid.x*(x2-x1) + Bmid.y*(y2-y1);
+                }
+            }
+            return integ;
+        }
+        function fluxTheory(alpha){ return (2*alpha)*rectArea; }
+        
+        let currentCurl=0.92, currentAlpha=0.46, electronVel=1.05;
+        function refresh3D() {
+            currentAlpha = currentCurl/2;
+            drawFieldLines(currentAlpha);
+            updateForceArrows(currentAlpha, electronVel);
+            updateCurlViz(currentCurl);
+            let lineInt = computeLineIntegral(currentAlpha, 72);
+            let fluxTh = fluxTheory(currentAlpha);
+            let err = Math.abs(lineInt-fluxTh)/(Math.abs(fluxTh)+1e-8)*100;
+            document.getElementById('lineIntVal3d').innerHTML = lineInt.toFixed(4);
+            document.getElementById('fluxIntVal3d').innerHTML = fluxTh.toFixed(4);
+            document.getElementById('errorVal3d').innerHTML = err.toFixed(5)+"%";
+            document.getElementById('curlShow').innerText = currentCurl.toFixed(2);
+            document.getElementById('speedShow').innerText = electronVel.toFixed(2);
+        }
+        
+        const curlSlider=document.getElementById('curlSlider'), speedSlider=document.getElementById('speedSlider'), resetBtn=document.getElementById('resetCameraBtn');
+        curlSlider.addEventListener('input',(e)=>{ currentCurl=parseFloat(e.target.value); refresh3D(); });
+        speedSlider.addEventListener('input',(e)=>{ electronVel=parseFloat(e.target.value); electronSpeedFactor=electronVel; refresh3D(); });
+        resetBtn.addEventListener('click',()=>{ camera.position.set(3.5,2.4,5); controls.target.set(0,0,0); controls.update(); });
+        
+        const ambient = new THREE.AmbientLight(0x1f314f);
+        scene.add(ambient);
+        const mainLight = new THREE.DirectionalLight(0xffffff,1); mainLight.position.set(1,2,1); scene.add(mainLight);
+        const fillLight = new THREE.PointLight(0x4477aa,0.5); fillLight.position.set(-1,1,1.5); scene.add(fillLight);
+        const grid = new THREE.GridHelper(5.6,24,0x4488aa,0x336699); grid.position.z=-0.2; scene.add(grid);
+        
+        initElectrons(); refresh3D();
+        let last=performance.now();
+        function animate(){
+            let now=performance.now(), delta=Math.min(0.033,(now-last)/1000);
+            last=now;
+            updateElectrons(delta);
+            controls.update();
+            renderer.render(scene,camera);
+            requestAnimationFrame(animate);
+        }
+        animate();
+        window.addEventListener('resize',()=>{ const w=canvasEl.clientWidth,h=canvasEl.clientHeight; camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h); });
+        setTimeout(()=>window.dispatchEvent(new Event('resize')),100);
+    })();
+</script>
+</body>
+</html>

@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>变力做功：第一类 vs 第二类曲线积分 | 超大清晰文字版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, #030715, #000000);
+            font-family: 'Inter', 'Segoe UI', 'Poppins', system-ui, -apple-system, 'Roboto', sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 主容器 */
+        .dashboard {
+            max-width: 1600px;
+            width: 100%;
+            background: rgba(6, 14, 28, 0.75);
+            backdrop-filter: blur(14px);
+            border-radius: 2.5rem;
+            border: 1px solid rgba(0, 255, 255, 0.45);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 255, 255, 0.2) inset;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1.2rem;
+        }
+        .header h1 {
+            font-size: clamp(2rem, 5vw, 2.8rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #e0f4ff, #4cbbff, #00e0ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .sub {
+            color: #b0e2ff;
+            font-size: 1.1rem;
+            margin-top: 8px;
+        }
+        .relation-box {
+            background: rgba(0, 20, 40, 0.8);
+            margin: 12px auto 0 auto;
+            padding: 10px 24px;
+            border-radius: 60px;
+            display: inline-block;
+            backdrop-filter: blur(4px);
+            border: 1px solid #0ff8;
+            font-size: 1.2rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: #d2f0ff;
+        }
+        .relation-box strong {
+            color: #ffdd88;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 28px;
+            margin-top: 14px;
+            font-size: 1rem;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 28px;
+            border-radius: 60px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 独立超大图形模块 */
+        .graphics-module {
+            margin: 1rem 0 1.2rem 0;
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 2rem;
+            padding: 0.8rem;
+            border: 1px solid rgba(0, 255, 255, 0.5);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.5);
+        }
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            background: #01041a;
+            border-radius: 1.5rem;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: #01041a;
+            cursor: grab;
+        }
+        canvas:active {
+            cursor: grabbing;
+        }
+        .zoom-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-bottom: 12px;
+            padding: 0 8px;
+        }
+        .zoom-btn {
+            background: #0a1a2ecc;
+            border: 1px solid cyan;
+            color: cyan;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            transition: 0.2s;
+        }
+        .zoom-btn:hover {
+            background: cyan20;
+            box-shadow: 0 0 8px cyan;
+        }
+        .status-text {
+            font-size: 1rem;
+            color: #aaffdd;
+            background: #00000080;
+            padding: 6px 16px;
+            border-radius: 30px;
+            margin-right: auto;
+        }
+
+        /* 右侧控制栏 - 详细解读 */
+        .control-sidebar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 0.5rem;
+        }
+        .controls-panel {
+            flex: 1.2;
+            min-width: 280px;
+            background: rgba(2, 12, 28, 0.7);
+            border-radius: 2rem;
+            padding: 1.2rem;
+            backdrop-filter: blur(8px);
+            border: 1px solid #2f8fcf;
+        }
+        .integral-panel {
+            flex: 1.5;
+            min-width: 320px;
+            background: rgba(2, 12, 28, 0.7);
+            border-radius: 2rem;
+            padding: 1.2rem;
+            backdrop-filter: blur(8px);
+            border: 1px solid #2f8fcf;
+        }
+        .slider-container {
+            background: #0e1a2ecc;
+            padding: 14px 18px;
+            border-radius: 60px;
+            margin-bottom: 20px;
+        }
+        .slider-container label {
+            display: flex;
+            justify-content: space-between;
+            color: #d4f1ff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: #2a5f8a;
+            border-radius: 10px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            width: 28px;
+            height: 28px;
+            background: #0ff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 14px cyan;
+            border: 2px solid white;
+        }
+        .mode-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .mode-btn {
+            flex: 1;
+            background: transparent;
+            border: 1.5px solid #2f8fbf;
+            color: #daf5ff;
+            padding: 12px 0;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .mode-btn.active {
+            background: #0ff22a20;
+            border-color: #0ff;
+            color: #0ff;
+            box-shadow: 0 0 12px #0ff6;
+        }
+        .card-value {
+            background: #02112aee;
+            border-radius: 28px;
+            padding: 16px;
+            border-left: 6px solid #0ff;
+            margin-bottom: 18px;
+        }
+        .card-value .title {
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #aad4ff;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .card-value .concept {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #d2ecff;
+        }
+        .explain-text {
+            font-size: 1.05rem;
+            line-height: 1.55;
+            color: #e0f0ff;
+            padding: 16px;
+            background: #00000070;
+            border-radius: 28px;
+            border-left: 4px solid cyan;
+            margin-top: 12px;
+        }
+        .vector-notes {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            background: #04182e70;
+            padding: 12px;
+            border-radius: 36px;
+            margin-top: 12px;
+        }
+        footer {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #6c8db0;
+        }
+        .highlight {
+            color: #88ffaa;
+            font-weight: bold;
+        }
+        @media (max-width: 860px) {
+            .control-sidebar { flex-direction: column; }
+            .legend { font-size: 0.85rem; gap: 16px; }
+            .card-value .concept { font-size: 0.9rem; }
+            .explain-text { font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <div class="header">
+        <h1>⚡ 变力沿曲线做功 · 曲线积分深度对比</h1>
+        <div class="sub">第一类（对弧长）vs 第二类（对坐标） — 切向分解与坐标分解的统一</div>
+        <div class="relation-box">
+            🔗 <strong>核心关系式</strong> : &nbsp; ∫<sub>C</sub> <strong>F·τ</strong> ds &nbsp; = &nbsp; ∫<sub>C</sub> <strong>P dx + Q dy</strong>
+        </div>
+        <div class="legend">
+            <span style="color:#7effe0;">● 曲线路径 C</span>
+            <span style="color:#ffaa66;">🔴 力矢量 F = (P, Q)</span>
+            <span style="color:#ff6b6b;">➡️ 切向分量 F<sub>τ</sub> (第一类积分)</span>
+            <span style="color:#66ccff;">⬅️ 坐标分量 P , Q (第二类积分)</span>
+            <span style="color:#ffff88;">⋮ 微元 ds 与 (dx, dy)</span>
+            <span>🖱️ 滚轮缩放 | 拖拽平移</span>
+        </div>
+    </div>
+
+    <!-- 独立超大图形模块 -->
+    <div class="graphics-module">
+        <div class="zoom-toolbar">
+            <span class="status-text" id="zoomStatus">🔍 滚轮缩放 | 鼠标拖拽平移视图</span>
+            <button id="resetZoomBtn" class="zoom-btn">⟳ 重置视图</button>
+        </div>
+        <div class="canvas-container">
+            <canvas id="workCanvas" width="1500" height="880" style="width:100%; height:auto; aspect-ratio:1500/880"></canvas>
+        </div>
+    </div>
+
+    <!-- 控制和数据面板 - 详细解读 -->
+    <div class="control-sidebar">
+        <div class="controls-panel">
+            <div class="slider-container">
+                <label>📍 路径演化参数 t ∈ [0,1] &nbsp; <span id="tLabel" style="font-weight:bold;">0.00</span></label>
+                <input type="range" id="tSlider" min="0" max="1" step="0.002" value="0.48">
+            </div>
+            <div class="mode-buttons">
+                <button id="btnFirst" class="mode-btn active">📐 第一类积分 · 切向分解</button>
+                <button id="btnSecond" class="mode-btn">🔄 第二类积分 · 坐标分解</button>
+            </div>
+            <div class="vector-notes">
+                <span>🎯 变力场: <strong>F = (-y , x + 0.8·sin(2πx))</strong></span>
+                <span>📐 曲线: 椭圆 + 正弦扰动 (上半平面)</span>
+            </div>
+        </div>
+        <div class="integral-panel">
+            <div class="card-value">
+                <div class="title">📖 第一类曲线积分 (对弧长) 概念解读</div>
+                <div class="concept">
+                    <strong>∫<sub>C</sub> f(x,y) ds</strong> &nbsp; → 对于变力做功：<strong class="highlight">W₁ = ∫<sub>C</sub> F·τ ds</strong><br><br>
+                    将力矢量 <strong>F</strong> 投影到路径的<strong class="highlight">切向方向</strong> (单位切向量 τ)，得到切向分力 F<sub>τ</sub>，再沿路径的<strong>弧长元素 ds</strong> 累加。<br>
+                    几何意义：把曲线看作一条有形状的细杆，力沿杆的切线方向“推拉”做功，与杆的形状有关但与坐标选取无关。
+                </div>
+            </div>
+            <div class="card-value">
+                <div class="title">📖 第二类曲线积分 (对坐标) 概念解读</div>
+                <div class="concept">
+                    <strong>∫<sub>C</sub> P dx + Q dy</strong> &nbsp; → 对于变力做功：<strong class="highlight">W₂ = ∫<sub>C</sub> F·dr</strong><br><br>
+                    将力矢量分解为水平分量 P 和垂直分量 Q，位移微元分解为 dx 和 dy。做功等于 <strong>P·dx + Q·dy</strong> 沿路径累加。<br>
+                    几何意义：力沿坐标轴方向的分量分别对相应位移投影做功，与坐标系选取有关，但积分结果<strong class="highlight">与第一类积分完全相等</strong>。
+                </div>
+            </div>
+            <div class="explain-text" id="dynamicExplain">
+                💡 <strong>当前模式动态解读</strong><br>
+                左侧图形展示了力矢量的分解方式。第一类积分将力投影到<strong class="highlight">切线方向</strong> (红色箭头)，第二类积分将力分解为<strong class="highlight">水平分量 P 和垂直分量 Q</strong> (红/蓝箭头)。<br>
+                两种视角数学上等价，均精确等于变力沿曲线所做的总功，体现了曲线积分的几何与物理统一性。
+            </div>
+        </div>
+    </div>
+    <footer>
+        🖱️ 滚动鼠标滚轮缩放图形 | 按住鼠标拖拽可平移视野 | 拖动下方滑块观察路径上不同位置的力分解 | 两种积分数学上严格相等
+    </footer>
+</div>
+
+<script>
+    (function() {
+        // ---------- 定义曲线 (范围更大 图形饱满) ----------
+        const getPos = (t) => {
+            const theta = Math.PI * t;      // 0 → π
+            const x = 4.2 * Math.cos(theta);
+            const y = 2.8 * Math.sin(theta) + 0.75 * Math.sin(2.6 * theta) + 0.3 * Math.cos(3.4 * theta);
+            return { x, y };
+        };
+        
+        const getDerivative = (t) => {
+            const theta = Math.PI * t;
+            const dtheta_dt = Math.PI;
+            const dx_dtheta = -4.2 * Math.sin(theta);
+            const dy_dtheta = 2.8 * Math.cos(theta) + 0.75 * 2.6 * Math.cos(2.6 * theta) - 0.3 * 3.4 * Math.sin(3.4 * theta);
+            return { dx: dx_dtheta * dtheta_dt, dy: dy_dtheta * dtheta_dt };
+        };
+        
+        // 变力场 F = (P, Q) = ( -y , x + 0.8*sin(2πx) )
+        const forceField = (x, y) => {
+            const P = -y;
+            const Q = x + 0.8 * Math.sin(2 * Math.PI * x);
+            return { P, Q };
+        };
+        
+        // 全局画布与视图
+        let currentT = 0.48;
+        let mode = "first";
+        const canvas = document.getElementById('workCanvas');
+        let ctx = canvas.getContext('2d');
+        let width = 1500, height = 880;
+        
+        // 原始世界坐标范围
+        const WORLD_X_MIN = -5.6;
+        const WORLD_X_MAX = 5.6;
+        const WORLD_Y_MIN = -4.2;
+        const WORLD_Y_MAX = 4.2;
+        
+        // 当前视图
+        let view = {
+            xMin: WORLD_X_MIN,
+            xMax: WORLD_X_MAX,
+            yMin: WORLD_Y_MIN,
+            yMax: WORLD_Y_MAX
+        };
+        
+        // 拖拽平移
+        let isPanning = false;
+        let panStart = { x: 0, y: 0 };
+        let panStartView = { xMin: 0, xMax: 0, yMin: 0, yMax: 0 };
+        
+        function worldToCanvas(x, y) {
+            const sx = (x - view.xMin) / (view.xMax - view.xMin) * width;
+            const sy = height - (y - view.yMin) / (view.yMax - view.yMin) * height;
+            return { x: sx, y: sy };
+        }
+        
+        function canvasToWorld(px, py) {
+            const worldX = view.xMin + (px / width) * (view.xMax - view.xMin);
+            const worldY = view.yMin + ((height - py) / height) * (view.yMax - view.yMin);
+            return { x: worldX, y: worldY };
+        }
+        
+        function resetView() {
+            view.xMin = WORLD_X_MIN;
+            view.xMax = WORLD_X_MAX;
+            view.yMin = WORLD_Y_MIN;
+            view.yMax = WORLD_Y_MAX;
+            drawCanvas();
+            document.getElementById('zoomStatus').innerHTML = "🔍 滚轮缩放 | 鼠标拖拽平移视图 (已重置)";
+        }
+        
+        // 滚轮缩放
+        function handleWheel(e) {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const scaleXCanvas = canvas.width / rect.width;
+            const scaleYCanvas = canvas.height / rect.height;
+            let mouseXCanvas = (e.clientX - rect.left) * scaleXCanvas;
+            let mouseYCanvas = (e.clientY - rect.top) * scaleYCanvas;
+            mouseXCanvas = Math.min(width, Math.max(0, mouseXCanvas));
+            mouseYCanvas = Math.min(height, Math.max(0, mouseYCanvas));
+            
+            const mouseWorld = canvasToWorld(mouseXCanvas, mouseYCanvas);
+            const delta = e.deltaY > 0 ? 1.1 : 0.9;
+            const zoomFactor = delta;
+            
+            let newWidth = (view.xMax - view.xMin) * zoomFactor;
+            let newHeight = (view.yMax - view.yMin) * zoomFactor;
+            if (newWidth < 0.2 || newWidth > 18) return;
+            
+            let newXMin = mouseWorld.x - (mouseWorld.x - view.xMin) * zoomFactor;
+            let newXMax = newXMin + newWidth;
+            let newYMin = mouseWorld.y - (mouseWorld.y - view.yMin) * zoomFactor;
+            let newYMax = newYMin + newHeight;
+            
+            view.xMin = newXMin;
+            view.xMax = newXMax;
+            view.yMin = newYMin;
+            view.yMax = newYMax;
+            
+            drawCanvas();
+            document.getElementById('zoomStatus').innerHTML = `🔍 视图范围 x:[${view.xMin.toFixed(2)},${view.xMax.toFixed(2)}] y:[${view.yMin.toFixed(2)},${view.yMax.toFixed(2)}]`;
+        }
+        
+        // 拖拽平移
+        function onMouseDown(e) {
+            isPanning = true;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            let mouseX = (e.clientX - rect.left) * scaleX;
+            let mouseY = (e.clientY - rect.top) * scaleY;
+            mouseX = Math.min(width, Math.max(0, mouseX));
+            mouseY = Math.min(height, Math.max(0, mouseY));
+            panStart = { x: mouseX, y: mouseY };
+            panStartView = { xMin: view.xMin, xMax: view.xMax, yMin: view.yMin, yMax: view.yMax };
+            canvas.style.cursor = "grabbing";
+        }
+        
+        function onMouseMove(e) {
+            if (!isPanning) return;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            let mouseX = (e.clientX - rect.left) * scaleX;
+            let mouseY = (e.clientY - rect.top) * scaleY;
+            mouseX = Math.min(width, Math.max(0, mouseX));
+            mouseY = Math.min(height, Math.max(0, mouseY));
+            const deltaX = mouseX - panStart.x;
+            const deltaY = mouseY - panStart.y;
+            const panScaleX = (panStartView.xMax - panStartView.xMin) / width;
+            const panScaleY = (panStartView.yMax - panStartView.yMin) / height;
+            view.xMin = panStartView.xMin - deltaX * panScaleX;
+            view.xMax = panStartView.xMax - deltaX * panScaleX;
+            view.yMin = panStartView.yMin + deltaY * panScaleY;
+            view.yMax = panStartView.yMax + deltaY * panScaleY;
+            drawCanvas();
+        }
+        
+        function onMouseUp(e) {
+            isPanning = false;
+            canvas.style.cursor = "grab";
+        }
+        
+        // 绘制超大箭头
+        function drawArrow(ctx, fromX, fromY, toX, toY, color, size=20) {
+            if (Math.hypot(toX - fromX, toY - fromY) < 1) return;
+            const angle = Math.atan2(toY - fromY, toX - fromX);
+            const arrowX = toX;
+            const arrowY = toY;
+            const backX = toX - size * 0.6 * Math.cos(angle);
+            const backY = toY - size * 0.6 * Math.sin(angle);
+            ctx.beginPath();
+            ctx.moveTo(arrowX, arrowY);
+            ctx.lineTo(backX - size * 0.4 * Math.sin(angle), backY + size * 0.4 * Math.cos(angle));
+            ctx.lineTo(backX + size * 0.4 * Math.sin(angle), backY - size * 0.4 * Math.cos(angle));
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+        
+        function drawCanvas() {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, width, height);
+            // 网格
+            ctx.save();
+            ctx.strokeStyle = "#2f6f9f40";
+            ctx.lineWidth = 1;
+            const stepX = (view.xMax - view.xMin) / 14;
+            const stepY = (view.yMax - view.yMin) / 10;
+            for (let x = view.xMin; x <= view.xMax; x += stepX) {
+                let p1 = worldToCanvas(x, view.yMin);
+                let p2 = worldToCanvas(x, view.yMax);
+                ctx.beginPath();
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.stroke();
+            }
+            for (let y = view.yMin; y <= view.yMax; y += stepY) {
+                let p1 = worldToCanvas(view.xMin, y);
+                let p2 = worldToCanvas(view.xMax, y);
+                ctx.beginPath();
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.stroke();
+            }
+            
+            // 曲线路径
+            ctx.beginPath();
+            ctx.strokeStyle = "#4effd0";
+            ctx.lineWidth = 5;
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = "#0ffc";
+            let first = true;
+            for (let i = 0; i <= 600; i++) {
+                let t = i/600;
+                let pos = getPos(t);
+                let canvasPt = worldToCanvas(pos.x, pos.y);
+                if (first) { ctx.moveTo(canvasPt.x, canvasPt.y); first = false; }
+                else ctx.lineTo(canvasPt.x, canvasPt.y);
+            }
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+            
+            // 当前点
+            let pos = getPos(currentT);
+            let deriv = getDerivative(currentT);
+            let speed = Math.hypot(deriv.dx, deriv.dy);
+            let tx = 0, ty = 0;
+            if (speed > 1e-6) { tx = deriv.dx / speed; ty = deriv.dy / speed; }
+            let force = forceField(pos.x, pos.y);
+            let pCanvas = worldToCanvas(pos.x, pos.y);
+            
+            // 动态点 (加大)
+            ctx.beginPath();
+            ctx.arc(pCanvas.x, pCanvas.y, 28, 0, 2*Math.PI);
+            ctx.fillStyle = "#ffdd99cc";
+            ctx.shadowBlur = 28;
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(pCanvas.x, pCanvas.y, 14, 0, 2*Math.PI);
+            ctx.fillStyle = "white";
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            
+            // 力矢量 F
+            let scaleForce = 0.6;
+            let fx_world = force.P * scaleForce;
+            let fy_world = force.Q * scaleForce;
+            let forceEnd = worldToCanvas(pos.x + fx_world, pos.y + fy_world);
+            ctx.beginPath();
+            ctx.moveTo(pCanvas.x, pCanvas.y);
+            ctx.lineTo(forceEnd.x, forceEnd.y);
+            ctx.strokeStyle = "#ffaa66";
+            ctx.lineWidth = 5.5;
+            ctx.stroke();
+            drawArrow(ctx, pCanvas.x, pCanvas.y, forceEnd.x, forceEnd.y, "#ffaa77", 20);
+            
+            // 微元示意 ds
+            let t_next = Math.min(1, currentT + 0.012);
+            let posNext = getPos(t_next);
+            let pNextCanvas = worldToCanvas(posNext.x, posNext.y);
+            ctx.beginPath();
+            ctx.moveTo(pCanvas.x, pCanvas.y);
+            ctx.lineTo(pNextCanvas.x, pNextCanvas.y);
+            ctx.strokeStyle = "#ffffb0";
+            ctx.lineWidth = 4;
+            ctx.setLineDash([6, 8]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // 超大文字标注
+            ctx.font = "bold 26px 'Segoe UI', 'JetBrains Mono'";
+            ctx.fillStyle = "#ffffaa";
+            ctx.fillText("微元 ds", pCanvas.x+32, pCanvas.y-32);
+            if(mode === "second") {
+                ctx.font = "bold 24px monospace";
+                ctx.fillStyle = "#bdf5ff";
+                ctx.fillText("位移微元 (dx, dy)", pCanvas.x+32, pCanvas.y-64);
+            }
+            
+            // 模式核心展示 (超大文字，不显示数值)
+            if (mode === "first") {
+                let F_dot_tau = force.P * tx + force.Q * ty;
+                let proj_len = Math.abs(F_dot_tau) * 0.85;
+                let proj_x_w = tx * (F_dot_tau > 0 ? proj_len : -proj_len);
+                let proj_y_w = ty * (F_dot_tau > 0 ? proj_len : -proj_len);
+                let projEnd = worldToCanvas(pos.x + proj_x_w, pos.y + proj_y_w);
+                ctx.beginPath();
+                ctx.moveTo(pCanvas.x, pCanvas.y);
+                ctx.lineTo(projEnd.x, projEnd.y);
+                ctx.strokeStyle = "#ff4d6d";
+                ctx.lineWidth = 6;
+                ctx.stroke();
+                drawArrow(ctx, pCanvas.x, pCanvas.y, projEnd.x, projEnd.y, "#ff7070", 20);
+                // 切线参考线
+                let tanEnd = worldToCanvas(pos.x + tx * 2.2, pos.y + ty * 2.2);
+                ctx.beginPath();
+                ctx.setLineDash([6, 10]);
+                ctx.moveTo(pCanvas.x, pCanvas.y);
+                ctx.lineTo(tanEnd.x, tanEnd.y);
+                ctx.strokeStyle = "#88aaff";
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.font = "bold 28px 'Segoe UI'";
+                ctx.fillStyle = "#ffbb99";
+                ctx.fillText("切向分力 Fτ", (pCanvas.x+projEnd.x)/2+28, (pCanvas.y+projEnd.y)/2-28);
+                ctx.font = "bold 26px system-ui";
+                ctx.fillStyle = "#caffff";
+                ctx.fillText("第一类积分: ∫ F·τ ds", width-380, 85);
+                ctx.font = "italic 24px 'Segoe UI'";
+                ctx.fillStyle = "#aaffdd";
+                ctx.fillText("沿切向投影 对弧长积分", width-380, 130);
+            } 
+            else {
+                let pCompX = force.P * 0.75;
+                let pCompY = 0;
+                let qCompX = 0;
+                let qCompY = force.Q * 0.75;
+                let pEnd = worldToCanvas(pos.x + pCompX, pos.y + pCompY);
+                let qEnd = worldToCanvas(pos.x + qCompX, pos.y + qCompY);
+                ctx.beginPath();
+                ctx.moveTo(pCanvas.x, pCanvas.y);
+                ctx.lineTo(pEnd.x, pEnd.y);
+                ctx.strokeStyle = "#ff7b6e";
+                ctx.lineWidth = 6;
+                ctx.stroke();
+                drawArrow(ctx, pCanvas.x, pCanvas.y, pEnd.x, pEnd.y, "#ff8a7a", 19);
+                ctx.beginPath();
+                ctx.moveTo(pCanvas.x, pCanvas.y);
+                ctx.lineTo(qEnd.x, qEnd.y);
+                ctx.strokeStyle = "#6ec8ff";
+                ctx.lineWidth = 6;
+                ctx.stroke();
+                drawArrow(ctx, pCanvas.x, pCanvas.y, qEnd.x, qEnd.y, "#6ec8ff", 19);
+                ctx.setLineDash([5, 8]);
+                ctx.beginPath();
+                let forceRefEnd = worldToCanvas(pos.x + force.P*0.75, pos.y + force.Q*0.75);
+                ctx.moveTo(pCanvas.x, pCanvas.y);
+                ctx.lineTo(forceRefEnd.x, forceRefEnd.y);
+                ctx.strokeStyle = "#b0ffb0";
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.font = "bold 26px sans-serif";
+                ctx.fillStyle = "#ffbc8c";
+                ctx.fillText("水平分力 P 贡献 P·dx", (pCanvas.x+pEnd.x)/2+24, (pCanvas.y+pEnd.y)/2-24);
+                ctx.fillText("垂直分力 Q 贡献 Q·dy", (pCanvas.x+qEnd.x)/2-60, (pCanvas.y+qEnd.y)/2-30);
+                ctx.font = "bold 26px system-ui";
+                ctx.fillStyle = "#caf0ff";
+                ctx.fillText("第二类积分: ∫ Pdx+Qdy", width-400, 85);
+                ctx.font = "italic 24px 'Segoe UI'";
+                ctx.fillStyle = "#aaffdd";
+                ctx.fillText("力分解为坐标分量 对位移投影积分", width-430, 130);
+            }
+            
+            // 更新参数显示
+            document.getElementById('tLabel').innerHTML = currentT.toFixed(4);
+            
+            // 动态解读更新
+            const explainDiv = document.getElementById('dynamicExplain');
+            if (mode === "first") {
+                explainDiv.innerHTML = `💡 <strong>当前模式：第一类曲线积分（切向分解）</strong><br>
+                左侧图形中，<span class="highlight">红色粗箭头</span>表示力矢量 <strong>F</strong> 在曲线<span class="highlight">切线方向上的投影分量 F<sub>τ</sub></span>。<br>
+                物理意义：变力沿曲线做功时，只有<span class="highlight">切线方向的分力</span>真正对运动产生贡献，法向分力不做功。<br>
+                第一类积分 W₁ = ∫<sub>C</sub> F·τ ds 将切向分力与弧长微元 ds 相乘并沿整条曲线累加，其结果精确等于变力所做的总功。<br>
+                <strong>特点</strong>：积分与曲线参数化方式无关，直接体现“力沿路径切向的累积效应”。`;
+            } else {
+                explainDiv.innerHTML = `💡 <strong>当前模式：第二类曲线积分（坐标分解）</strong><br>
+                左侧图形中，<span class="highlight">红/蓝箭头</span>分别表示力矢量的水平分量 P 和垂直分量 Q。<br>
+                第二类积分 W₂ = ∫<sub>C</sub> P dx + Q dy 将力分解为坐标方向，分别乘以位移微元 dx 和 dy 后累加。<br>
+                <strong>物理意义</strong>：力在水平方向做的功 P·dx 加上垂直方向做的功 Q·dy，总和等于总功。<br>
+                <strong>关键联系</strong>：两种积分数学上<span class="highlight">完全等价</span>，W₁ = W₂，只是观察和分解问题的视角不同。`;
+            }
+        }
+        
+        // 事件绑定
+        canvas.addEventListener('wheel', handleWheel, { passive: false });
+        canvas.addEventListener('mousedown', onMouseDown);
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+        canvas.addEventListener('dragstart', (e) => e.preventDefault());
+        canvas.style.cursor = "grab";
+        
+        // 触摸支持
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); const touch = e.touches[0]; onMouseDown(touch); });
+        window.addEventListener('touchmove', (e) => { if(isPanning){ e.preventDefault(); const touch = e.touches[0]; onMouseMove(touch); } });
+        window.addEventListener('touchend', (e) => { onMouseUp(e); });
+        
+        // UI 控件
+        const tSlider = document.getElementById('tSlider');
+        const btnFirst = document.getElementById('btnFirst');
+        const btnSecond = document.getElementById('btnSecond');
+        const resetZoomBtn = document.getElementById('resetZoomBtn');
+        
+        tSlider.addEventListener('input', () => {
+            currentT = parseFloat(tSlider.value);
+            drawCanvas();
+        });
+        btnFirst.addEventListener('click', () => {
+            mode = "first";
+            btnFirst.classList.add('active');
+            btnSecond.classList.remove('active');
+            drawCanvas();
+        });
+        btnSecond.addEventListener('click', () => {
+            mode = "second";
+            btnSecond.classList.add('active');
+            btnFirst.classList.remove('active');
+            drawCanvas();
+        });
+        resetZoomBtn.addEventListener('click', () => { resetView(); });
+        
+        canvas.width = 1500; canvas.height = 880;
+        width = 1500; height = 880;
+        resetView();
+        drawCanvas();
+    })();
+</script>
+</body>
+</html>
