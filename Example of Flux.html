@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>高等数学：第二类曲面积分 | 动态通量演示 | 斜截柱体贴合有效底面</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', 'Roboto', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+        }
+        /* 科技感UI面板 */
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(6, 16, 26, 0.85);
+            backdrop-filter: blur(14px);
+            border-radius: 28px;
+            padding: 12px 20px;
+            color: #e0f4ff;
+            border: 1px solid rgba(0, 210, 255, 0.6);
+            box-shadow: 0 8px 22px rgba(0,0,0,0.5);
+            z-index: 20;
+            pointer-events: none;
+            font-size: 15px;
+            max-width: 320px;
+        }
+        .info-panel h1 {
+            margin: 0 0 4px;
+            font-size: 1.35rem;
+            letter-spacing: 1px;
+        }
+        .info-panel p {
+            margin: 0;
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        /* 控制面板 */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(8, 20, 34, 0.92);
+            backdrop-filter: blur(20px);
+            border-radius: 36px;
+            padding: 14px 22px;
+            border: 1px solid rgba(0, 220, 255, 0.65);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 12px;
+            z-index: 25;
+            pointer-events: auto;
+            font-size: 15px;
+            color: #caf0ff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 120px;
+            flex: 1;
+        }
+        .control-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        input {
+            background: rgba(20, 40, 60, 0.95);
+            border: 1px solid #0cf;
+            border-radius: 48px;
+            padding: 8px 12px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.95rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        input[type="range"] {
+            accent-color: #0cf;
+        }
+        .value-display {
+            font-size: 0.85rem;
+            text-align: right;
+            color: #0cf;
+            font-weight: bold;
+        }
+        /* 曲线面板 */
+        .charts-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 10px;
+            border: 1px solid rgba(0, 200, 255, 0.5);
+            z-index: 18;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 42vh;
+            overflow-y: auto;
+        }
+        .chart-card {
+            background: rgba(12, 24, 42, 0.85);
+            border-radius: 18px;
+            padding: 6px 8px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(80, 180, 255, 0.4);
+        }
+        .chart-card canvas {
+            width: 100%;
+            height: auto;
+            background: rgba(0, 0, 0, 0.65);
+            border-radius: 14px;
+            display: block;
+        }
+        .chart-title {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #b8e2ff;
+            text-align: center;
+        }
+        @media (max-width: 850px) {
+            .controls { flex-direction: column; gap: 8px; padding: 12px; bottom: 12px; left: 12px; right: 12px; }
+            .control-group { flex-direction: row; align-items: center; justify-content: space-between; }
+            .control-group label { width: 110px; font-size: 0.85rem; }
+            input { width: 150px; }
+            .charts-container { width: 260px; top: 12px; right: 12px; max-height: 38vh; }
+            .info-panel { top: 12px; left: 12px; padding: 8px 14px; max-width: 260px; }
+            .info-panel h1 { font-size: 1.2rem; }
+        }
+        .note {
+            position: absolute;
+            bottom: 12px;
+            left: 20px;
+            font-size: 11px;
+            color: #bbddff;
+            background: rgba(0,0,0,0.55);
+            padding: 4px 12px;
+            border-radius: 20px;
+            pointer-events: none;
+            z-index: 22;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="info-panel">
+        <h1>⚡ 第二类曲面积分 · 有向通量</h1>
+        <p>Φ = <strong>v·n · A</strong> = |v|·cosθ·(πr²) | 柱体体积 ∝ |通量| | 底面贴合有效投影</p>
+    </div>
+    <div class="controls">
+        <div class="control-group">
+            <label>🚀 流速 |v| <span style="color:#0cf;">(箭头/粒子密度)</span></label>
+            <input type="range" id="speedSlider" min="0" max="2.2" step="0.01" value="1.5">
+            <div class="value-display" id="speedVal">1.50</div>
+        </div>
+        <div class="control-group">
+            <label>🔄 法向夹角 θ (0°~180°) <span style="color:#0cf;">(通量符号)</span></label>
+            <input type="range" id="angleSlider" min="0" max="180" step="1" value="42">
+            <div class="value-display" id="angleVal">42°</div>
+        </div>
+        <div class="control-group">
+            <label>📐 圆面半径 r (面积 A=πr²)</label>
+            <input type="range" id="radiusSlider" min="0.45" max="1.8" step="0.01" value="1.08">
+            <div class="value-display" id="radiusVal">1.08</div>
+        </div>
+        <div class="control-group">
+            <label>📊 实时有向通量 : </label>
+            <div style="font-size:1.35rem; font-weight:bold; color:#ffaa55;" id="fluxValue">0.00</div>
+        </div>
+    </div>
+    <div class="charts-container">
+        <div class="chart-card">
+            <div class="chart-title">📈 通量 Φ 随流速 |v| 变化 (θ, r固定)</div>
+            <canvas id="fluxVsSpeedCanvas" width="500" height="170" style="width:100%; height:auto; aspect-ratio:5/1.7;"></canvas>
+        </div>
+        <div class="chart-card">
+            <div class="chart-title">📉 通量 Φ 随半径 r 变化 (θ, |v|固定)</div>
+            <canvas id="fluxVsRadiusCanvas" width="500" height="170" style="width:100%; height:auto; aspect-ratio:5/1.7;"></canvas>
+        </div>
+        <div class="chart-card">
+            <div class="chart-title">🔄 通量 Φ 随夹角 θ 变化 (|v|, r固定)</div>
+            <canvas id="fluxVsThetaCanvas" width="500" height="170" style="width:100%; height:auto; aspect-ratio:5/1.7;"></canvas>
+        </div>
+    </div>
+    <div class="note">
+        ✨ 圆柱体底面贴合圆形平面，顶面与底面平行（沿流速方向拉伸） | 微粒速度 ∝ |v| | 箭头数量与流速成正比
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+        // --- 初始化场景 ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x030618);
+        scene.fog = new THREE.FogExp2(0x030618, 0.009);
+        
+        const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(4.8, 3.8, 6.0);
+        camera.lookAt(0, 0, 0);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.body.appendChild(renderer.domElement);
+        
+        const labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0px';
+        labelRenderer.domElement.style.left = '0px';
+        labelRenderer.domElement.style.pointerEvents = 'none';
+        document.body.appendChild(labelRenderer.domElement);
+        
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.07;
+        controls.autoRotate = false;
+        controls.enableZoom = true;
+        controls.zoomSpeed = 1.0;
+        controls.target.set(0, 0, 0);
+        
+        // 辅助网格
+        const gridHelper = new THREE.GridHelper(14, 28, 0x33aaff, 0x2266aa);
+        gridHelper.position.y = -1.2;
+        gridHelper.material.transparent = true;
+        gridHelper.material.opacity = 0.3;
+        scene.add(gridHelper);
+        
+        // 灯光系统
+        const ambient = new THREE.AmbientLight(0x1a2a3a);
+        scene.add(ambient);
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        mainLight.position.set(2.5, 4.5, 3);
+        scene.add(mainLight);
+        const fillLight = new THREE.PointLight(0x4488cc, 0.6);
+        fillLight.position.set(1, 2.2, 2);
+        scene.add(fillLight);
+        const rimLight = new THREE.PointLight(0xffaa66, 0.5);
+        rimLight.position.set(-1.2, 1.8, -2.5);
+        scene.add(rimLight);
+        
+        // --- 核心几何体 ---
+        let diskMesh = null;          // 圆形平面
+        let normalArrow = null;       // 法向量箭头
+        let flowCylinder = null;      // 圆柱体（底面贴合平面，顶面平行底面）
+        let velocityArrows = [];      // 流速方向小箭头阵列
+        let movingParticles = [];      // 粒子流
+        let ringBorder = null;
+        
+        const flowDir = new THREE.Vector3(1, 0, 0); // 流速方向固定X轴正向
+        
+        // 清理函数
+        function clearDynamicArrows() {
+            velocityArrows.forEach(arr => scene.remove(arr));
+            velocityArrows = [];
+        }
+        
+        function clearParticles() {
+            movingParticles.forEach(p => scene.remove(p));
+            movingParticles = [];
+        }
+        
+        // 更新箭头密度：箭头大小适中，数量随速度增加
+        function updateVelocityArrowDensity(speed) {
+            clearDynamicArrows();
+            const count = Math.min(68, Math.max(24, Math.floor(20 + speed * 24)));
+            for (let i = 0; i < count; i++) {
+                const x = -1.6 + Math.random() * 4.4;
+                const y = -1.3 + Math.random() * 2.7;
+                const z = -1.9 + Math.random() * 3.8;
+                const arrowLen = 0.38 + speed * 0.2;
+                const arrowColor = 0x66ffdd;
+                const arrowHelper = new THREE.ArrowHelper(flowDir, new THREE.Vector3(x, y, z), arrowLen, arrowColor, 0.2, 0.16);
+                scene.add(arrowHelper);
+                velocityArrows.push(arrowHelper);
+            }
+        }
+        
+        // 粒子系统：数量增加至 750 个，速度与流速成正比
+        function initParticles(speed) {
+            clearParticles();
+            const particleCount = 750;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            for (let i = 0; i < particleCount; i++) {
+                positions[i*3] = -2.8 + Math.random() * 7.2;
+                positions[i*3+1] = -1.5 + Math.random() * 3.0;
+                positions[i*3+2] = -2.0 + Math.random() * 4.0;
+            }
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const particleMat = new THREE.PointsMaterial({ color: 0x88ddff, size: 0.05, transparent: true, opacity: 0.75 });
+            const particleSystem = new THREE.Points(geometry, particleMat);
+            scene.add(particleSystem);
+            movingParticles.push(particleSystem);
+            particleSystem.userData = {
+                stepBase: 0.022,
+                speedFactor: speed,
+                geomRef: geometry,
+                bounds: [-3.0, 4.6]
+            };
+        }
+        
+        function updateParticleSpeed(speed) {
+            if (movingParticles[0]) {
+                movingParticles[0].userData.speedFactor = speed;
+            }
+        }
+        
+        // 核心函数：圆柱体底面始终贴合圆形平面，顶面与底面平行（沿流速方向拉伸）
+        // 圆柱体沿流速方向（X轴）延伸，底面中心位于原点（圆面中心），半径为 effectiveRadius = r * |cosθ|
+        // 圆柱体长度 = |v|，由于流速方向与圆柱体轴向完全一致，底面和顶面自然平行且垂直于流速方向。
+        // 这样圆柱体完全贴合有效投影底面，且没有多余部分。
+        let cachedInfoLabel = null; // 用于实时更新标签内容
+        
+        function updateGeometry(speed, angleDeg, radius) {
+            const angleRad = angleDeg * Math.PI / 180;
+            const cosTheta = Math.cos(angleRad);
+            const area = Math.PI * radius * radius;
+            const signedFlux = speed * area * cosTheta;
+            document.getElementById('fluxValue').innerHTML = signedFlux.toFixed(4);
+            
+            // 法向量方向: 绕Y轴旋转 angleRad
+            const newNormal = new THREE.Vector3(Math.cos(angleRad), 0, Math.sin(angleRad)).normalize();
+            
+            // 更新圆形平面 (有向曲面)
+            if (diskMesh) scene.remove(diskMesh);
+            const circleGeo = new THREE.CircleGeometry(radius, 96);
+            const diskMat = new THREE.MeshPhongMaterial({
+                color: 0x3a8cff,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.78,
+                emissive: 0x004c99,
+                shininess: 70
+            });
+            diskMesh = new THREE.Mesh(circleGeo, diskMat);
+            const quat = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), newNormal);
+            diskMesh.quaternion.copy(quat);
+            diskMesh.position.set(0, 0, 0);
+            scene.add(diskMesh);
+            
+            // 圆形边框
+            if (ringBorder) scene.remove(ringBorder);
+            const torusGeo = new THREE.TorusGeometry(radius, 0.045, 72, 200);
+            const edgeMat = new THREE.MeshStandardMaterial({ color: 0x0cf, emissive: 0x2a8faa });
+            ringBorder = new THREE.Mesh(torusGeo, edgeMat);
+            ringBorder.quaternion.copy(quat);
+            ringBorder.position.set(0, 0, 0);
+            scene.add(ringBorder);
+            
+            // 法向量箭头 (粉色)
+            if (normalArrow) scene.remove(normalArrow);
+            const arrowLenNorm = 1.1 + radius * 0.25;
+            normalArrow = new THREE.ArrowHelper(newNormal, new THREE.Vector3(0, 0, 0), arrowLenNorm, 0xff66cc, 0.55, 0.45);
+            scene.add(normalArrow);
+            
+            // 主流速方向大箭头装饰
+            if (window.mainFlowArrow) scene.remove(window.mainFlowArrow);
+            const mainFlowArr = new THREE.ArrowHelper(flowDir, new THREE.Vector3(-1.8, 1.5, -1.5), 2.5, 0x44ffaa, 0.7, 0.6);
+            scene.add(mainFlowArr);
+            window.mainFlowArrow = mainFlowArr;
+            
+            // ---------- 圆柱体：底面贴合圆形平面，顶面与底面平行，沿流速方向拉伸 ----------
+            if (flowCylinder) scene.remove(flowCylinder);
+            if (window.cylinderWire) scene.remove(window.cylinderWire);
+            
+            const effectiveRadius = radius * Math.abs(cosTheta);
+            const cylinderLen = speed;
+            if (cylinderLen > 0.03 && effectiveRadius > 0.01) {
+                // 圆柱几何体: 沿Y轴默认，旋转至X轴，使圆柱体轴向与流速方向一致
+                const cylGeo = new THREE.CylinderGeometry(effectiveRadius, effectiveRadius, cylinderLen, 64, 32);
+                const cylMat = new THREE.MeshPhongMaterial({
+                    color: 0x44bbff,
+                    emissive: 0x2277aa,
+                    transparent: true,
+                    opacity: 0.88,
+                    side: THREE.DoubleSide
+                });
+                flowCylinder = new THREE.Mesh(cylGeo, cylMat);
+                const cylQuat = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), flowDir);
+                flowCylinder.quaternion.copy(cylQuat);
+                // 圆柱体底面中心位于原点，因此位置在长度的一半处，使得底面中心在原点，顶面中心在 (cylinderLen, 0, 0)
+                flowCylinder.position.set(cylinderLen / 2, 0, 0);
+                scene.add(flowCylinder);
+                
+                // 添加半透线框增强视觉效果，且展示圆柱与底面的贴合
+                const wireGeo = new THREE.CylinderGeometry(effectiveRadius + 0.02, effectiveRadius + 0.02, cylinderLen, 48, 24);
+                const wireMat = new THREE.MeshBasicMaterial({ color: 0x88ddff, wireframe: true, transparent: true, opacity: 0.35 });
+                const wireCyl = new THREE.Mesh(wireGeo, wireMat);
+                wireCyl.quaternion.copy(cylQuat);
+                wireCyl.position.set(cylinderLen / 2, 0, 0);
+                scene.add(wireCyl);
+                window.cylinderWire = wireCyl;
+            } else {
+                flowCylinder = null;
+                if (window.cylinderWire) scene.remove(window.cylinderWire);
+                window.cylinderWire = null;
+            }
+            
+            // 更新箭头与粒子
+            updateVelocityArrowDensity(speed);
+            if (movingParticles.length === 0) {
+                initParticles(speed);
+            } else {
+                updateParticleSpeed(speed);
+            }
+            
+            // 实时更新CSS2D标签内容（通量、有效面积、夹角动态同步）
+            if (cachedInfoLabel) {
+                cachedInfoLabel.element.innerHTML = `⚡ Φ = ${signedFlux.toFixed(4)}<br>📐 A_eff = ${(area * Math.abs(cosTheta)).toFixed(4)}<br>🔄 θ = ${angleDeg}°`;
+                cachedInfoLabel.element.style.border = `2px solid ${signedFlux >= 0 ? '#0ff' : '#f66'}`;
+            } else {
+                const infoDiv = document.createElement('div');
+                infoDiv.style.backgroundColor = 'rgba(0,0,0,0.8)';
+                infoDiv.style.color = '#ffdd99';
+                infoDiv.style.fontSize = '14px';
+                infoDiv.style.fontWeight = 'bold';
+                infoDiv.style.padding = '6px 14px';
+                infoDiv.style.borderRadius = '28px';
+                infoDiv.style.backdropFilter = 'blur(6px)';
+                infoDiv.style.fontFamily = 'monospace';
+                const cssLabel = new CSS2DObject(infoDiv);
+                cssLabel.position.set(0.9, 1.35, 0.9);
+                scene.add(cssLabel);
+                cachedInfoLabel = cssLabel;
+                cachedInfoLabel.element.innerHTML = `⚡ Φ = ${signedFlux.toFixed(4)}<br>📐 A_eff = ${(area * Math.abs(cosTheta)).toFixed(4)}<br>🔄 θ = ${angleDeg}°`;
+                cachedInfoLabel.element.style.border = `2px solid ${signedFlux >= 0 ? '#0ff' : '#f66'}`;
+            }
+        }
+        
+        // ------------------- 曲线绘制 (带完整坐标刻度) -------------------
+        let currentSpeed = 1.5, currentAngle = 42, currentRadius = 1.08;
+        
+        function drawFluxVsSpeed(fixedAngleDeg, fixedRadius) {
+            const canvas = document.getElementById('fluxVsSpeedCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.clientWidth, h = canvas.clientHeight;
+            canvas.width = w; canvas.height = h;
+            ctx.clearRect(0,0,w,h);
+            ctx.fillStyle = '#0a1428';
+            ctx.fillRect(0,0,w,h);
+            const angleRad = fixedAngleDeg * Math.PI/180;
+            const cosTheta = Math.cos(angleRad);
+            const areaFix = Math.PI * fixedRadius * fixedRadius;
+            const maxSpeed = 2.2;
+            const maxAbsFlux = maxSpeed * areaFix * Math.abs(cosTheta);
+            // 网格
+            ctx.strokeStyle = '#2a5a7e';
+            ctx.lineWidth = 0.8;
+            for (let i=0; i<=4; i++) {
+                const x = (i/4)*w;
+                ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
+                const y = (i/4)*h;
+                ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+            }
+            ctx.beginPath(); ctx.strokeStyle='#8acbff'; ctx.lineWidth=1.8;
+            ctx.moveTo(0, h/2); ctx.lineTo(w, h/2);
+            ctx.moveTo(0,0); ctx.lineTo(0,h);
+            ctx.stroke();
+            // 曲线
+            ctx.beginPath();
+            ctx.strokeStyle = '#ffaa66';
+            ctx.lineWidth = 2.8;
+            let first = true;
+            for (let sp = 0; sp <= maxSpeed; sp+=0.03) {
+                const flux = sp * areaFix * cosTheta;
+                const x = (sp / maxSpeed) * w;
+                let y = h/2 - (flux / (maxAbsFlux+0.001)) * (h/2);
+                y = Math.min(h-8, Math.max(8, y));
+                if(first) { ctx.moveTo(x, y); first=false; }
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            const curFlux = currentSpeed * areaFix * cosTheta;
+            const curX = (currentSpeed / maxSpeed) * w;
+            let curY = h/2 - (curFlux / (maxAbsFlux+0.001)) * (h/2);
+            ctx.fillStyle = '#ffaa44';
+            ctx.beginPath();
+            ctx.arc(curX, Math.min(h-7,Math.max(7,curY)), 7, 0, 2*Math.PI);
+            ctx.fill();
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 13px "Segoe UI", monospace';
+            ctx.fillText(`当前 |v| = ${currentSpeed.toFixed(2)}`, curX+10, curY-8);
+            ctx.fillStyle = '#b8e2ff';
+            ctx.font = '11px monospace';
+            for (let v=0; v<=2.2; v+=0.5) {
+                let xpos = (v/maxSpeed)*w;
+                ctx.fillText(v.toFixed(1), xpos-6, h/2+22);
+            }
+            ctx.fillText('流速 |v| →', w-55, h-12);
+            ctx.fillStyle = '#ffaa88';
+            ctx.fillText('通量 Φ', 10, 24);
+        }
+        
+        function drawFluxVsRadius(fixedSpeed, fixedAngleDeg) {
+            const canvas = document.getElementById('fluxVsRadiusCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.clientWidth, h = canvas.clientHeight;
+            canvas.width = w; canvas.height = h;
+            ctx.fillStyle = '#0a1428';
+            ctx.fillRect(0,0,w,h);
+            const angleRad = fixedAngleDeg * Math.PI/180;
+            const cosTheta = Math.cos(angleRad);
+            const maxR = 1.8;
+            const maxFluxAbs = fixedSpeed * Math.PI * maxR * maxR * Math.abs(cosTheta);
+            ctx.strokeStyle = '#2a5a7e';
+            for (let i=0;i<=4;i++) {
+                const x = (i/4)*w;
+                ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
+                const y = (i/4)*h;
+                ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+            }
+            ctx.beginPath(); ctx.strokeStyle='#8acbff'; ctx.lineWidth=1.8;
+            ctx.moveTo(0, h/2); ctx.lineTo(w, h/2);
+            ctx.moveTo(0,0); ctx.lineTo(0,h);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.strokeStyle = '#88ffaa';
+            ctx.lineWidth = 2.8;
+            let first = true;
+            for (let r = 0.2; r <= maxR; r+=0.02) {
+                const flux = fixedSpeed * Math.PI * r * r * cosTheta;
+                const x = ((r-0.2)/(maxR-0.2)) * w;
+                let y = h/2 - (flux / (maxFluxAbs+0.001)) * (h/2);
+                y = Math.min(h-8, Math.max(8, y));
+                if(first) { ctx.moveTo(x, y); first=false; }
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            const curFlux = fixedSpeed * Math.PI * currentRadius * currentRadius * cosTheta;
+            const curX = ((currentRadius-0.2)/(maxR-0.2)) * w;
+            let curY = h/2 - (curFlux / (maxFluxAbs+0.001)) * (h/2);
+            ctx.fillStyle = '#ffaa44';
+            ctx.beginPath();
+            ctx.arc(curX, Math.min(h-7,Math.max(7,curY)), 7, 0, 2*Math.PI);
+            ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 13px monospace';
+            ctx.fillText(`r = ${currentRadius.toFixed(2)}`, curX+8, curY-8);
+            ctx.fillStyle = '#b8e2ff';
+            for (let rv=0.4; rv<=1.8; rv+=0.4) {
+                let xpos = ((rv-0.2)/(maxR-0.2))*w;
+                ctx.fillText(rv.toFixed(1), xpos-6, h/2+22);
+            }
+            ctx.fillText('半径 r →', w-50, h-12);
+            ctx.fillStyle = '#ffaa88';
+            ctx.fillText('通量 Φ', 10, 24);
+        }
+        
+        function drawFluxVsTheta(fixedSpeed, fixedRadius, currentAngleVal) {
+            const canvas = document.getElementById('fluxVsThetaCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.clientWidth, h = canvas.clientHeight;
+            canvas.width = w; canvas.height = h;
+            ctx.fillStyle = '#0a1428';
+            ctx.fillRect(0,0,w,h);
+            const area = Math.PI * fixedRadius * fixedRadius;
+            const maxAbsFlux = fixedSpeed * area;
+            ctx.strokeStyle = '#2a5a7e';
+            for (let i=0;i<=4;i++) {
+                const x = (i/4)*w;
+                ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
+                const y = (i/4)*h;
+                ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+            }
+            ctx.beginPath(); ctx.strokeStyle='#8acbff'; ctx.lineWidth=1.8;
+            ctx.moveTo(0, h/2); ctx.lineTo(w, h/2);
+            ctx.moveTo(0,0); ctx.lineTo(0,h);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.strokeStyle = '#ffaa88';
+            ctx.lineWidth = 2.8;
+            let first = true;
+            for (let ang = 0; ang <= 180; ang+=2) {
+                const rad = ang * Math.PI/180;
+                const flux = fixedSpeed * area * Math.cos(rad);
+                const x = (ang / 180) * w;
+                let y = h/2 - (flux / (maxAbsFlux+0.001)) * (h/2);
+                y = Math.min(h-8, Math.max(8, y));
+                if(first) { ctx.moveTo(x, y); first=false; }
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            const curRad = currentAngleVal * Math.PI/180;
+            const curFlux = fixedSpeed * area * Math.cos(curRad);
+            const curX = (currentAngleVal / 180) * w;
+            let curY = h/2 - (curFlux / (maxAbsFlux+0.001)) * (h/2);
+            ctx.fillStyle = '#ff7777';
+            ctx.beginPath();
+            ctx.arc(curX, Math.min(h-7,Math.max(7,curY)), 7, 0, 2*Math.PI);
+            ctx.fill();
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 13px monospace';
+            ctx.fillText(`θ = ${currentAngleVal}°`, curX+8, curY-8);
+            for (let a=0; a<=180; a+=45) {
+                let xpos = (a/180)*w;
+                ctx.fillStyle = '#b8e2ff';
+                ctx.fillText(a+"°", xpos-8, h/2+24);
+            }
+            ctx.fillText('夹角 θ →', w-55, h-12);
+            ctx.fillStyle = '#ffaa88';
+            ctx.fillText('通量 Φ', 10, 24);
+        }
+        
+        function drawAllCurves() {
+            drawFluxVsSpeed(currentAngle, currentRadius);
+            drawFluxVsRadius(currentSpeed, currentAngle);
+            drawFluxVsTheta(currentSpeed, currentRadius, currentAngle);
+        }
+        
+        // 粒子动画 (速度正比于流速)
+        function animateParticles() {
+            if (movingParticles.length && movingParticles[0]) {
+                const pts = movingParticles[0];
+                const geom = pts.userData.geomRef;
+                if (!geom) return;
+                const positions = geom.attributes.position.array;
+                const count = positions.length / 3;
+                const speedFactor = pts.userData.speedFactor || 0.8;
+                const step = 0.028 * speedFactor;
+                for (let i = 0; i < count; i++) {
+                    let x = positions[i*3];
+                    x += step;
+                    if (x > 4.6) x = -3.0;
+                    positions[i*3] = x;
+                }
+                geom.attributes.position.needsUpdate = true;
+            }
+            if (velocityArrows.length) {
+                const time = Date.now() * 0.005;
+                velocityArrows.forEach((arr, idx) => {
+                    if (arr.line) arr.line.material.color.setHex(0x66ffdd + (Math.sin(time+idx)*0x111111));
+                });
+            }
+        }
+        
+        // UI 监听
+        const speedSlider = document.getElementById('speedSlider');
+        const angleSlider = document.getElementById('angleSlider');
+        const radiusSlider = document.getElementById('radiusSlider');
+        const speedVal = document.getElementById('speedVal');
+        const angleVal = document.getElementById('angleVal');
+        const radiusVal = document.getElementById('radiusVal');
+        
+        function refresh() {
+            currentSpeed = parseFloat(speedSlider.value);
+            currentAngle = parseFloat(angleSlider.value);
+            currentRadius = parseFloat(radiusSlider.value);
+            speedVal.innerText = currentSpeed.toFixed(2);
+            angleVal.innerText = currentAngle + "°";
+            radiusVal.innerText = currentRadius.toFixed(2);
+            updateGeometry(currentSpeed, currentAngle, currentRadius);
+            drawAllCurves();
+        }
+        
+        speedSlider.addEventListener('input', refresh);
+        angleSlider.addEventListener('input', refresh);
+        radiusSlider.addEventListener('input', refresh);
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
+            drawAllCurves();
+        });
+        
+        function renderLoop() {
+            animateParticles();
+            controls.update();
+            renderer.render(scene, camera);
+            labelRenderer.render(scene, camera);
+            requestAnimationFrame(renderLoop);
+        }
+        
+        refresh();
+        renderLoop();
+        
+        // 添加快捷标识文字
+        const dirLabelDiv = document.createElement('div');
+        dirLabelDiv.textContent = '→ 流速方向 X  | 圆柱体底面贴合平面，顶面平行底面';
+        dirLabelDiv.style.color = '#acf';
+        dirLabelDiv.style.fontSize = '11px';
+        dirLabelDiv.style.background = 'rgba(0,0,0,0.6)';
+        dirLabelDiv.style.padding = '4px 12px';
+        dirLabelDiv.style.borderRadius = '28px';
+        dirLabelDiv.style.border = '1px solid #0cf';
+        const dirLabelCSS = new CSS2DObject(dirLabelDiv);
+        dirLabelCSS.position.set(2.6, 2.2, -1.8);
+        scene.add(dirLabelCSS);
+    </script>
+</body>
+</html>
