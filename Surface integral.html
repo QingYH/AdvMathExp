@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>详解读 · 曲面积分通量 | 动态曲面参数 + 连续水流 (内→外正向通量)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: radial-gradient(circle at 10% 20%, #021a2a, #000000);
+            font-family: 'Inter', 'Segoe UI', 'Poppins', system-ui, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .dashboard {
+            max-width: 1600px;
+            width: 100%;
+            background: rgba(8, 18, 32, 0.65);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            border: 1px solid rgba(0, 200, 255, 0.45);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            padding: 1.2rem;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 0.8rem;
+        }
+        .header h1 {
+            font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #6bc8ff, #00aaff, #0077ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .sub {
+            color: #b0e2ff;
+            font-size: 0.9rem;
+        }
+        .relation-box {
+            background: rgba(0,30,50,0.8);
+            margin: 8px auto 0;
+            padding: 6px 18px;
+            border-radius: 40px;
+            display: inline-block;
+            font-size: 0.85rem;
+            font-family: monospace;
+            color: #d4f0ff;
+            border: 1px solid #0ff8;
+        }
+        .graphics-module {
+            margin: 0.8rem 0;
+            background: rgba(0,0,0,0.3);
+            border-radius: 1.5rem;
+            padding: 0.5rem;
+            border: 1px solid rgba(0,255,255,0.35);
+            position: relative;
+        }
+        .canvas-container {
+            width: 100%;
+            background: #010a1a;
+            border-radius: 1rem;
+            overflow: hidden;
+            position: relative;
+            min-height: 500px;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: #010a1a;
+            cursor: default;
+        }
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-bottom: 6px;
+            padding: 0 4px;
+        }
+        .tool-btn {
+            background: #0a1a2ecc;
+            border: 1px solid #0ff;
+            color: #0ff;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .status-text {
+            font-size: 0.7rem;
+            color: #c6ffea;
+            background: #00000080;
+            padding: 4px 12px;
+            border-radius: 30px;
+            margin-right: auto;
+        }
+        .control-sidebar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        .controls-panel, .integral-panel {
+            background: rgba(2,12,28,0.7);
+            border-radius: 1.2rem;
+            padding: 0.8rem;
+            backdrop-filter: blur(8px);
+            border: 1px solid #2f8fcf;
+        }
+        .controls-panel { flex: 1.3; min-width: 280px; }
+        .integral-panel { flex: 1.7; min-width: 300px; }
+        .param-group {
+            background: #0e1a2ecc;
+            padding: 8px 12px;
+            border-radius: 40px;
+            margin-bottom: 12px;
+        }
+        .param-group label {
+            display: flex;
+            justify-content: space-between;
+            color: #caf0ff;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            background: #2a5f8a;
+            border-radius: 10px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            width: 18px;
+            height: 18px;
+            background: #0ff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 8px cyan;
+            border: 2px solid white;
+        }
+        .mode-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 12px 0 6px;
+        }
+        .mode-btn {
+            flex: 1;
+            background: transparent;
+            border: 1.5px solid #2f8fbf;
+            color: #daf5ff;
+            padding: 8px 0;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-align: center;
+        }
+        .mode-btn.active {
+            background: #0ff22a20;
+            border-color: #0ff;
+            color: #0ff;
+            box-shadow: 0 0 6px #0ff6;
+        }
+        .concept-card {
+            background: #02112aee;
+            border-radius: 18px;
+            padding: 12px;
+            border-left: 4px solid #0ff;
+            margin-bottom: 14px;
+        }
+        .concept-card .title {
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            color: #8bcbff;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .concept-card .content {
+            font-size: 0.85rem;
+            line-height: 1.45;
+            color: #e0f0ff;
+        }
+        .explain-text {
+            font-size: 0.85rem;
+            line-height: 1.45;
+            color: #f0f8ff;
+            padding: 12px;
+            background: #00000080;
+            border-radius: 18px;
+            border-left: 3px solid #0ff;
+            margin-top: 8px;
+        }
+        .legend-panel {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            padding: 8px 14px;
+            border: 1px solid rgba(0,255,255,0.7);
+            z-index: 10;
+            pointer-events: none;
+            font-size: 0.7rem;
+        }
+        .legend-panel h4 {
+            color: #0ff;
+            font-size: 0.75rem;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            color: #eee;
+        }
+        .legend-color {
+            width: 20px;
+            height: 10px;
+            border-radius: 4px;
+        }
+        footer {
+            margin-top: 0.8rem;
+            text-align: center;
+            font-size: 0.65rem;
+            color: #8dafcf;
+        }
+        .math-highlight {
+            color: #ffdd88;
+            font-family: monospace;
+            background: #00000040;
+            padding: 0 4px;
+            border-radius: 8px;
+        }
+        @media (max-width: 800px) {
+            .legend-panel { bottom: 8px; right: 8px; padding: 5px 10px; }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <div class="header">
+        <h1>💧 曲面积分与通量 · 不可压缩流体连续穿透曲面</h1>
+        <div class="sub">第一类（法向通量）vs 第二类（坐标投影）— 数学等价 | 物理内涵详细解读</div>
+        <div class="relation-box">🔗 流量 Φ = ∬<sub>S</sub> <strong>v·n</strong> dS = ∬<sub>S</sub> <strong>P dy dz + Q dz dx + R dx dy</strong></div>
+    </div>
+
+    <div class="graphics-module" style="position: relative;">
+        <div class="toolbar">
+            <span class="status-text">💧 恒定速度场方向与曲面外法向一致 → v·n > 0 (正向通量) | 粒子连续穿透</span>
+            <button id="resetAllBtn" class="tool-btn">⟳ 重置所有参数</button>
+            <button id="resetCameraBtn" class="tool-btn">📷 重置相机视角</button>
+        </div>
+        <div class="canvas-container">
+            <canvas id="flowCanvas" width="1200" height="680" style="width:100%; height:auto; aspect-ratio:1200/680"></canvas>
+        </div>
+        <div class="legend-panel">
+            <h4>📖 视觉图例</h4>
+            <div class="legend-item"><span class="legend-color" style="background: #33ccff;"></span> 💧 连续水流粒子（内→外）</div>
+            <div class="legend-item"><span class="legend-color" style="background: #ffaa44;"></span> 🌊 速度矢量 v</div>
+            <div class="legend-item"><span class="legend-color" style="background: #ff3366;"></span> 🔴 外法向量 n</div>
+            <div class="legend-item"><span class="legend-color" style="background: #88ffaa;"></span> ✅ 法向分量 (v·n)n</div>
+        </div>
+    </div>
+
+    <div class="control-sidebar">
+        <div class="controls-panel">
+            <div class="param-group">
+                <label>🌊 流速 X 分量 <span id="vxVal">-2.50</span></label>
+                <input type="range" id="vxSlider" min="-4" max="4" step="0.1" value="-2.5">
+            </div>
+            <div class="param-group">
+                <label>🌊 流速 Y 分量 <span id="vyVal">0.50</span></label>
+                <input type="range" id="vySlider" min="-3" max="3" step="0.1" value="0.5">
+            </div>
+            <div class="param-group">
+                <label>🌊 流速 Z 分量 <span id="vzVal">1.80</span></label>
+                <input type="range" id="vzSlider" min="-2" max="5" step="0.1" value="1.8">
+            </div>
+            <div class="param-group">
+                <label>⚡ 流速全局倍数 <span id="speedScaleVal">1.00</span></label>
+                <input type="range" id="speedScale" min="0.3" max="2.5" step="0.05" value="1.0">
+            </div>
+            <div class="param-group">
+                <label>📍 曲面平移 X/Y/Z <span id="posXVal">0.00</span> , <span id="posYVal">0.00</span> , <span id="posZVal">0.00</span></label>
+                <input type="range" id="posXSlider" min="-3" max="3" step="0.05" value="0" style="margin-bottom: 4px;">
+                <input type="range" id="posYSlider" min="-3" max="3" step="0.05" value="0" style="margin-bottom: 4px;">
+                <input type="range" id="posZSlider" min="-2" max="3" step="0.05" value="0">
+            </div>
+            <div class="param-group">
+                <label>🔄 旋转 (绕Y/X轴) <span id="rotYVal">0°</span> , <span id="rotXVal">0°</span></label>
+                <input type="range" id="rotYSlider" min="-180" max="180" step="5" value="0" style="margin-bottom: 4px;">
+                <input type="range" id="rotXSlider" min="-180" max="180" step="5" value="0">
+            </div>
+            <div class="param-group">
+                <label>📐 曲面拉伸 a (x²系数) <span id="aVal">0.35</span></label>
+                <input type="range" id="aSlider" min="0.15" max="0.8" step="0.01" value="0.35">
+            </div>
+            <div class="param-group">
+                <label>📐 曲面拉伸 b (y²系数) <span id="bVal">0.45</span></label>
+                <input type="range" id="bSlider" min="0.2" max="0.9" step="0.01" value="0.45">
+            </div>
+            <div class="param-group">
+                <label>📐 曲面高度 c (常数项) <span id="cVal">3.6</span></label>
+                <input type="range" id="cSlider" min="2.0" max="5.0" step="0.05" value="3.6">
+            </div>
+            <div class="param-group">
+                <label>📍 观测点 (u,v) &nbsp; <span id="uvLabel">u=0.50, v=0.50</span></label>
+                <input type="range" id="uSlider" min="0" max="1" step="0.01" value="0.50">
+                <input type="range" id="vSlider" min="0" max="1" step="0.01" value="0.50" style="margin-top: 6px;">
+            </div>
+            <div class="mode-buttons">
+                <button id="btnFirst" class="mode-btn active">📐 第一类 · 法向通量视角</button>
+                <button id="btnSecond" class="mode-btn">🔄 第二类 · 坐标投影视角</button>
+            </div>
+        </div>
+        <div class="integral-panel">
+            <div class="concept-card">
+                <div class="title">📖 第一类曲面积分 (对面积 · 法向通量)</div>
+                <div class="content">
+                    <strong>Φ₁ = ∬<sub>S</sub> v·n dS</strong> <br>
+                    物理意义：速度矢量 <strong>v</strong> 在曲面单位外法向量 <strong>n</strong> 上的投影，乘以面积微元 dS 后在整个曲面积分。<br>
+                    几何直观：<strong>v·n</strong> 表示流体垂直于曲面微元的“穿透速度”。积分结果即为单位时间内从曲面内侧流向外侧的流体体积——<span class="math-highlight">正向通量（净流出）</span>。该表达式与坐标选取无关，直接刻画了流量大小。
+                </div>
+            </div>
+            <div class="concept-card">
+                <div class="title">📖 第二类曲面积分 (对坐标 · 投影分解)</div>
+                <div class="content">
+                    <strong>Φ₂ = ∬<sub>S</sub> P dy dz + Q dz dx + R dx dy</strong><br>
+                    将速度场分解到三个坐标平面：<strong>P dy dz</strong> 表示速度的 x 分量在 yz 平面上的投影通量，类似地 Q dz dx 和 R dx dy 对应 y 和 z 方向。<br>
+                    通过有向投影将曲面流量分解为三个坐标方向的贡献之和。数学上 <span class="math-highlight">Φ₂ = Φ₁</span>，两种积分完全等价，但第二类更利于在特定坐标系下计算。
+                </div>
+            </div>
+            <div class="explain-text" id="dynamicExplain">
+                💡 <strong>当前模式动态详解</strong><br>
+                速度场方向与曲面外法向大体一致，<strong>v·n > 0</strong>，表示流体从曲面内侧穿透并流向外侧，形成正向通量。<br>
+                右侧滑块可任意调节曲面形状、位置、旋转以及速度分量，所有矢量箭头自动适配。下方显示当前观测点处的法向通量数值。
+            </div>
+            <div style="font-size:0.75rem; background:#07182a; border-radius:20px; padding:8px; margin-top:8px; text-align:center; color:#bbf0ff;">
+                🧭 当前观测点法向通量 <strong id="fluxValue" style="color:#88ffaa;">0.000</strong> &nbsp; (v·n) &nbsp; 正值 = 内向外流出
+            </div>
+        </div>
+    </div>
+    <footer>💧 详细解读：第一类积分体现法向穿透率，第二类积分等价于坐标投影累加 | 粒子连续流动模拟不可压缩流体 | 所有参数可调，矢量实时更新</footer>
+</div>
+
+<script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+        }
+    }
+</script>
+
+<script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+    // ---------- 可变曲面参数 z = C - A*x² - B*y² ----------
+    let shapeParams = { A: 0.35, B: 0.45, C: 3.6 };
+    
+    const getSurfacePointLocal = (u, v) => {
+        let x = -3.0 + u * 6.0;
+        let y = -2.2 + v * 4.4;
+        let z = shapeParams.C - shapeParams.A * x * x - shapeParams.B * y * y;
+        if (z < 0) z = 0;
+        return { x, y, z };
+    };
+    
+    const getNormalLocal = (x, y, z) => {
+        if (z <= 0.01) return new THREE.Vector3(0, 0, 1);
+        let nx = 2 * shapeParams.A * x;
+        let ny = 2 * shapeParams.B * y;
+        let nz = 1;
+        let len = Math.hypot(nx, ny, nz);
+        if (len < 1e-6) return new THREE.Vector3(0, 0, 1);
+        return new THREE.Vector3(nx/len, ny/len, nz/len);
+    };
+    
+    let velocityComponents = { vx: -2.5, vy: 0.5, vz: 1.8 };
+    let speedScale = 1.0;
+    const getVelocityField = () => ({ 
+        P: velocityComponents.vx * speedScale, 
+        Q: velocityComponents.vy * speedScale, 
+        R: velocityComponents.vz * speedScale 
+    });
+    
+    // 场景
+    const canvas = document.getElementById('flowCanvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: false, antialias: true });
+    const labelRenderer = new CSS2DRenderer();
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x010a1a);
+    scene.fog = new THREE.FogExp2(0x010a1a, 0.005);
+    
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+    camera.position.set(7.0, 5.5, 8.5);
+    camera.lookAt(0, 0, 1.5);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
+    controls.rotateSpeed = 1.2;
+    controls.zoomSpeed = 1.2;
+    controls.target.set(0, 0, 1.5);
+    
+    // 灯光
+    const ambientLight = new THREE.AmbientLight(0x224466);
+    scene.add(ambientLight);
+    const mainLight = new THREE.DirectionalLight(0xffffff, 1.0);
+    mainLight.position.set(3, 5, 2);
+    scene.add(mainLight);
+    const backLight = new THREE.PointLight(0x2288ff, 0.5);
+    backLight.position.set(-2, 1, 3);
+    scene.add(backLight);
+    const fillLight = new THREE.PointLight(0x44aaff, 0.4);
+    fillLight.position.set(1, 2, 2);
+    scene.add(fillLight);
+    const gridHelper = new THREE.GridHelper(12, 20, 0x3399ff, 0x2266aa);
+    gridHelper.position.y = -1.2;
+    gridHelper.material.transparent = true;
+    gridHelper.material.opacity = 0.3;
+    scene.add(gridHelper);
+    
+    // 曲面组
+    const surfaceGroup = new THREE.Group();
+    scene.add(surfaceGroup);
+    let currentMesh = null, currentWire = null, pointMarker = null, tangentPlaneHelper = null;
+    let velocityArrow = null, normalArrow = null, projArrows = [];
+    let currentU = 0.5, currentV = 0.5, currentMode = "first";
+    
+    function rebuildSurfaceMesh() {
+        if (currentMesh) surfaceGroup.remove(currentMesh);
+        if (currentWire) surfaceGroup.remove(currentWire);
+        const uSeg = 64, vSeg = 64;
+        const vertices = [], indices = [], normalsArray = [];
+        for (let i = 0; i <= uSeg; i++) {
+            const u = i / uSeg;
+            for (let j = 0; j <= vSeg; j++) {
+                const v = j / vSeg;
+                const p = getSurfacePointLocal(u, v);
+                vertices.push(p.x, p.y, p.z);
+                const n = getNormalLocal(p.x, p.y, p.z);
+                normalsArray.push(n.x, n.y, n.z);
+            }
+        }
+        for (let i = 0; i < uSeg; i++) {
+            for (let j = 0; j < vSeg; j++) {
+                const a = i * (vSeg+1) + j;
+                const b = i * (vSeg+1) + j + 1;
+                const c = (i+1) * (vSeg+1) + j;
+                const d = (i+1) * (vSeg+1) + j + 1;
+                indices.push(a, b, c);
+                indices.push(b, d, c);
+            }
+        }
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
+        geometry.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(normalsArray), 3));
+        geometry.setIndex(indices);
+        const material = new THREE.MeshPhongMaterial({ color: 0x3a8cdf, side: THREE.DoubleSide, emissive: 0x002a55, transparent: true, opacity: 0.55, shininess: 85 });
+        const mesh = new THREE.Mesh(geometry, material);
+        surfaceGroup.add(mesh);
+        currentMesh = mesh;
+        const edgesGeo = new THREE.EdgesGeometry(geometry);
+        const edgesMat = new THREE.LineBasicMaterial({ color: 0x4effd0 });
+        const wire = new THREE.LineSegments(edgesGeo, edgesMat);
+        surfaceGroup.add(wire);
+        currentWire = wire;
+        if (pointMarker) surfaceGroup.remove(pointMarker);
+        const sphereGeo = new THREE.SphereGeometry(0.1, 24, 24);
+        const sphereMat = new THREE.MeshStandardMaterial({ color: 0xffaa66, emissive: 0x552200 });
+        pointMarker = new THREE.Mesh(sphereGeo, sphereMat);
+        surfaceGroup.add(pointMarker);
+        updatePointAndVectors();
+    }
+    
+    function updateTangentPlane(posLocal, normalLocal) {
+        if (tangentPlaneHelper) surfaceGroup.remove(tangentPlaneHelper);
+        const up = new THREE.Vector3(0, 0, 1);
+        const quat = new THREE.Quaternion().setFromUnitVectors(up, normalLocal.clone().normalize());
+        const planeGeo = new THREE.PlaneGeometry(0.7, 0.7);
+        const planeMat = new THREE.MeshPhongMaterial({ color: 0xff66cc, side: THREE.DoubleSide, transparent: true, opacity: 0.3 });
+        const plane = new THREE.Mesh(planeGeo, planeMat);
+        plane.position.copy(posLocal);
+        plane.quaternion.copy(quat);
+        surfaceGroup.add(plane);
+        tangentPlaneHelper = plane;
+    }
+    
+    function updatePointAndVectors() {
+        const posLocal = getSurfacePointLocal(currentU, currentV);
+        const pointVecLocal = new THREE.Vector3(posLocal.x, posLocal.y, posLocal.z);
+        if (pointMarker) pointMarker.position.copy(pointVecLocal);
+        const normalLocal = getNormalLocal(posLocal.x, posLocal.y, posLocal.z);
+        updateTangentPlane(pointVecLocal, normalLocal);
+        const worldNormal = normalLocal.clone().applyQuaternion(surfaceGroup.quaternion);
+        const vel = getVelocityField();
+        const velVecWorld = new THREE.Vector3(vel.P, vel.Q, vel.R);
+        const invQuat = surfaceGroup.quaternion.clone().conjugate();
+        const velVecLocal = velVecWorld.clone().applyQuaternion(invQuat);
+        if (velocityArrow) surfaceGroup.remove(velocityArrow);
+        if (normalArrow) surfaceGroup.remove(normalArrow);
+        projArrows.forEach(a => surfaceGroup.remove(a));
+        projArrows = [];
+        const velLen = Math.min(velVecLocal.length(), 1.5);
+        if (velLen > 0.05) velocityArrow = new THREE.ArrowHelper(velVecLocal.clone().normalize(), pointVecLocal, velLen, 0xffaa44, 0.55, 0.3);
+        if (velocityArrow) surfaceGroup.add(velocityArrow);
+        normalArrow = new THREE.ArrowHelper(normalLocal, pointVecLocal, 0.95, 0xff3366, 0.55, 0.3);
+        surfaceGroup.add(normalArrow);
+        const vn_scalar = velVecWorld.dot(worldNormal);
+        document.getElementById('fluxValue').innerHTML = vn_scalar.toFixed(4);
+        if (currentMode === "first") {
+            const vnVecWorld = worldNormal.clone().multiplyScalar(vn_scalar);
+            const vnVecLocal = vnVecWorld.clone().applyQuaternion(invQuat);
+            const lenNorm = Math.min(vnVecLocal.length(), 1.2);
+            if (lenNorm > 0.05) {
+                const dirNorm = vnVecLocal.clone().normalize();
+                const vnArrow = new THREE.ArrowHelper(dirNorm, pointVecLocal, lenNorm, 0x88ffaa, 0.5, 0.26);
+                surfaceGroup.add(vnArrow);
+                projArrows.push(vnArrow);
+            }
+            document.getElementById('dynamicExplain').innerHTML = `💡 <strong>当前模式：第一类曲面积分 · 法向通量</strong><br>
+            🌊 速度矢量 v = (${vel.P.toFixed(2)}, ${vel.Q.toFixed(2)}, ${vel.R.toFixed(2)})<br>
+            🔴 曲面单位外法向量 n （垂直于曲面，指向外侧）<br>
+            ✅ 法向分量 <strong>v·n = ${vn_scalar.toFixed(4)}</strong> （正值表示流体从曲面内侧穿透流向外侧）<br>
+            📐 第一类积分 Φ₁ = ∬<sub>S</sub> v·n dS 将每个微元上的法向穿透速度乘以面积微元后累加，得到单位时间总流量。<br>
+            <span class="math-highlight">物理意义：净流出通量（内→外）</span>，与坐标系选择无关。右侧粉色箭头即为 (v·n)·n 方向分量。`;
+        } else {
+            document.getElementById('dynamicExplain').innerHTML = `💡 <strong>当前模式：第二类曲面积分 · 坐标投影分解</strong><br>
+            🌊 速度 v = (${vel.P.toFixed(2)}, ${vel.Q.toFixed(2)}, ${vel.R.toFixed(2)})<br>
+            🧭 第二类积分 Φ₂ = ∬<sub>S</sub> P dy dz + Q dz dx + R dx dy <br>
+            将速度投影到三个坐标平面：<strong>P dy dz</strong> 表示 x 方向速度在 yz 平面上的有向面积通量，<strong>Q dz dx</strong> 和 <strong>R dx dy</strong> 同理。<br>
+            数学上 <strong>Φ₂ = Φ₁</strong>，两种积分完全等价。当前观测点处 v·n = <span style="color:#88ffaa;">${vn_scalar.toFixed(4)}</span> ，与第二类积分局部值一致。<br>
+            彩色箭头展示了速度的三个坐标分量（橙/绿/蓝），它们共同贡献于总通量。`;
+        }
+        document.getElementById('uvLabel').innerHTML = `u=${currentU.toFixed(2)}, v=${currentV.toFixed(2)} | 法向通量 v·n = ${vn_scalar.toFixed(4)}`;
+    }
+    
+    // 粒子系统
+    const PARTICLE_COUNT = 7000;
+    const particlePositions = [];
+    for (let i = 0; i < PARTICLE_COUNT; i++) particlePositions.push(new THREE.Vector3(1.5 + Math.random() * 5.5, (Math.random() - 0.5) * 5, Math.random() * 5));
+    const particleGeometry = new THREE.BufferGeometry();
+    const particleMaterial = new THREE.PointsMaterial({ color: 0x44ccff, size: 0.045, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending });
+    const particleSystem = new THREE.Points(particleGeometry, particleMaterial);
+    scene.add(particleSystem);
+    const coreCount = 2500, corePositions = [];
+    for (let i = 0; i < coreCount; i++) corePositions.push(new THREE.Vector3(1.0 + Math.random() * 6, (Math.random() - 0.5) * 4.5, Math.random() * 5));
+    const coreGeo = new THREE.BufferGeometry();
+    const coreMat = new THREE.PointsMaterial({ color: 0xaaffff, size: 0.055, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending });
+    const coreSystem = new THREE.Points(coreGeo, coreMat);
+    scene.add(coreSystem);
+    const trailCount = 3000, trailPositions = [];
+    for (let i = 0; i < trailCount; i++) trailPositions.push(new THREE.Vector3(1.8 + Math.random() * 5, (Math.random() - 0.5) * 5, Math.random() * 5.2));
+    const trailGeo = new THREE.BufferGeometry();
+    const trailMat = new THREE.PointsMaterial({ color: 0x88ddff, size: 0.032, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending });
+    const trailSystem = new THREE.Points(trailGeo, trailMat);
+    scene.add(trailSystem);
+    
+    function updateParticles(deltaTime) {
+        const vel = getVelocityField();
+        const baseSpeed = 2.6;
+        const updateArray = (arr, count, factor) => {
+            for (let i = 0; i < count; i++) {
+                const p = arr[i];
+                p.x += vel.P * deltaTime * baseSpeed * factor;
+                p.y += vel.Q * deltaTime * baseSpeed * factor;
+                p.z += vel.R * deltaTime * baseSpeed * factor;
+                if (p.x < -4.5) p.x = 5.5;
+                if (p.x > 6.5) p.x = -4;
+                if (Math.abs(p.y) > 4.5) p.y = (Math.random() - 0.5) * 4.5;
+                if (p.z > 5.5) p.z = 0.2;
+                if (p.z < 0) p.z = 5.2;
+            }
+        };
+        updateArray(particlePositions, PARTICLE_COUNT, 1.0);
+        updateArray(corePositions, coreCount, 1.05);
+        updateArray(trailPositions, trailCount, 0.88);
+        const setPos = (geom, arr, cnt) => {
+            const buf = new Float32Array(cnt * 3);
+            for (let i = 0; i < cnt; i++) { buf[i*3]=arr[i].x; buf[i*3+1]=arr[i].y; buf[i*3+2]=arr[i].z; }
+            geom.setAttribute('position', new THREE.BufferAttribute(buf, 3));
+        };
+        setPos(particleGeometry, particlePositions, PARTICLE_COUNT);
+        setPos(coreGeo, corePositions, coreCount);
+        setPos(trailGeo, trailPositions, trailCount);
+    }
+    
+    // 控件绑定
+    const bindSlider = (id, callback) => { document.getElementById(id).addEventListener('input', callback); };
+    bindSlider('vxSlider', () => { velocityComponents.vx = parseFloat(vxSlider.value); vxVal.innerText = velocityComponents.vx.toFixed(2); updatePointAndVectors(); });
+    bindSlider('vySlider', () => { velocityComponents.vy = parseFloat(vySlider.value); vyVal.innerText = velocityComponents.vy.toFixed(2); updatePointAndVectors(); });
+    bindSlider('vzSlider', () => { velocityComponents.vz = parseFloat(vzSlider.value); vzVal.innerText = velocityComponents.vz.toFixed(2); updatePointAndVectors(); });
+    bindSlider('speedScale', () => { speedScale = parseFloat(speedScaleSlider.value); speedScaleVal.innerText = speedScale.toFixed(2); updatePointAndVectors(); });
+    const updatePos = () => { surfaceGroup.position.set(parseFloat(posXSlider.value), parseFloat(posYSlider.value), parseFloat(posZSlider.value)); posXVal.innerText = parseFloat(posXSlider.value).toFixed(2); posYVal.innerText = parseFloat(posYSlider.value).toFixed(2); posZVal.innerText = parseFloat(posZSlider.value).toFixed(2); updatePointAndVectors(); };
+    bindSlider('posXSlider', updatePos); bindSlider('posYSlider', updatePos); bindSlider('posZSlider', updatePos);
+    const updateRot = () => { surfaceGroup.rotation.order = 'XYZ'; surfaceGroup.rotation.x = parseFloat(rotXSlider.value) * Math.PI/180; surfaceGroup.rotation.y = parseFloat(rotYSlider.value) * Math.PI/180; rotYVal.innerText = rotYSlider.value + "°"; rotXVal.innerText = rotXSlider.value + "°"; updatePointAndVectors(); };
+    bindSlider('rotYSlider', updateRot); bindSlider('rotXSlider', updateRot);
+    const updateShapeParams = () => { shapeParams.A = parseFloat(aSlider.value); shapeParams.B = parseFloat(bSlider.value); shapeParams.C = parseFloat(cSlider.value); aVal.innerText = shapeParams.A.toFixed(2); bVal.innerText = shapeParams.B.toFixed(2); cVal.innerText = shapeParams.C.toFixed(2); rebuildSurfaceMesh(); };
+    bindSlider('aSlider', updateShapeParams); bindSlider('bSlider', updateShapeParams); bindSlider('cSlider', updateShapeParams);
+    bindSlider('uSlider', (e) => { currentU = parseFloat(e.target.value); updatePointAndVectors(); });
+    bindSlider('vSlider', (e) => { currentV = parseFloat(e.target.value); updatePointAndVectors(); });
+    document.getElementById('btnFirst').onclick = () => { currentMode = "first"; document.getElementById('btnFirst').classList.add('active'); document.getElementById('btnSecond').classList.remove('active'); updatePointAndVectors(); };
+    document.getElementById('btnSecond').onclick = () => { currentMode = "second"; document.getElementById('btnSecond').classList.add('active'); document.getElementById('btnFirst').classList.remove('active'); updatePointAndVectors(); };
+    document.getElementById('resetAllBtn').onclick = () => {
+        vxSlider.value = "-2.5"; vySlider.value = "0.5"; vzSlider.value = "1.8"; speedScaleSlider.value = "1.0";
+        posXSlider.value = "0"; posYSlider.value = "0"; posZSlider.value = "0";
+        rotYSlider.value = "0"; rotXSlider.value = "0";
+        aSlider.value = "0.35"; bSlider.value = "0.45"; cSlider.value = "3.6";
+        uSlider.value = "0.5"; vSlider.value = "0.5";
+        velocityComponents = { vx: -2.5, vy: 0.5, vz: 1.8 }; speedScale = 1.0;
+        vxVal.innerText = "-2.50"; vyVal.innerText = "0.50"; vzVal.innerText = "1.80"; speedScaleVal.innerText = "1.00";
+        updatePos(); updateRot(); updateShapeParams();
+        currentU = 0.5; currentV = 0.5;
+        updatePointAndVectors();
+    };
+    document.getElementById('resetCameraBtn').onclick = () => { camera.position.set(7.0, 5.5, 8.5); controls.target.set(0, 0, 1.5); controls.update(); };
+    
+    const axesHelper = new THREE.AxesHelper(4.0);
+    axesHelper.material.transparent = true; axesHelper.material.opacity = 0.15;
+    scene.add(axesHelper);
+    const makeLabel = (text, pos, color) => { const div = document.createElement('div'); div.textContent = text; div.style.cssText = `color:${color}; font-size:11px; background:rgba(0,0,0,0.5); padding:1px 5px; border-radius:12px;`; const label = new CSS2DObject(div); label.position.copy(pos); scene.add(label); };
+    makeLabel('x', new THREE.Vector3(4.5, -0.2, 0), '#88ccff'); makeLabel('y', new THREE.Vector3(0, 4.0, 0), '#88ccff'); makeLabel('z', new THREE.Vector3(0, -0.2, 4.5), '#88ccff'); makeLabel('水流方向 →', new THREE.Vector3(2.5, 2.2, 3.5), '#ffaa66');
+    
+    rebuildSurfaceMesh();
+    let lastTime = performance.now();
+    function animate() {
+        const now = performance.now();
+        let delta = Math.min(0.033, (now - lastTime) / 1000);
+        lastTime = now;
+        updateParticles(delta);
+        controls.update();
+        renderer.render(scene, camera);
+        labelRenderer.render(scene, camera);
+        requestAnimationFrame(animate);
+    }
+    function onResize() { const w = canvas.parentElement.clientWidth, h = w * 0.57; canvas.width = w; canvas.height = h; renderer.setSize(w, h); labelRenderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+    labelRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    labelRenderer.domElement.style.position = 'absolute'; labelRenderer.domElement.style.top = '0px'; labelRenderer.domElement.style.left = '0px'; labelRenderer.domElement.style.pointerEvents = 'none';
+    canvas.parentElement.appendChild(labelRenderer.domElement);
+    window.addEventListener('resize', onResize); setTimeout(onResize, 100);
+    renderer.setClearColor(0x010a1a, 1);
+    animate();
+</script>
+</body>
+</html>
