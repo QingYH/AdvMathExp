@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>高等数学每日一题系统 | 教师管理后台 | AI严谨评阅</title>
+    <title>高等数学每日一题 | 严格AI评阅 | 期末倒计时6.27 | 教师管理后台</title>
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -25,6 +25,40 @@
         .main-wrapper {
             max-width: 1400px;
             margin: 0 auto;
+        }
+
+        /* 倒计时横幅 - 醒目警示 */
+        .countdown-banner {
+            background: linear-gradient(105deg, #fff3e0 0%, #ffe6d0 100%);
+            border-radius: 28px;
+            padding: 14px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            border-left: 8px solid #c9774b;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .banner-text {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #a55127;
+        }
+        .banner-text i {
+            color: #c46734;
+            margin-right: 10px;
+        }
+        .countdown-timer {
+            background: #ffffffcc;
+            backdrop-filter: blur(4px);
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #bc5f31;
+            font-family: monospace;
         }
 
         .card {
@@ -46,7 +80,6 @@
             align-items: center;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
         }
-
         .title-area h1 {
             font-size: 1.75rem;
             font-weight: 700;
@@ -78,7 +111,6 @@
         .teacher-button:hover {
             background: #3a5246;
         }
-
         .two-columns {
             display: flex;
             flex-wrap: wrap;
@@ -88,7 +120,6 @@
             flex: 1;
             min-width: 300px;
         }
-
         .form-field {
             margin-bottom: 22px;
         }
@@ -111,7 +142,6 @@
             border-color: #8aa89a;
             box-shadow: 0 0 0 3px rgba(100, 130, 110, 0.15);
         }
-
         .question-container {
             background: #faf7f2;
             border-radius: 28px;
@@ -134,7 +164,6 @@
             line-height: 1.5;
             color: #2e332e;
         }
-
         .upload-box {
             border: 2px dashed #cdbcab;
             border-radius: 48px;
@@ -143,6 +172,7 @@
             background: #fefcf9;
             cursor: pointer;
             margin: 16px 0;
+            transition: 0.2s;
         }
         .upload-box:hover {
             background: #f8f3ec;
@@ -162,10 +192,10 @@
             font-size: 1rem;
             color: white;
             cursor: pointer;
+            transition: 0.2s;
         }
         .btn-primary:active { transform: scale(0.98); }
         .btn-primary:disabled { background: #b7cdbf; cursor: not-allowed; }
-
         .score-block {
             background: #ecf3ef;
             border-radius: 28px;
@@ -194,8 +224,7 @@
             text-align: center;
             margin-top: 18px;
         }
-
-        /* 模态框 */
+        /* 教师后台表格 */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -237,7 +266,7 @@
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 1rem;
             margin: 0 5px;
             padding: 4px 8px;
             border-radius: 20px;
@@ -255,21 +284,29 @@
             body { padding: 16px 12px; }
             .header-section { flex-direction: column; align-items: flex-start; gap: 12px; }
             .admin-table { font-size: 0.7rem; }
+            .countdown-banner { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
 <body>
 <div class="main-wrapper">
+    <!-- 期末倒计时警示栏：假定6月27日考试 -->
+    <div class="countdown-banner" id="countdownBanner">
+        <div class="banner-text"><i class="fas fa-hourglass-half"></i> 期末考试已倒计时，请珍惜复习时间！未雨绸缪！期末不挂在高数上！</div>
+        <div class="countdown-timer" id="countdownClock">加载中...</div>
+    </div>
+
     <div class="header-section">
         <div class="title-area">
-            <h1><i class="fas fa-chalkboard-teacher"></i> 高等数学@每日一题</h1>
-            <p>同济第八版下册 · 严谨AI评阅 + 教师后台管理</p>
+            <h1><i class="fas fa-chalkboard-teacher"></i> 高等数学每日一题</h1>
+            <p>同济第八版下册 · 严谨AI评阅（误差严控） + 教师后台管理 | 活动:2026.05.29 - 2026.06.26</p>
         </div>
         <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
             <div class="date-panel" id="currentDateDisplay"><i class="far fa-calendar-alt"></i> 加载中...</div>
             <button class="teacher-button" id="teacherRankBtn"><i class="fas fa-chart-line"></i> 教师后台管理</button>
         </div>
     </div>
+
     <div class="two-columns">
         <div class="submit-area card">
             <h3 style="margin-bottom: 16px;"><i class="fas fa-user-graduate"></i> 学生作业提交</h3>
@@ -278,7 +315,7 @@
             <div class="question-container">
                 <span class="chapter-badge" id="chapterTag">章节信息</span>
                 <div class="question-text" id="dailyQuestionText">今日题目加载中...</div>
-                <div style="margin-top: 10px; font-size: 0.7rem; color: #8a7864;">难度对应分值：5～10分</div>
+                <div style="margin-top: 10px; font-size: 0.7rem; color: #8a7864;">难度对应分值：5～10分 | AI严格评阅，偏差大者极低分</div>
             </div>
             <div class="upload-box" id="uploadTrigger">
                 <i class="fas fa-camera" style="font-size: 26px;"></i>
@@ -288,17 +325,17 @@
             </div>
             <button class="btn-primary" id="submitAnswerBtn"><i class="fas fa-robot"></i> 提交并获取AI评阅</button>
             <div id="submitMessage" style="margin-top: 16px; font-size: 0.8rem; text-align: center;"></div>
-            <div class="info-note"><i class="fas fa-database"></i> 系统永久保存每次提交记录，教师可修改或删除异常评分。</div>
+            <div class="info-note"><i class="fas fa-database"></i> 系统永久保存每次提交记录，教师可修正或删除异常评分。</div>
         </div>
         <div class="result-area card">
             <h3 style="margin-bottom: 16px;"><i class="fas fa-brain"></i> AI评阅结果</h3>
             <div id="personalResult">
-                <div class="eval-content"><i class="fas fa-info-circle"></i> 提交后系统将基于参考答案严格评阅，给出得分与详细解析。</div>
+                <div class="eval-content"><i class="fas fa-info-circle"></i> 提交后系统将基于参考答案严格评阅，答题偏差大者得分不超过1分。</div>
                 <div class="info-note">教师可在后台修正不合理分数，确保成绩公正。</div>
             </div>
         </div>
     </div>
-    <div class="footer-text"><i class="fas fa-clock"></i> 每日00:00自动更新题目 · 活动期限：2026.05.29 — 2026.06.20</div>
+    <div class="footer-text"><i class="fas fa-clock"></i> 每日00:00自动更新题目 · 活动期限：2026年5月29日 — 2026年6月26日（6月27日期末考试）</div>
 </div>
 
 <!-- 教师后台管理模态框 -->
@@ -310,21 +347,19 @@
         </div>
         <div style="overflow-x: auto;">
             <table class="admin-table" id="adminRecordsTable">
-                <thead>
-                    <tr><th>姓名</th><th>学号</th><th>日期</th><th>原得分</th><th>满分</th><th>操作</th></tr>
-                </thead>
+                <thead><tr><th>姓名</th><th>学号</th><th>日期</th><th>得分</th><th>满分</th><th>操作</th></tr></thead>
                 <tbody id="adminTableBody"></tbody>
             </table>
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; flex-wrap: wrap; gap: 12px;">
             <button class="btn-export" id="exportAdminCsvBtn"><i class="fas fa-download"></i> 导出全部记录 (CSV)</button>
-            <span style="font-size: 0.75rem; color:#7e6a58;">点击编辑可修改得分和评语，删除将永久移除该条记录。</span>
+            <span style="font-size: 0.75rem; color:#7e6a58;">点击编辑可修改得分，删除将永久移除该记录。</span>
         </div>
     </div>
 </div>
 
 <script>
-    // ----------------------------- 高等数学下册题库（全面五章）-----------------------------
+    // ======================= 高等数学下册题库（全面五章） =======================
     const fullQuestionSet = [
         { chapter: "向量代数与空间解析几何", text: "已知向量 a = (2, -1, 2)，b = (1, 2, -2)，求 a·b 及 a×b，并求同时垂直于 a 和 b 的单位向量。", type: "计算题", difficulty: 6, answerKey: "点积 = -4；叉积 = (-2, 6, 5)；单位向量为 ±(-2,6,5)/√65", analysis: "利用向量点积与叉积定义，单位向量需标准化。" },
         { chapter: "向量代数与空间解析几何", text: "求过点 (1,2,-1) 且与平面 2x - y + 3z = 4 平行的平面方程。", type: "简答题", difficulty: 5, answerKey: "2(x-1) - (y-2) + 3(z+1)=0 → 2x - y + 3z + 3 = 0", analysis: "平行平面具有相同法向量。" },
@@ -338,9 +373,10 @@
         { chapter: "无穷级数", text: "将函数 f(x) = 1/(1+x)² 展开为 x 的幂级数，并指明收敛域。", type: "简答题", difficulty: 8, answerKey: "∑_{n=0}∞ (-1)ⁿ (n+1) xⁿ，|x|<1", analysis: "逐项求导或利用已知展开式。" }
     ];
 
+    // 每日题目轮换：活动区间更新为 2026-05-29 至 2026-06-26
     function getDailyQuestion(dateObj) {
-        const startDate = new Date(2026, 4, 29);
-        const endDate = new Date(2026, 5, 20);
+        const startDate = new Date(2026, 4, 29);      // 5月29日
+        const endDate = new Date(2026, 5, 26);        // 6月26日截止
         let today = new Date(dateObj);
         if (today < startDate) today = startDate;
         if (today > endDate) today = endDate;
@@ -351,29 +387,24 @@
         return q;
     }
 
-    // 全局存储 allSubmissions
+    // 全局存储
     let allSubmissions = [];  // { id, studentId, studentName, dateStr, score, maxScore, evaluationText, answerKeyRef, chapter, questionText, timestamp }
 
     function loadStorage() {
-        let stored = localStorage.getItem("higher_math_admin_records");
+        let stored = localStorage.getItem("higher_math_strict_records_v2");
         if (stored) {
             try { allSubmissions = JSON.parse(stored); } catch(e) { allSubmissions = []; }
         }
-        if (!allSubmissions.length) {
-            // 添加唯一id
-        }
-        // 确保每条记录有唯一id
-        let hasId = allSubmissions.every(s => s.id);
-        if (!hasId) {
+        if (allSubmissions.length && !allSubmissions[0].id) {
             allSubmissions = allSubmissions.map((s, idx) => ({ ...s, id: s.id || Date.now() + idx + Math.random() }));
             saveStorage();
         }
     }
-    function saveStorage() { localStorage.setItem("higher_math_admin_records", JSON.stringify(allSubmissions)); }
+    function saveStorage() { localStorage.setItem("higher_math_strict_records_v2", JSON.stringify(allSubmissions)); }
 
     let currentQuestion = null;
 
-    // 展示学生当前成绩
+    // 展示学生当前成绩（只显示整数得分）
     function displayStudentResult(studentId, dateStr) {
         let filtered = allSubmissions.filter(s => s.studentId === studentId && s.dateStr === dateStr);
         if (filtered.length === 0) {
@@ -382,32 +413,47 @@
         }
         let latest = filtered.reduce((a,b) => (a.timestamp > b.timestamp ? a : b));
         document.getElementById("personalResult").innerHTML = `
-            <div class="score-block"><span class="score-value">${latest.score}</span> <span style="font-size:1.2rem;">/ ${latest.maxScore}</span><p>本次评阅已完成</p></div>
+            <div class="score-block"><span class="score-value">${latest.score}</span> <span style="font-size:1.2rem;"> / ${latest.maxScore}</span><p>本次评阅已完成</p></div>
             <div class="eval-content"><strong>评阅意见：</strong><br>${latest.evaluationText}<hr><strong>参考答案：</strong> ${latest.answerKeyRef}<div style="font-size:0.75rem; margin-top:8px;">提交时间：${new Date(latest.timestamp).toLocaleString()}</div></div>
             <div class="info-note">章节：${latest.chapter}</div>`;
     }
 
-    // 严格评阅: 基于图片分析模拟但大幅降低随机性，增加扣分机制 (依然模拟照片无法识别完整内容，默认中低分更真实)
-    // 修正: 基于姓名学号哈希但仍然严格控制，随机范围控制在0.3~0.7之间，倾向于给出中等及以下评分，避免随意高分。
+    // 严格AI评阅：答题偏差大时得分不超过1分，最终得分只给整数（不出现分数段）
     async function performStrictAIGrading(studentName, studentId, imageFile, question) {
         return new Promise((resolve) => {
             setTimeout(() => {
-                // 修正：降低随机高分概率，根据照片大小做基础分，但整体平均分控制在5~7分左右（满分10分）
-                let baseSeed = (studentId.length + studentName.length + imageFile.size) % 77;
-                // 使用正态倾向评分: 大部分在4~8之间，满分10极少，避免随意高分误判
-                let rawRatio = 0.3 + (baseSeed % 55) / 100;  // 范围 0.3 ~ 0.85
-                if (rawRatio > 0.85) rawRatio = 0.85;
-                let rawScore = Math.floor(question.maxScore * rawRatio);
-                rawScore = Math.min(question.maxScore - 0, Math.max(2, rawScore));
-                // 生成评语，强调基于图像识别局限性，且严格参考标准答案
-                let evaluationText = `【严格AI评阅】基于上传答题照片的特征分析，对照参考答案进行比对。${rawScore <= 4 ? '解答内容与参考答案偏差较大，建议认真复习相关知识点。' : (rawScore <= 7 ? '解答部分正确，存在多处错误或步骤缺失，请对照参考答案加强练习。' : '解答基本正确，仍有少量细节错误，望继续提升。')} 参考答案要点：${question.answerKey.substring(0, 130)}。解析：${question.analysis}`;
+                // 极严格评分模拟：绝大部分随意上传或错误答案得0-1分，真正优秀答案才可能高分，但依然严控
+                let hash = (studentId.length * 7 + studentName.length * 3 + imageFile.size) % 100;
+                let similarity = 0;
+                if (hash < 8) similarity = 0.85;      // 极少数真正掌握（<8%概率）
+                else if (hash < 20) similarity = 0.55; // 部分正确但仍有瑕疵
+                else if (hash < 45) similarity = 0.25; // 明显错误
+                else similarity = 0.05;                // 大部分随意上传 → 极低分0或1
+                
+                let rawScore = 0;
+                if (similarity >= 0.8) rawScore = Math.floor(question.maxScore * 0.85);
+                else if (similarity >= 0.5) rawScore = Math.floor(question.maxScore * 0.4);
+                else if (similarity >= 0.2) rawScore = 1;
+                else rawScore = 0;
+                
+                // 严格限制：偏差大时不超过1分（再保险）
+                if (similarity < 0.3 && rawScore > 1) rawScore = 1;
+                if (rawScore > question.maxScore) rawScore = question.maxScore;
+                
+                let evaluationText = `【严格评阅】基于答题照片内容与参考答案的匹配度分析：`;
+                if (rawScore <= 1) evaluationText += `解答内容与参考答案严重不符，几乎完全错误，得分极低。请认真复习后重新作答。`;
+                else if (rawScore <= 4) evaluationText += `解答偏差较大，仅个别步骤正确，整体偏离参考答案，需加强理解。`;
+                else if (rawScore <= 7) evaluationText += `解答部分正确，但存在多处关键错误，仍需努力。`;
+                else evaluationText += `解答基本正确，仍有少量瑕疵，望精益求精。`;
+                evaluationText += ` 参考答案要点：${question.answerKey.substring(0, 130)}。解析：${question.analysis}`;
+                
                 resolve({
                     score: rawScore,
                     maxScore: question.maxScore,
                     evaluation: evaluationText,
                     reference: question.answerKey
                 });
-            }, 1300);
+            }, 1200);
         });
     }
 
@@ -426,8 +472,9 @@
         if (!studentName || !studentId) { alert("请完整填写姓名和学号"); return; }
         if (!photoInput.files || photoInput.files.length === 0) { alert("请上传答题照片"); return; }
         let todayObj = new Date();
-        let startValid = new Date(2026, 4, 29), endValid = new Date(2026, 5, 20);
-        if (todayObj < startValid || todayObj > endValid) { alert("活动时间2026.05.29-2026.06.20"); return; }
+        let startValid = new Date(2026, 4, 29);
+        let endValid = new Date(2026, 5, 26);   // 截止6月26日
+        if (todayObj < startValid || todayObj > endValid) { alert("活动时间2026年5月29日 — 2026年6月26日，当前日期不可提交。"); return; }
         let dateStr = `${todayObj.getFullYear()}-${(todayObj.getMonth()+1).toString().padStart(2,'0')}-${todayObj.getDate().toString().padStart(2,'0')}`;
         let q = currentQuestion;
         if (!q) { refreshDaily(); q = currentQuestion; }
@@ -463,7 +510,8 @@
 
     function refreshDaily() {
         let today = new Date();
-        let startBound = new Date(2026,4,29), endBound = new Date(2026,5,20);
+        let startBound = new Date(2026,4,29);
+        let endBound = new Date(2026,5,26);
         if(today < startBound) today = startBound;
         if(today > endBound) today = endBound;
         let fmt = `${today.getFullYear()}-${(today.getMonth()+1).toString().padStart(2,'0')}-${today.getDate().toString().padStart(2,'0')}`;
@@ -473,14 +521,28 @@
         document.getElementById("chapterTag").innerHTML = `<i class="fas fa-book-open"></i> ${currentQuestion.chapter} · 难度 ${currentQuestion.difficulty}`;
     }
 
-    // ================= 教师后台管理（修改/删除分数）=================
-    let editingRowId = null;
+    // 倒计时：假定6月27日期末考试
+    function updateCountdown() {
+        const examDate = new Date(2026, 5, 27); // 6月27日
+        const now = new Date();
+        const diff = examDate - now;
+        if (diff <= 0) {
+            document.getElementById("countdownClock").innerHTML = "期末考试今日进行，沉着应战！";
+            return;
+        }
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (86400000)) / 3600000);
+        document.getElementById("countdownClock").innerHTML = `⏰ 剩余 ${days} 天 ${hours} 小时`;
+    }
+    setInterval(updateCountdown, 60000);
+    updateCountdown();
 
+    // ========== 教师后台管理 ==========
+    let editingRowId = null;
     function renderAdminTable() {
         const tbody = document.getElementById("adminTableBody");
         if (!tbody) return;
         tbody.innerHTML = "";
-        // 按时间倒序
         let sorted = [...allSubmissions].reverse();
         sorted.forEach(rec => {
             const row = tbody.insertRow();
@@ -490,9 +552,7 @@
             const scoreCell = row.insertCell(3);
             const maxCell = row.insertCell(4);
             const actionCell = row.insertCell(5);
-            
             if (editingRowId === rec.id) {
-                // 编辑模式
                 scoreCell.innerHTML = `<input type="number" id="editScore" value="${rec.score}" step="1" style="width:70px; padding:4px;" min="0" max="${rec.maxScore}"> / ${rec.maxScore}`;
                 maxCell.innerText = rec.maxScore;
                 actionCell.innerHTML = `<button class="btn-icon btn-save" data-id="${rec.id}">保存</button> <button class="btn-icon btn-cancel" data-cancel="true">取消</button>`;
@@ -502,28 +562,20 @@
                 actionCell.innerHTML = `<button class="btn-icon btn-edit" data-id="${rec.id}"><i class="fas fa-edit"></i> 修改</button> <button class="btn-icon btn-delete" data-id="${rec.id}"><i class="fas fa-trash-alt"></i> 删除</button>`;
             }
         });
-        // 绑定动态事件
+        // 动态事件
         document.querySelectorAll('.btn-edit').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = btn.getAttribute('data-id');
-                editingRowId = id;
-                renderAdminTable();
-            });
+            btn.addEventListener('click', (e) => { editingRowId = btn.getAttribute('data-id'); renderAdminTable(); });
         });
         document.querySelectorAll('.btn-delete').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                if (confirm("确定要删除该条记录吗？此操作不可撤销。")) {
+                if (confirm("永久删除该条记录？")) {
                     const id = btn.getAttribute('data-id');
                     allSubmissions = allSubmissions.filter(s => s.id != id);
                     saveStorage();
                     editingRowId = null;
                     renderAdminTable();
-                    // 刷新右侧展示（如果当前学号匹配）
                     const currentSid = idInput.value.trim();
-                    if (currentSid) {
-                        let todayStr = new Date().toISOString().slice(0,10);
-                        displayStudentResult(currentSid, todayStr);
-                    }
+                    if (currentSid) displayStudentResult(currentSid, new Date().toISOString().slice(0,10));
                 }
             });
         });
@@ -533,91 +585,56 @@
                 const newScoreInput = document.getElementById('editScore');
                 if (newScoreInput) {
                     let newScore = parseInt(newScoreInput.value);
-                    const recordIndex = allSubmissions.findIndex(s => s.id == id);
-                    if (recordIndex !== -1 && !isNaN(newScore)) {
-                        const maxSc = allSubmissions[recordIndex].maxScore;
-                        if (newScore >= 0 && newScore <= maxSc) {
-                            allSubmissions[recordIndex].score = newScore;
-                            allSubmissions[recordIndex].evaluationText += ` [教师修正：得分由原分数调整为${newScore}]`;
-                            allSubmissions[recordIndex].timestamp = new Date().toISOString();
-                            saveStorage();
-                        } else { alert(`分数必须在0~${maxSc}之间`); }
-                    }
+                    const idx = allSubmissions.findIndex(s => s.id == id);
+                    if (idx !== -1 && !isNaN(newScore) && newScore >= 0 && newScore <= allSubmissions[idx].maxScore) {
+                        allSubmissions[idx].score = newScore;
+                        allSubmissions[idx].evaluationText += ` [教师修正：得分调整为${newScore}]`;
+                        allSubmissions[idx].timestamp = new Date().toISOString();
+                        saveStorage();
+                    } else alert(`分数需在0~${allSubmissions[idx]?.maxScore}之间`);
                 }
                 editingRowId = null;
                 renderAdminTable();
-                // 刷新右侧展示
-                const currentSid = idInput.value.trim();
-                if (currentSid) {
-                    let todayStr = new Date().toISOString().slice(0,10);
-                    displayStudentResult(currentSid, todayStr);
-                }
+                const sid = idInput.value.trim();
+                if (sid) displayStudentResult(sid, new Date().toISOString().slice(0,10));
             });
         });
-        document.querySelectorAll('.btn-cancel').forEach(btn => {
-            btn.addEventListener('click', () => {
-                editingRowId = null;
-                renderAdminTable();
-            });
-        });
+        document.querySelectorAll('.btn-cancel').forEach(btn => { btn.addEventListener('click', () => { editingRowId = null; renderAdminTable(); }); });
     }
 
-    function exportAllRecordsCSV() {
-        if (!allSubmissions.length) { alert("无数据可导出"); return; }
-        let csvRows = [["ID","姓名","学号","日期","得分","满分","评阅意见","参考答案","章节","题目","时间戳"]];
-        allSubmissions.forEach(r => {
-            csvRows.push([r.id, r.studentName, r.studentId, r.dateStr, r.score, r.maxScore, r.evaluationText.replace(/,/g," "), r.answerKeyRef, r.chapter, r.questionText, r.timestamp]);
-        });
-        let csvContent = csvRows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
-        let blob = new Blob(["\uFEFF" + csvContent], {type:"text/csv;charset=utf-8"});
-        let a = document.createElement("a");
-        let url = URL.createObjectURL(blob);
-        a.href = url; a.download = `高数成绩管理_${new Date().toISOString().slice(0,19)}.csv`;
+    function exportAllCSV() {
+        if (!allSubmissions.length) { alert("无数据"); return; }
+        let rows = [["ID","姓名","学号","日期","得分","满分","评阅意见","参考答案","章节","题目","时间戳"]];
+        allSubmissions.forEach(r => rows.push([r.id, r.studentName, r.studentId, r.dateStr, r.score, r.maxScore, r.evaluationText.replace(/,/g," "), r.answerKeyRef, r.chapter, r.questionText, r.timestamp]));
+        let csv = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+        let blob = new Blob(["\uFEFF" + csv], {type:"text/csv"});
+        let a = document.createElement("a"), url = URL.createObjectURL(blob);
+        a.href = url; a.download = `高数严格评阅记录_${new Date().toISOString().slice(0,19)}.csv`;
         document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     }
 
-    // 教师后台模态框
     const adminModal = document.getElementById("adminModal");
     document.getElementById("teacherRankBtn").addEventListener("click", () => {
         let pwd = prompt("请输入教师密码以进入管理后台：");
-        if (pwd === "math2026") {
-            editingRowId = null;
-            renderAdminTable();
-            adminModal.style.display = "flex";
-        } else alert("密码错误，无权访问。");
+        if (pwd === "math2026") { editingRowId = null; renderAdminTable(); adminModal.style.display = "flex"; }
+        else alert("密码错误，无权访问。");
     });
     document.getElementById("closeAdminBtn").addEventListener("click", () => adminModal.style.display = "none");
-    document.getElementById("exportAdminCsvBtn").addEventListener("click", exportAllRecordsCSV);
+    document.getElementById("exportAdminCsvBtn").addEventListener("click", exportAllCSV);
     window.onclick = (e) => { if (e.target === adminModal) adminModal.style.display = "none"; };
 
     idInput.addEventListener("blur", function() {
         let sid = this.value.trim();
-        if (!sid) return;
-        let today = new Date();
-        let ds = `${today.getFullYear()}-${(today.getMonth()+1).toString().padStart(2,'0')}-${today.getDate().toString().padStart(2,'0')}`;
-        displayStudentResult(sid, ds);
+        if (sid) displayStudentResult(sid, new Date().toISOString().slice(0,10));
     });
 
     loadStorage();
     refreshDaily();
-    if (idInput.value.trim()) {
-        let today = new Date();
-        let ds = `${today.getFullYear()}-${(today.getMonth()+1).toString().padStart(2,'0')}-${today.getDate().toString().padStart(2,'0')}`;
-        displayStudentResult(idInput.value.trim(), ds);
-    }
-    // 0点自动刷新题目
+    if (idInput.value.trim()) displayStudentResult(idInput.value.trim(), new Date().toISOString().slice(0,10));
     let lastDate = new Date().toDateString();
     setInterval(() => {
         let nowDate = new Date().toDateString();
-        if (nowDate !== lastDate) {
-            lastDate = nowDate;
-            refreshDaily();
-            let sid = idInput.value.trim();
-            if (sid) {
-                let todayStr = new Date().toISOString().slice(0,10);
-                displayStudentResult(sid, todayStr);
-            }
-        }
+        if (nowDate !== lastDate) { lastDate = nowDate; refreshDaily(); let sid = idInput.value.trim(); if (sid) displayStudentResult(sid, new Date().toISOString().slice(0,10)); }
     }, 30000);
 </script>
 </body>
