@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>高等数学每日一题 | 名单验证+DeepSeek评阅 | 每日仅保留最新提交</title>
+    <title>高数每日一题 | DeepSeek视觉评阅 + 图片识别内容展示 | 精准评分+名单验证</title>
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
@@ -142,6 +142,15 @@
             font-size: 0.9rem;
             line-height: 1.5;
         }
+        .ocr-content {
+            background: #eef2fa;
+            border-radius: 24px;
+            padding: 14px 18px;
+            margin: 12px 0;
+            font-family: monospace;
+            font-size: 0.85rem;
+            border-left: 4px solid #5a7c6b;
+        }
         .info-note {
             font-size: 0.7rem;
             background: #f1ede8;
@@ -197,8 +206,8 @@
     </div>
     <div class="header-section">
         <div class="title-area">
-            <h1><i class="fas fa-chalkboard-teacher"></i> 高等数学@每日一题</h1>
-            <p>同济八版下册 · DeepSeek视觉评阅 · 仅限B3班学生提交 · 每日可重复提交，仅保留最新成绩</p>
+            <h1><i class="fas fa-chalkboard-teacher"></i> 高等数学每日一题</h1>
+            <p>同济八版下册 · DeepSeek视觉评阅 + 图片识别内容展示 · 名单验证 · 每日最新记录</p>
         </div>
         <div style="display: flex; align-items: center; gap: 12px;">
             <div class="date-panel" id="currentDateDisplay"><i class="far fa-calendar-alt"></i> 加载中...</div>
@@ -214,7 +223,7 @@
             <div class="question-container">
                 <span class="chapter-badge" id="chapterTag">章节信息</span>
                 <div class="question-text" id="dailyQuestionText">今日题目加载中...</div>
-                <div style="margin-top: 10px; font-size: 0.7rem; color: #8a7864;">难度分值：5～10分 | 每日可多次提交，系统只保留当日最后一次评阅结果</div>
+                <div style="margin-top: 10px; font-size: 0.7rem; color: #8a7864;">难度分值：5～10分 | 调用DeepSeek视觉模型精准评阅并提取图片文字</div>
             </div>
             <div class="upload-box" id="uploadTrigger">
                 <i class="fas fa-camera" style="font-size: 26px;"></i>
@@ -224,13 +233,13 @@
             </div>
             <button class="btn-primary" id="submitAnswerBtn"><i class="fas fa-robot"></i> 提交并调用DeepSeek评阅</button>
             <div id="submitMessage" style="margin-top: 16px; font-size: 0.8rem; text-align: center;"></div>
-            <div class="info-note"><i class="fas fa-database"></i> 每次提交会覆盖当日旧记录，教师后台可查看所有历史修改记录。</div>
+            <div class="info-note"><i class="fas fa-database"></i> 每日可重复提交，系统只保留当日最后一次评阅结果。教师可后台修正。</div>
         </div>
         <div class="result-area card">
             <h3 style="margin-bottom: 16px;"><i class="fas fa-brain"></i> DeepSeek 视觉评阅结果</h3>
             <div id="personalResult">
-                <div class="eval-content"><i class="fas fa-info-circle"></i> 上传照片后调用DeepSeek视觉模型精准评阅。</div>
-                <div class="info-note">每日多次提交，系统仅保留最新一条记录作为当日最终成绩。</div>
+                <div class="eval-content"><i class="fas fa-info-circle"></i> 真实调用DeepSeek多模态模型，根据照片中解题步骤精准给分，并展示图片识别出的文字内容。</div>
+                <div class="info-note">每日多次提交仅保留最新得分。</div>
             </div>
         </div>
     </div>
@@ -311,25 +320,24 @@
         return q;
     }
 
-    // 全局存储 allSubmissions (每条记录唯一，但每天每人只保留最新一次)
+    // 全局存储 allSubmissions (每天每人仅最新一条)
     let allSubmissions = [];
 
     function loadStorage() {
-        let stored = localStorage.getItem("higher_math_daily_latest_v3");
+        let stored = localStorage.getItem("higher_math_deepseek_ocr_v4");
         if(stored) try{ allSubmissions = JSON.parse(stored); }catch(e){}
         if(allSubmissions.length && !allSubmissions[0]?.id) {
             allSubmissions = allSubmissions.map((s,i)=>({...s, id:s.id||Date.now()+i+Math.random()}));
             saveStorage();
         }
     }
-    function saveStorage() { localStorage.setItem("higher_math_daily_latest_v3", JSON.stringify(allSubmissions)); }
+    function saveStorage() { localStorage.setItem("higher_math_deepseek_ocr_v4", JSON.stringify(allSubmissions)); }
 
-    // 核心: 更新或插入记录 (同一学生同一天只保留最新一条)
+    // 覆盖更新 (同一学生同一天只保留最新)
     function upsertSubmission(newRecord) {
-        const existingIndex = allSubmissions.findIndex(s => s.studentId === newRecord.studentId && s.dateStr === newRecord.dateStr);
-        if(existingIndex !== -1) {
-            // 覆盖旧记录，保留旧记录的id便于管理，但更新所有字段
-            allSubmissions[existingIndex] = { ...newRecord, id: allSubmissions[existingIndex].id };
+        const idx = allSubmissions.findIndex(s => s.studentId === newRecord.studentId && s.dateStr === newRecord.dateStr);
+        if(idx !== -1) {
+            allSubmissions[idx] = { ...newRecord, id: allSubmissions[idx].id };
         } else {
             allSubmissions.push(newRecord);
         }
@@ -338,9 +346,9 @@
 
     let currentQuestion = null;
     function displayStudentResult(studentId, dateStr) {
-        let record = allSubmissions.find(s => s.studentId === studentId && s.dateStr === dateStr);
+        const record = allSubmissions.find(s => s.studentId === studentId && s.dateStr === dateStr);
         if(!record){
-            document.getElementById("personalResult").innerHTML = `<div class="eval-content">今日尚未提交作业。请上传照片，DeepSeek将精准评阅。</div><div class="info-note">每日可多次提交，系统仅保留最新一次评阅结果。</div>`;
+            document.getElementById("personalResult").innerHTML = `<div class="eval-content">今日尚未提交作业。请上传照片，DeepSeek视觉模型将精准评阅并展示图片识别内容。</div><div class="info-note">每日可多次提交，系统仅保留最新一次评阅结果。</div>`;
             return;
         }
         let encouragement = "";
@@ -348,43 +356,93 @@
         else if(record.score >= record.maxScore * 0.6) encouragement = `<div class="encouragement-high"><i class="fas fa-thumbs-up"></i> 良好！掌握不错，再细心些会更棒。</div>`;
         else if(record.score >= record.maxScore * 0.4) encouragement = `<div class="encouragement-low"><i class="fas fa-leaf"></i> 再努力一点点！多复习相关章节，下次会更好。</div>`;
         else encouragement = `<div class="encouragement-low"><i class="fas fa-heart"></i> 别灰心，针对性复习薄弱点，相信你可以进步！</div>`;
+        
+        // 构建识别内容区域
+        let ocrHtml = record.ocrText ? `<div class="ocr-content"><i class="fas fa-file-alt"></i> <strong>📷 图片识别内容：</strong><br>${record.ocrText}</div>` : `<div class="ocr-content"><i class="fas fa-file-alt"></i> 未提取到图片文字信息（可能图片不清晰或无文字）。</div>`;
+        
         document.getElementById("personalResult").innerHTML = `
             <div class="score-block"><span class="score-value">${record.score}</span> / ${record.maxScore}<p>DeepSeek 视觉评阅 (最新提交)</p></div>
+            ${ocrHtml}
             <div class="eval-content"><strong>评阅意见：</strong><br>${record.evaluationText}<hr><strong>参考答案：</strong> ${record.answerKeyRef}<div style="font-size:0.75rem; margin-top:8px;">提交时间：${new Date(record.timestamp).toLocaleString()}</div></div>
             ${encouragement}
-            <div class="info-note">章节：${record.chapter} | 当日多次提交将自动覆盖之前记录。</div>`;
+            <div class="info-note">章节：${record.chapter} | 当日多次提交将自动覆盖之前记录。识别内容为DeepSeek从图片中提取的文字。</div>`;
     }
 
-    // DeepSeek视觉模型调用 (模拟精准评阅，但结构完全符合真实API，可替换为真实密钥)
-    async function callDeepSeekVision(imageBase64, question) {
-        // 实际对接时替换为您的真实DeepSeek endpoint和api key
-        // 此处为模拟但根据参考答案倾向给出精准评分，避免随机错误导致误判
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                // 为了确保精准：根据图片base64哈希 + 题目难度的智能化评分，使正确解答得高分
-                // 避免随机，我们构造一个相对合理的打分函数： 大部分情况下，hash值在20-80之间，若学生认真解答应获中高分
-                // 但为演示公平，真实系统应接入真正视觉模型，本模拟仅为展示逻辑，教师可替换真实请求。
-                let hash = (imageBase64.length + question.text.length) % 100;
-                let scoreRatio = 0;
-                if (hash < 15) scoreRatio = 0.92;
-                else if (hash < 35) scoreRatio = 0.75;
-                else if (hash < 65) scoreRatio = 0.55;
-                else if (hash < 85) scoreRatio = 0.35;
-                else scoreRatio = 0.18;
-                let rawScore = Math.floor(question.maxScore * scoreRatio);
-                if(rawScore < 0) rawScore = 0;
-                let evaluation = `【DeepSeek视觉模型评阅】根据图像中解题步骤与最终答案分析：`;
-                if(rawScore >= question.maxScore*0.8) evaluation += `解答完全正确，步骤清晰，逻辑严密。参考答案一致。`;
-                else if(rawScore >= question.maxScore*0.6) evaluation += `解答基本正确，但存在少量细节遗漏，建议参照参考答案完善。`;
-                else if(rawScore >= question.maxScore*0.4) evaluation += `解答部分正确，关键步骤存在偏差，请认真复习对应章节。`;
-                else evaluation += `解答与参考答案偏差较大，建议重新学习该知识点后再做练习。`;
-                evaluation += ` 参考答案：${question.answerKey.substring(0,150)}。解析：${question.analysis}`;
-                resolve({ score: rawScore, maxScore: question.maxScore, evaluation, reference: question.answerKey });
-            }, 1500);
-        });
+    // ======================= 3. 真实 DeepSeek 视觉模型调用 (返回评分+评语+OCR识别文本) =======================
+    // 请替换成您自己的 DeepSeek API Key
+    const DEEPSEEK_API_KEY = "sk-9f4b8d2c6e1a7b3c5d8e0f2a4b6c8d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d";  // 请填写真实API Key
+    const DEEPSEEK_VISION_URL = "https://api.deepseek.com/v1/chat/completions";
+
+    async function callDeepSeekVisionWithOCR(imageBase64, question) {
+        // 构建多模态消息：要求返回图片中的文字内容 + 评分 + 评语
+        const prompt = `你是一位严谨的高等数学教授。请根据以下题目和参考答案，认真评阅学生上传的答题照片。
+        要求：
+        1. 首先从图片中提取学生手写或打印的解题文字内容（OCR识别），整理成可读段落。
+        2. 然后根据参考答案给出得分（满分${question.maxScore}分，整数分）。
+        3. 写一段详细的评语，指出对错和关键错误点或优点。
+        
+        题目：${question.text}
+        参考答案：${question.answerKey}
+        
+        请严格按照以下JSON格式返回（不要包含任何额外解释）：
+        {"ocr_text": "识别出的图片文字内容", "score": 整数, "comment": "评语"}`;
+        
+        const payload = {
+            model: "deepseek-chat",
+            messages: [
+                {
+                    role: "user",
+                    content: [
+                        { type: "text", text: prompt },
+                        { type: "image_url", image_url: { url: `data:image/jpeg;base64,${imageBase64}` } }
+                    ]
+                }
+            ],
+            temperature: 0.3,
+            max_tokens: 1200
+        };
+
+        try {
+            const response = await fetch(DEEPSEEK_VISION_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
+                },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`DeepSeek API 错误: ${response.status} ${errText}`);
+            }
+            const data = await response.json();
+            const reply = data.choices[0].message.content;
+            // 解析JSON
+            let jsonMatch = reply.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                let rawScore = parseInt(parsed.score);
+                if (isNaN(rawScore)) rawScore = 0;
+                rawScore = Math.min(question.maxScore, Math.max(0, rawScore));
+                const ocrText = parsed.ocr_text || "未能自动识别文字内容";
+                const comment = parsed.comment || "评阅完成。";
+                return {
+                    score: rawScore,
+                    maxScore: question.maxScore,
+                    evaluation: comment,
+                    reference: question.answerKey,
+                    ocrText: ocrText
+                };
+            } else {
+                throw new Error("返回格式异常，未找到JSON");
+            }
+        } catch (error) {
+            console.error("DeepSeek调用失败:", error);
+            throw new Error(`视觉评阅失败: ${error.message}`);
+        }
     }
 
-    // 提交逻辑 + 名单验证 + 覆盖旧记录
+    // 提交处理
     let isSubmitting = false;
     const submitBtn = document.getElementById("submitAnswerBtn");
     const nameInput = document.getElementById("studentName");
@@ -411,7 +469,7 @@
         if(!q){ refreshDaily(); q=currentQuestion; }
         isSubmitting = true;
         const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = "<i class='fas fa-spinner fa-pulse'></i> DeepSeek 视觉分析中...";
+        submitBtn.innerHTML = "<i class='fas fa-spinner fa-pulse'></i> DeepSeek 视觉分析中 (识别图片+评分)...";
         submitBtn.disabled = true;
         try {
             const file = photoInput.files[0];
@@ -421,22 +479,24 @@
                 reader.readAsDataURL(file);
             });
             const base64Image = await base64Promise;
-            const grading = await callDeepSeekVision(base64Image, q);
+            const grading = await callDeepSeekVisionWithOCR(base64Image, q);
             const newRecord = {
                 id: Date.now() + Math.random(),
                 studentId, studentName, dateStr,
                 score: grading.score, maxScore: grading.maxScore,
                 evaluationText: grading.evaluation, answerKeyRef: grading.reference,
-                chapter: q.chapter, questionText: q.text, timestamp: new Date().toISOString()
+                chapter: q.chapter, questionText: q.text, timestamp: new Date().toISOString(),
+                ocrText: grading.ocrText
             };
-            // 覆盖当日旧记录
             upsertSubmission(newRecord);
             displayStudentResult(studentId, dateStr);
-            msgDiv.innerHTML = `<span style="color:#4f6b5c;">✓ 提交成功！最新得分 ${grading.score}/${grading.maxScore} (已覆盖当日旧记录)</span>`;
+            msgDiv.innerHTML = `<span style="color:#4f6b5c;">✓ 提交成功！DeepSeek评分：${grading.score}/${grading.maxScore} (已覆盖当日旧记录)</span>`;
             photoInput.value = "";
             document.getElementById("fileInfo").innerText = "未选择任何文件";
-        } catch(e){ msgDiv.innerHTML = `<span style="color:#ab7b5a;">评阅失败，请重试</span>`; console.error(e); }
-        finally { isSubmitting=false; submitBtn.innerHTML=originalText; submitBtn.disabled=false; }
+        } catch(e) {
+            console.error(e);
+            msgDiv.innerHTML = `<span style="color:#ab7b5a;">评阅失败: ${e.message}，请检查API配置或稍后重试</span>`;
+        } finally { isSubmitting=false; submitBtn.innerHTML=originalText; submitBtn.disabled=false; }
     }
 
     submitBtn.addEventListener("click", handleSubmit);
@@ -458,7 +518,7 @@
         document.getElementById("chapterTag").innerHTML = `<i class="fas fa-book-open"></i> ${currentQuestion.chapter} · 难度 ${currentQuestion.difficulty}`;
     }
 
-    // 倒计时 6月27日
+    // 倒计时 (6月27日)
     function updateCountdown() {
         const exam = new Date(2026,5,27);
         const now = new Date();
@@ -470,7 +530,7 @@
     }
     setInterval(updateCountdown,60000); updateCountdown();
 
-    // 教师后台管理 (展示所有记录，可修改删除)
+    // 教师后台管理
     let editingRowId = null;
     function renderAdminTable(){
         const tbody = document.getElementById("adminTableBody");
@@ -495,18 +555,18 @@
             }
         });
         document.querySelectorAll('.btn-edit').forEach(btn=>btn.addEventListener('click',(e)=>{editingRowId=btn.getAttribute('data-id');renderAdminTable();}));
-        document.querySelectorAll('.btn-delete').forEach(btn=>btn.addEventListener('click',()=>{if(confirm("删除该记录？")){const id=btn.getAttribute('data-id');allSubmissions=allSubmissions.filter(s=>s.id!=id);saveStorage();editingRowId=null;renderAdminTable();const sid=idInput.value.trim();if(sid)displayStudentResult(sid,new Date().toISOString().slice(0,10));}}));
+        document.querySelectorAll('.btn-delete').forEach(btn=>btn.addEventListener('click',()=>{if(confirm("删除记录？")){const id=btn.getAttribute('data-id');allSubmissions=allSubmissions.filter(s=>s.id!=id);saveStorage();editingRowId=null;renderAdminTable();const sid=idInput.value.trim();if(sid)displayStudentResult(sid,new Date().toISOString().slice(0,10));}}));
         document.querySelectorAll('.btn-save').forEach(btn=>btn.addEventListener('click',()=>{const id=btn.getAttribute('data-id');const inp=document.getElementById('editScore');if(inp){let newScore=parseInt(inp.value);const idx=allSubmissions.findIndex(s=>s.id==id);if(idx!==-1&&!isNaN(newScore)&&newScore>=0&&newScore<=allSubmissions[idx].maxScore){allSubmissions[idx].score=newScore;allSubmissions[idx].evaluationText+=` [教师修正：得分调整为${newScore}]`;allSubmissions[idx].timestamp=new Date().toISOString();saveStorage();}}editingRowId=null;renderAdminTable();const sid=idInput.value.trim();if(sid)displayStudentResult(sid,new Date().toISOString().slice(0,10));}));
         document.querySelectorAll('.btn-cancel').forEach(btn=>btn.addEventListener('click',()=>{editingRowId=null;renderAdminTable();}));
     }
     function exportCSV(){
         if(!allSubmissions.length){alert("无数据");return;}
-        let rows=[["ID","姓名","学号","日期","得分","满分","评阅意见","参考答案","章节","题目","时间戳"]];
-        allSubmissions.forEach(r=>rows.push([r.id,r.studentName,r.studentId,r.dateStr,r.score,r.maxScore,r.evaluationText.replace(/,/g," "),r.answerKeyRef,r.chapter,r.questionText,r.timestamp]));
+        let rows=[["ID","姓名","学号","日期","得分","满分","评阅意见","识别内容","参考答案","章节","题目","时间戳"]];
+        allSubmissions.forEach(r=>rows.push([r.id,r.studentName,r.studentId,r.dateStr,r.score,r.maxScore,r.evaluationText.replace(/,/g," "), (r.ocrText||"").replace(/,/g," "), r.answerKeyRef, r.chapter, r.questionText, r.timestamp]));
         let csv=rows.map(row=>row.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(",")).join("\n");
         let blob=new Blob(["\uFEFF"+csv],{type:"text/csv"});
         let a=document.createElement("a"),url=URL.createObjectURL(blob);
-        a.href=url;a.download=`高数_最新提交记录.csv`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+        a.href=url;a.download=`高数_图片识别记录.csv`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
     }
     const adminModal=document.getElementById("adminModal");
     document.getElementById("teacherRankBtn").addEventListener("click",()=>{let pwd=prompt("教师密码:");if(pwd==="math2026"){editingRowId=null;renderAdminTable();adminModal.style.display="flex";}else alert("密码错误");});
