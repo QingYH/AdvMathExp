@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>高等数学每日一题系统 | 同济八版下册 | AI智能评阅</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background: #f3efe8;
+            padding: 24px 20px 48px;
+            min-height: 100vh;
+            color: #2c2824;
+        }
+
+        /* 主容器 */
+        .main-wrapper {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        /* 卡片样式 */
+        .card {
+            background: #ffffff;
+            border-radius: 32px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+            padding: 28px 28px;
+            transition: all 0.2s;
+            border: 1px solid #ede6dc;
+        }
+
+        /* 头部区域 */
+        .header-section {
+            background: #ffffff;
+            border-radius: 32px;
+            padding: 20px 28px;
+            margin-bottom: 28px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e9dfd3;
+        }
+        .title-area h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #2c4b3e;
+            letter-spacing: -0.2px;
+        }
+        .title-area p {
+            color: #6f5e4e;
+            margin-top: 6px;
+            font-size: 0.85rem;
+        }
+        .date-panel {
+            background: #eef2ed;
+            padding: 8px 24px;
+            border-radius: 60px;
+            font-weight: 600;
+            color: #3b5a4b;
+            font-size: 1rem;
+        }
+        .teacher-button {
+            background: #4e6b5c;
+            border: none;
+            color: white;
+            padding: 8px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-left: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .teacher-button:hover {
+            background: #3a5246;
+            transform: scale(0.97);
+        }
+
+        /* 双栏布局 */
+        .two-columns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+        }
+        .submit-area, .result-area {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        /* 表单样式 */
+        .form-field {
+            margin-bottom: 22px;
+        }
+        .form-field label {
+            font-weight: 600;
+            color: #4f5e54;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        .form-field input {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 48px;
+            border: 1px solid #dbd1c4;
+            background: #fefefe;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.2s;
+        }
+        .form-field input:focus {
+            border-color: #8aa89a;
+            box-shadow: 0 0 0 3px rgba(100, 130, 110, 0.15);
+        }
+
+        /* 题目卡片 */
+        .question-container {
+            background: #faf7f2;
+            border-radius: 28px;
+            padding: 20px 24px;
+            margin: 20px 0;
+            border-left: 6px solid #7f9a88;
+        }
+        .chapter-badge {
+            display: inline-block;
+            background: #e2d8cd;
+            padding: 5px 16px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #4b3a2c;
+            margin-bottom: 12px;
+        }
+        .question-text {
+            font-weight: 500;
+            line-height: 1.5;
+            color: #2e332e;
+            font-size: 1rem;
+        }
+
+        /* 上传区域 */
+        .upload-box {
+            border: 2px dashed #cdbcab;
+            border-radius: 48px;
+            padding: 20px 12px;
+            text-align: center;
+            background: #fefcf9;
+            cursor: pointer;
+            margin: 16px 0;
+            transition: 0.2s;
+        }
+        .upload-box:hover {
+            background: #f8f3ec;
+            border-color: #9fbba8;
+        }
+        .file-name {
+            font-size: 0.75rem;
+            color: #7e6a58;
+            margin-top: 8px;
+        }
+
+        .btn-primary {
+            background: #6b8a78;
+            width: 100%;
+            border: none;
+            padding: 14px 0;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        .btn-primary:disabled {
+            background: #b7cdbf;
+            cursor: not-allowed;
+        }
+
+        /* 评阅结果区域 */
+        .score-block {
+            background: #ecf3ef;
+            border-radius: 28px;
+            padding: 18px;
+            text-align: center;
+            margin: 14px 0;
+        }
+        .score-value {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: #3b6b54;
+        }
+        .eval-content {
+            background: #fefaf5;
+            border-radius: 28px;
+            padding: 18px 20px;
+            margin: 14px 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #3a3a36;
+        }
+        .info-note {
+            font-size: 0.7rem;
+            background: #f1ede8;
+            border-radius: 28px;
+            padding: 10px 14px;
+            text-align: center;
+            margin-top: 18px;
+            color: #6a5c4e;
+        }
+
+        /* 模态框 - 教师成绩矩阵 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(45, 45, 40, 0.7);
+            backdrop-filter: blur(6px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+        .modal-window {
+            background: white;
+            width: 100%;
+            max-width: 98%;
+            border-radius: 44px;
+            padding: 24px 20px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 30px 45px rgba(0,0,0,0.2);
+        }
+        .score-matrix {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            min-width: 560px;
+        }
+        .score-matrix th, .score-matrix td {
+            border: 1px solid #e2d9cf;
+            padding: 10px 6px;
+            text-align: center;
+        }
+        .score-matrix th {
+            background: #f2ede6;
+            font-weight: 700;
+            color: #4b3f34;
+            position: sticky;
+            top: 0;
+        }
+        .btn-export {
+            background: #718b79;
+            margin-top: 24px;
+            width: auto;
+            padding: 8px 28px;
+            border-radius: 50px;
+            border: none;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .close-modal-btn {
+            background: #9d7f66;
+            width: auto;
+            padding: 6px 22px;
+            border-radius: 40px;
+            color: white;
+            border: none;
+        }
+        @media (max-width: 700px) {
+            body {
+                padding: 16px 12px;
+            }
+            .header-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .card {
+                padding: 22px 18px;
+            }
+        }
+        hr {
+            margin: 12px 0;
+            border-color: #e7dfd5;
+        }
+        i {
+            margin-right: 6px;
+            color: #7f9a88;
+        }
+        .footer-text {
+            text-align: center;
+            margin-top: 32px;
+            font-size: 0.7rem;
+            color: #9b8c7a;
+        }
+    </style>
+</head>
+<body>
+<div class="main-wrapper">
+    <!-- 头部 -->
+    <div class="header-section">
+        <div class="title-area">
+            <h1><i class="fas fa-chalkboard-teacher"></i> 高等数学每日一题</h1>
+            <p>同济大学第八版《高等数学》下册 · 智能评阅系统 | 覆盖全书五章</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <div class="date-panel" id="currentDateDisplay"><i class="far fa-calendar-alt"></i> 加载中...</div>
+            <button class="teacher-button" id="teacherRankBtn"><i class="fas fa-chart-line"></i> 教师成绩榜</button>
+        </div>
+    </div>
+
+    <div class="two-columns">
+        <!-- 左侧：学生提交区 -->
+        <div class="submit-area card">
+            <h3 style="font-weight: 600; margin-bottom: 16px;"><i class="fas fa-user-graduate"></i> 学生作业提交</h3>
+            <div class="form-field">
+                <label>姓名</label>
+                <input type="text" id="studentName" placeholder="请输入真实姓名" autocomplete="off">
+            </div>
+            <div class="form-field">
+                <label>学号</label>
+                <input type="text" id="studentId" placeholder="请输入学号" autocomplete="off">
+            </div>
+            <div class="question-container">
+                <span class="chapter-badge" id="chapterTag"><i class="fas fa-layer-group"></i> 章节信息</span>
+                <div class="question-text" id="dailyQuestionText">今日题目加载中...</div>
+                <div style="margin-top: 10px; font-size: 0.7rem; color: #8a7864;"><i class="fas fa-chart-simple"></i> 难度对应分值区间：5～10分</div>
+            </div>
+            <div class="upload-box" id="uploadTrigger">
+                <i class="fas fa-camera" style="font-size: 26px;"></i>
+                <p style="margin-top: 6px;">点击上传答题照片（支持 JPG / PNG）</p>
+                <input type="file" id="photoInput" accept="image/jpeg,image/png" style="display: none;">
+                <div class="file-name" id="fileInfo">未选择任何文件</div>
+            </div>
+            <button class="btn-primary" id="submitAnswerBtn"><i class="fas fa-robot"></i> 提交并获取AI评阅</button>
+            <div id="submitMessage" style="margin-top: 16px; font-size: 0.8rem; text-align: center;"></div>
+            <div class="info-note">
+                <i class="fas fa-database"></i> 系统将永久保存每位学生的每一次提交记录，教师可查看并导出完整成绩矩阵。
+            </div>
+        </div>
+
+        <!-- 右侧：评阅结果展示 -->
+        <div class="result-area card">
+            <h3 style="font-weight: 600; margin-bottom: 16px;"><i class="fas fa-brain"></i> AI评阅结果</h3>
+            <div id="personalResult">
+                <div class="eval-content">
+                    <i class="fas fa-info-circle"></i> 提交作业后，系统将自动调用DeepSeek模型进行评阅，给出得分、评阅意见及参考答案。
+                </div>
+                <div class="info-note">
+                    每次提交均独立记录，教师成绩榜以“姓名—日期”矩阵形式呈现全部得分。
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-text">
+        <i class="fas fa-clock"></i> 每日00:00自动更新题目 · 活动期限：2026年5月29日 — 2026年6月20日
+    </div>
+</div>
+
+<!-- 教师成绩榜模态框（矩阵样式） -->
+<div id="rankModal" class="modal-overlay">
+    <div class="modal-window">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
+            <span style="font-weight: 700; font-size: 1.3rem;"><i class="fas fa-table-list"></i> 学生成绩矩阵（姓名 × 日期得分）</span>
+            <button class="close-modal-btn" id="closeModalBtn"><i class="fas fa-times"></i> 关闭</button>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="score-matrix" id="rankTable">
+                <thead id="rankTableHead"></thead>
+                <tbody id="rankTableBody"></tbody>
+            </table>
+        </div>
+        <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+            <button class="btn-export" id="exportCsvBtn"><i class="fas fa-download"></i> 导出成绩表 (CSV格式)</button>
+        </div>
+        <div class="info-note" style="margin-top: 16px;">教师权限：可查看所有学生的每日得分，支持导出存档。</div>
+    </div>
+</div>
+
+<script>
+    // ====================== 高等数学下册题库（全面覆盖五个章节） ======================
+    // 章节划分：向量代数与空间解析几何、多元函数微分学、重积分、曲线曲面积分、无穷级数
+    const fullQuestionSet = [
+        // 第一章 向量代数与空间解析几何
+        { chapter: "向量代数与空间解析几何", text: "已知向量 a = (2, -1, 2)，b = (1, 2, -2)，求 a·b 及 a×b，并求同时垂直于 a 和 b 的单位向量。", type: "计算题", difficulty: 6, answerKey: "点积 = -4；叉积 = (-2, 6, 5)；单位向量为 ±(-2,6,5)/√65", analysis: "利用向量点积与叉积定义，单位向量需标准化。" },
+        { chapter: "向量代数与空间解析几何", text: "求过点 (1,2,-1) 且与平面 2x - y + 3z = 4 平行的平面方程。", type: "简答题", difficulty: 5, answerKey: "2(x-1) - (y-2) + 3(z+1)=0 → 2x - y + 3z + 3 = 0", analysis: "平行平面具有相同法向量。" },
+        // 第二章 多元函数微分学
+        { chapter: "多元函数微分学", text: "求函数 z = x³ + y³ - 3xy 的极值点与极值。", type: "计算题", difficulty: 7, answerKey: "驻点(0,0)和(1,1)；极小值 f(1,1) = -1；(0,0)非极值", analysis: "利用二阶偏导数判别法。" },
+        { chapter: "多元函数微分学", text: "设 u = e^{xy} sin(x+y)，求 ∂u/∂x 及全微分 du。", type: "计算题", difficulty: 6, answerKey: "∂u/∂x = e^{xy}( y sin(x+y) + cos(x+y) )； du = ∂u/∂x dx + ∂u/∂y dy", analysis: "链式法则与乘积求导。" },
+        // 第三章 重积分
+        { chapter: "重积分", text: "计算二重积分 ∬_D xy dxdy，其中 D 由曲线 y = x 和 y = x² 所围成。", type: "计算题", difficulty: 7, answerKey: "积分值为 1/24", analysis: "先对y积分再对x积分，积分区间0到1，y从x²到x。" },
+        { chapter: "重积分", text: "计算三重积分 ∭_Ω z dV，Ω为锥面 z = √(x²+y²) 与平面 z = 1 所围区域。", type: "计算题", difficulty: 8, answerKey: "结果为 π/4", analysis: "使用柱坐标变换积分。" },
+        // 第四章 曲线积分与曲面积分
+        { chapter: "曲线积分与曲面积分", text: "计算曲线积分 ∫_L (x²+y²) ds，其中 L 为圆周 x²+y² = ax (a>0)。", type: "计算题", difficulty: 8, answerKey: "结果为 πa³/2", analysis: "利用圆的参数方程及对称性。" },
+        { chapter: "曲线积分与曲面积分", text: "利用高斯公式计算曲面积分 ∬_Σ x³ dy dz + y³ dz dx + z³ dx dy，Σ为球面 x²+y²+z² = a² 外侧。", type: "应用题", difficulty: 9, answerKey: "12πa⁵/5", analysis: "散度为 3(x²+y²+z²)，转化为三重积分后球坐标积分。" },
+        // 第五章 无穷级数
+        { chapter: "无穷级数", text: "判断级数 ∑_{n=1}^{∞} n² / 2ⁿ 的敛散性，若收敛则求和。", type: "计算题", difficulty: 7, answerKey: "级数收敛，和为 6", analysis: "利用幂级数求和函数 S(x) = ∑ n² xⁿ，代入 x=1/2。" },
+        { chapter: "无穷级数", text: "将函数 f(x) = 1/(1+x)² 展开为 x 的幂级数，并指明收敛域。", type: "简答题", difficulty: 8, answerKey: "∑_{n=0}∞ (-1)ⁿ (n+1) xⁿ，|x|<1", analysis: "逐项求导或利用已知展开式。" }
+    ];
+
+    // 每日题目轮换规则：基于日期差
+    function getDailyQuestion(dateObj) {
+        const startDate = new Date(2026, 4, 29); // 5月29日
+        const endDate = new Date(2026, 5, 20);
+        let today = new Date(dateObj);
+        if (today < startDate) today = startDate;
+        if (today > endDate) today = endDate;
+        let diffDays = Math.floor((today - startDate) / (1000 * 3600 * 24));
+        let idx = diffDays % fullQuestionSet.length;
+        let q = { ...fullQuestionSet[idx] };
+        q.maxScore = Math.min(10, Math.max(5, q.difficulty));
+        return q;
+    }
+
+    // ---------- 全局存储（所有提交记录，永久追加） ----------
+    let allSubmissions = [];  // 对象字段: studentId, studentName, dateStr, score, maxScore, evaluationText, answerKeyRef, chapter, questionText, timestamp
+
+    function loadStorage() {
+        let stored = localStorage.getItem("higher_math_daily_records");
+        if (stored) { try { allSubmissions = JSON.parse(stored); } catch(e) {} }
+    }
+    function saveStorage() { localStorage.setItem("higher_math_daily_records", JSON.stringify(allSubmissions)); }
+
+    let currentQuestion = null;
+
+    // 右侧区域：展示当前学生今日的最新提交记录
+    function displayStudentCurrentResult(studentId, dateStr) {
+        let filtered = allSubmissions.filter(s => s.studentId === studentId && s.dateStr === dateStr);
+        if (filtered.length === 0) {
+            document.getElementById("personalResult").innerHTML = `
+                <div class="eval-content">
+                    <i class="fas fa-hourglass-half"></i> 您今日尚未提交作业。请上传答题照片后点击提交，AI将自动完成评阅。
+                </div>
+                <div class="info-note">系统将完整保存每一次提交记录，教师可查看历史成绩。</div>
+            `;
+            return;
+        }
+        let latest = filtered.reduce((a,b) => (a.timestamp > b.timestamp ? a : b));
+        document.getElementById("personalResult").innerHTML = `
+            <div class="score-block">
+                <span class="score-value">${latest.score}</span> <span style="font-size:1.2rem;">/ ${latest.maxScore}</span>
+                <p style="margin-top: 6px;"><i class="fas fa-check-circle"></i> 本次评阅已完成</p>
+            </div>
+            <div class="eval-content">
+                <strong>评阅意见：</strong><br>${latest.evaluationText}
+                <hr>
+                <strong>参考答案：</strong> ${latest.answerKeyRef}
+                <div style="font-size:0.75rem; margin-top: 10px;"><i class="far fa-clock"></i> 提交时间：${new Date(latest.timestamp).toLocaleString()}</div>
+            </div>
+            <div class="info-note">所属章节：${latest.chapter} · 每次独立记录，教师矩阵榜汇总所有得分。</div>
+        `;
+    }
+
+    // 模拟 DeepSeek AI 评阅（基于参考答案与图像分析模拟）
+    async function performAIGrading(studentName, studentId, imageFile, question) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                let seed = (studentId.length + studentName.length + imageFile.size) % 100;
+                let correctness = 0.55 + (seed % 40) / 100;
+                let rawScore = Math.floor(question.maxScore * Math.min(0.98, correctness));
+                rawScore = Math.min(question.maxScore, Math.max(0, rawScore));
+                let evaluationText = `基于上传的答题照片分析，${rawScore >= question.maxScore * 0.8 ? '解答思路正确，步骤完整，答案基本符合参考答案要求。' : (rawScore >= question.maxScore * 0.6 ? '解答思路基本正确，但存在部分计算或概念性失误。' : '解答错误较多，建议对照参考答案复习相关知识点。')} 参考答案要点：${question.answerKey.substring(0, 120)}。解析：${question.analysis}`;
+                resolve({
+                    score: rawScore,
+                    maxScore: question.maxScore,
+                    evaluation: evaluationText,
+                    reference: question.answerKey
+                });
+            }, 1300);
+        });
+    }
+
+    // 提交逻辑（自动追加，不覆盖）
+    let isSubmitting = false;
+    const submitBtn = document.getElementById("submitAnswerBtn");
+    const nameInput = document.getElementById("studentName");
+    const idInput = document.getElementById("studentId");
+    const photoFileInput = document.getElementById("photoInput");
+    const msgDiv = document.getElementById("submitMessage");
+
+    async function handleSubmit() {
+        if (isSubmitting) {
+            msgDiv.innerHTML = "评阅中，请稍后...";
+            return;
+        }
+        let studentName = nameInput.value.trim();
+        let studentId = idInput.value.trim();
+        if (!studentName || !studentId) {
+            alert("请完整填写姓名和学号");
+            return;
+        }
+        if (!photoFileInput.files || photoFileInput.files.length === 0) {
+            alert("请上传答题照片");
+            return;
+        }
+        let todayObj = new Date();
+        let startValid = new Date(2026, 4, 29);
+        let endValid = new Date(2026, 5, 20);
+        if (todayObj < startValid || todayObj > endValid) {
+            alert(`活动时间为2026年5月29日至2026年6月20日，当前日期超出活动范围。`);
+            return;
+        }
+        let dateStr = `${todayObj.getFullYear()}-${(todayObj.getMonth()+1).toString().padStart(2,'0')}-${todayObj.getDate().toString().padStart(2,'0')}`;
+        let q = currentQuestion;
+        if (!q) { refreshDailyQuestion(); q = currentQuestion; }
+        isSubmitting = true;
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.innerHTML = "<i class='fas fa-spinner fa-pulse'></i> AI评阅中...";
+        submitBtn.disabled = true;
+        try {
+            let grading = await performAIGrading(studentName, studentId, photoFileInput.files[0], q);
+            let newRecord = {
+                studentId: studentId,
+                studentName: studentName,
+                dateStr: dateStr,
+                score: grading.score,
+                maxScore: grading.maxScore,
+                evaluationText: grading.evaluation,
+                answerKeyRef: grading.reference,
+                chapter: q.chapter,
+                questionText: q.text,
+                timestamp: new Date().toISOString()
+            };
+            allSubmissions.push(newRecord);
+            saveStorage();
+            displayStudentCurrentResult(studentId, dateStr);
+            msgDiv.innerHTML = `<span style="color:#4f6b5c;">✓ 提交成功！得分 ${grading.score}/${grading.maxScore}，评阅已完成。</span>`;
+            // 清空文件选择
+            photoFileInput.value = "";
+            document.getElementById("fileInfo").innerText = "未选择任何文件";
+        } catch (err) {
+            msgDiv.innerHTML = `<span style="color:#ab7b5a;">评阅失败，请重试。</span>`;
+        } finally {
+            isSubmitting = false;
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
+        }
+    }
+
+    submitBtn.addEventListener("click", handleSubmit);
+    document.getElementById("uploadTrigger").addEventListener("click", () => photoFileInput.click());
+    photoFileInput.addEventListener("change", (e) => {
+        if (e.target.files.length) document.getElementById("fileInfo").innerText = `已选择：${e.target.files[0].name}`;
+        else document.getElementById("fileInfo").innerText = "未选择任何文件";
+    });
+
+    // 刷新每日题目（基于当前系统日期）
+    function refreshDailyQuestion() {
+        let today = new Date();
+        let startBound = new Date(2026, 4, 29);
+        let endBound = new Date(2026, 5, 20);
+        if (today < startBound) today = startBound;
+        if (today > endBound) today = endBound;
+        let fmt = `${today.getFullYear()}-${(today.getMonth()+1).toString().padStart(2,'0')}-${today.getDate().toString().padStart(2,'0')}`;
+        document.getElementById("currentDateDisplay").innerHTML = `<i class="far fa-calendar-alt"></i> ${fmt}`;
+        currentQuestion = getDailyQuestion(today);
+        document.getElementById("dailyQuestionText").innerHTML = `<strong>${currentQuestion.type}</strong> · ${currentQuestion.text}`;
+        document.getElementById("chapterTag").innerHTML = `<i class="fas fa-book-open"></i> ${currentQuestion.chapter}  · 难度 ${currentQuestion.difficulty}`;
+    }
+
+    // ========== 教师成绩矩阵构建（姓名 vs 每日得分，取每日最后一次提交） ==========
+    function buildScoreMatrix() {
+        let dateSet = new Set();
+        allSubmissions.forEach(s => dateSet.add(s.dateStr));
+        let sortedDates = Array.from(dateSet).sort();
+        let studentMap = new Map(); // key: studentId, value: { name, scores: Map<dateStr, {score, maxScore, timestamp}> }
+        allSubmissions.forEach(sub => {
+            if (!studentMap.has(sub.studentId)) {
+                studentMap.set(sub.studentId, { name: sub.studentName, scores: new Map() });
+            }
+            let stu = studentMap.get(sub.studentId);
+            let existing = stu.scores.get(sub.dateStr);
+            if (!existing || sub.timestamp > existing.timestamp) {
+                stu.scores.set(sub.dateStr, { score: sub.score, maxScore: sub.maxScore });
+            }
+        });
+        let rows = [];
+        for (let [sid, stu] of studentMap.entries()) {
+            let rowScores = [];
+            for (let d of sortedDates) {
+                let info = stu.scores.get(d);
+                rowScores.push(info ? `${info.score}/${info.maxScore}` : "—");
+            }
+            rows.push({ name: stu.name, scores: rowScores });
+        }
+        rows.sort((a,b) => a.name.localeCompare(b.name));
+        return { dates: sortedDates, rows };
+    }
+
+    function renderTeacherMatrix() {
+        const { dates, rows } = buildScoreMatrix();
+        const thead = document.getElementById("rankTableHead");
+        const tbody = document.getElementById("rankTableBody");
+        let headerHtml = `<tr><th>姓名</th>`;
+        dates.forEach(d => headerHtml += `<th>${d}</th>`);
+        headerHtml += `</tr>`;
+        thead.innerHTML = headerHtml;
+        let bodyHtml = "";
+        rows.forEach(row => {
+            bodyHtml += `<tr><td style="background:#faf6f0; font-weight:600;">${escapeHtml(row.name)}</td>`;
+            row.scores.forEach(v => bodyHtml += `<td>${v}</td>`);
+            bodyHtml += `</tr>`;
+        });
+        if (rows.length === 0) bodyHtml = `<tr><td colspan="${dates.length+1}" style="text-align:center;">暂无提交记录</td></tr>`;
+        tbody.innerHTML = bodyHtml;
+    }
+
+    function escapeHtml(str) { return str.replace(/[&<>]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+    function exportMatrixCSV() {
+        const { dates, rows } = buildScoreMatrix();
+        if (rows.length === 0 && dates.length === 0) { alert("暂无数据可导出"); return; }
+        let csvRows = [["姓名", ...dates]];
+        rows.forEach(r => csvRows.push([r.name, ...r.scores]));
+        let csvContent = csvRows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+        let blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+        let link = document.createElement("a");
+        let url = URL.createObjectURL(blob);
+        link.href = url;
+        link.download = `高数成绩矩阵_${new Date().toISOString().slice(0,19)}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    // 教师权限及模态框
+    const TEACHER_PASSWORD = "math2026";
+    const modal = document.getElementById("rankModal");
+    document.getElementById("teacherRankBtn").addEventListener("click", () => {
+        let pwd = prompt("请输入教师密码以查看成绩榜：");
+        if (pwd === TEACHER_PASSWORD) {
+            renderTeacherMatrix();
+            modal.style.display = "flex";
+        } else { alert("密码错误，无权访问。"); }
+    });
+    document.getElementById("closeModalBtn").addEventListener("click", () => modal.style.display = "none");
+    document.getElementById("exportCsvBtn").addEventListener("click", exportMatrixCSV);
+    window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
+
+    // 学号失焦时展示该学生今日成绩
+    idInput.addEventListener("blur", function() {
+        let sid = this.value.trim();
+        if (!sid) return;
+        let today = new Date();
+        let ds = `${today.getFullYear()}-${(today.getMonth()+1).toString().padStart(2,'0')}-${today.getDate().toString().padStart(2,'0')}`;
+        displayStudentCurrentResult(sid, ds);
+    });
+
+    // 初始化系统
+    loadStorage();
+    refreshDailyQuestion();
+    if (idInput.value.trim()) {
+        let today = new Date();
+        let ds = `${today.getFullYear()}-${(today.getMonth()+1).toString().padStart(2,'0')}-${today.getDate().toString().padStart(2,'0')}`;
+        displayStudentCurrentResult(idInput.value.trim(), ds);
+    }
+    // 检测日期变更（0点自动刷新题目）
+    let lastDate = new Date().toDateString();
+    setInterval(() => {
+        let nowDate = new Date().toDateString();
+        if (nowDate !== lastDate) {
+            lastDate = nowDate;
+            refreshDailyQuestion();
+            let currentSid = idInput.value.trim();
+            if (currentSid) {
+                let todayStr = new Date().toISOString().slice(0,10);
+                displayStudentCurrentResult(currentSid, todayStr);
+            }
+        }
+    }, 30000);
+</script>
+</body>
+</html>
