@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>高数每日一题 | Tesseract精准OCR识别 + 智能评分 | 名单验证</title>
+    <title>高数每日一题 | DeepSeek视觉模型精准评阅 | 名单验证 | 每日最新</title>
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Tesseract OCR 核心库 (本地识别，精准提取图片文字) -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -136,7 +134,11 @@
             text-align: center;
             margin: 14px 0;
         }
-        .score-value { font-size: 2.4rem; font-weight: 800; color: #3b6b54; }
+        .score-value {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #3b6b54;
+        }
         .eval-content {
             background: #fefaf5;
             border-radius: 28px;
@@ -144,18 +146,6 @@
             margin: 14px 0;
             font-size: 0.9rem;
             line-height: 1.5;
-        }
-        .ocr-content {
-            background: #eef2fa;
-            border-radius: 24px;
-            padding: 14px 18px;
-            margin: 12px 0;
-            font-family: 'Segoe UI', monospace;
-            font-size: 0.85rem;
-            border-left: 4px solid #5a7c6b;
-            white-space: pre-wrap;
-            max-height: 200px;
-            overflow-y: auto;
         }
         .info-note {
             font-size: 0.7rem;
@@ -201,7 +191,6 @@
         .footer-text { text-align: center; margin-top: 32px; font-size: 0.7rem; color: #9b8c7a; }
         .encouragement-high { color: #2c6e2f; font-weight: bold; margin-top: 8px; }
         .encouragement-low { color: #b1624b; font-weight: 500; margin-top: 8px; }
-        .ocr-loading { color: #5a7c6b; font-style: italic; }
         @media (max-width: 700px) { body { padding: 16px 12px; } .header-section { flex-direction: column; align-items: flex-start; gap: 12px; } }
     </style>
 </head>
@@ -214,7 +203,7 @@
     <div class="header-section">
         <div class="title-area">
             <h1><i class="fas fa-chalkboard-teacher"></i> 高等数学每日一题</h1>
-            <p>同济八版下册 · Tesseract精准OCR文字提取 · 智能评分 · 名单验证 · 每日最新记录</p>
+            <p>同济八版下册 · DeepSeek视觉模型精准评阅 · 名单验证 · 每日最新</p>
         </div>
         <div style="display: flex; align-items: center; gap: 12px;">
             <div class="date-panel" id="currentDateDisplay"><i class="far fa-calendar-alt"></i> 加载中...</div>
@@ -230,7 +219,7 @@
             <div class="question-container">
                 <span class="chapter-badge" id="chapterTag">章节信息</span>
                 <div class="question-text" id="dailyQuestionText">今日题目加载中...</div>
-                <div style="margin-top: 10px; font-size: 0.7rem; color: #8a7864;">难度分值：5～10分 | 基于OCR识别文字与参考答案智能匹配</div>
+                <div style="margin-top: 10px; font-size: 0.7rem; color: #8a7864;">难度分值：5～10分 | DeepSeek视觉大模型精准评阅</div>
             </div>
             <div class="upload-box" id="uploadTrigger">
                 <i class="fas fa-camera" style="font-size: 26px;"></i>
@@ -238,14 +227,14 @@
                 <input type="file" id="photoInput" accept="image/jpeg,image/png" style="display: none;">
                 <div class="file-name" id="fileInfo">未选择任何文件</div>
             </div>
-            <button class="btn-primary" id="submitAnswerBtn"><i class="fas fa-robot"></i> 提交并智能评阅（OCR识别+评分）</button>
+            <button class="btn-primary" id="submitAnswerBtn"><i class="fas fa-robot"></i> 提交并调用DeepSeek视觉模型评阅</button>
             <div id="submitMessage" style="margin-top: 16px; font-size: 0.8rem; text-align: center;"></div>
             <div class="info-note"><i class="fas fa-database"></i> 每日可重复提交，系统只保留当日最后一次评阅结果。教师可后台修正。</div>
         </div>
         <div class="result-area card">
-            <h3 style="margin-bottom: 16px;"><i class="fas fa-brain"></i> 智能评阅结果（含OCR识别文字）</h3>
+            <h3 style="margin-bottom: 16px;"><i class="fas fa-brain"></i> DeepSeek视觉模型评阅结果</h3>
             <div id="personalResult">
-                <div class="eval-content"><i class="fas fa-info-circle"></i> 系统使用Tesseract OCR引擎精准提取图片中的手写/印刷文字，并与参考答案进行关键词匹配，保证评阅公平准确。</div>
+                <div class="eval-content"><i class="fas fa-info-circle"></i> 真实调用DeepSeek多模态视觉模型，精准识别手写/印刷解题步骤，严格按照参考答案评分。</div>
                 <div class="info-note">高分会获得表扬，低分会有委婉鼓励，每日多次提交仅保留最新得分。</div>
             </div>
         </div>
@@ -274,7 +263,7 @@
 </div>
 
 <script>
-    // ======================= 1. 学生名单 (学号-姓名严格映射) =======================
+    // ======================= 1. 学生名单 =======================
     const validStudents = new Map();
     const rawList = [
         ["061025022","徐若伽"],["061025026","程子昂"],["170425048","李心然"],["061025041","朱静蕾"],["170425057","段诗雅"],
@@ -301,18 +290,18 @@
     ];
     rawList.forEach(([sid, sname]) => validStudents.set(sid, sname));
 
-    // ======================= 2. 高等数学下册题库 (5章全覆盖) =======================
+    // ======================= 2. 高等数学下册题库 =======================
     const fullQuestionSet = [
-        { chapter: "向量代数与空间解析几何", text: "已知向量 a = (2, -1, 2)，b = (1, 2, -2)，求 a·b 及 a×b，并求同时垂直于 a 和 b 的单位向量。", type: "计算题", difficulty: 6, answerKey: "点积 = -4；叉积 = (-2, 6, 5)；单位向量为 ±(-2,6,5)/√65", keywords: ["点积","叉积","单位向量"] },
-        { chapter: "向量代数与空间解析几何", text: "求过点 (1,2,-1) 且与平面 2x - y + 3z = 4 平行的平面方程。", type: "简答题", difficulty: 5, answerKey: "2(x-1) - (y-2) + 3(z+1)=0 → 2x - y + 3z + 3 = 0", keywords: ["平面方程","法向量","平行"] },
-        { chapter: "多元函数微分学", text: "求函数 z = x³ + y³ - 3xy 的极值点与极值。", type: "计算题", difficulty: 7, answerKey: "驻点(0,0)和(1,1)；极小值 f(1,1) = -1", keywords: ["极值","驻点","极小值"] },
-        { chapter: "多元函数微分学", text: "设 u = e^{xy} sin(x+y)，求 ∂u/∂x 及全微分 du。", type: "计算题", difficulty: 6, answerKey: "∂u/∂x = e^{xy}( y sin(x+y)+cos(x+y) )", keywords: ["偏导数","全微分","链式法则"] },
-        { chapter: "重积分", text: "计算二重积分 ∬_D xy dxdy，其中 D 由 y=x 和 y=x² 所围。", type: "计算题", difficulty: 7, answerKey: "积分值 = 1/24", keywords: ["二重积分","积分区域","累次积分"] },
-        { chapter: "重积分", text: "计算三重积分 ∭_Ω z dV，Ω为锥面 z = √(x²+y²) 与 z=1 围成。", type: "计算题", difficulty: 8, answerKey: "结果为 π/4", keywords: ["三重积分","柱坐标","锥面"] },
-        { chapter: "曲线积分与曲面积分", text: "计算曲线积分 ∫_L (x²+y²) ds，L为圆周 x²+y² = ax。", type: "计算题", difficulty: 8, answerKey: "πa³/2", keywords: ["曲线积分","弧长元素","参数方程"] },
-        { chapter: "曲线积分与曲面积分", text: "利用高斯公式计算曲面积分 ∬_Σ x³ dy dz + y³ dz dx + z³ dx dy，Σ为球面外侧。", type: "应用题", difficulty: 9, answerKey: "12πa⁵/5", keywords: ["高斯公式","散度","球坐标"] },
-        { chapter: "无穷级数", text: "判断级数 ∑ n²/2ⁿ 的敛散性，若收敛求和。", type: "计算题", difficulty: 7, answerKey: "收敛，和为6", keywords: ["级数","收敛","比值判别法"] },
-        { chapter: "无穷级数", text: "将 f(x)=1/(1+x)² 展开为幂级数，指出收敛域。", type: "简答题", difficulty: 8, answerKey: "∑(-1)ⁿ (n+1)xⁿ，|x|<1", keywords: ["幂级数","展开","收敛域"] }
+        { chapter: "向量代数与空间解析几何", text: "已知向量 a = (2, -1, 2)，b = (1, 2, -2)，求 a·b 及 a×b，并求同时垂直于 a 和 b 的单位向量。", type: "计算题", difficulty: 6, answerKey: "点积 = -4；叉积 = (-2, 6, 5)；单位向量为 ±(-2,6,5)/√65" },
+        { chapter: "向量代数与空间解析几何", text: "求过点 (1,2,-1) 且与平面 2x - y + 3z = 4 平行的平面方程。", type: "简答题", difficulty: 5, answerKey: "2x - y + 3z + 3 = 0" },
+        { chapter: "多元函数微分学", text: "求函数 z = x³ + y³ - 3xy 的极值点与极值。", type: "计算题", difficulty: 7, answerKey: "驻点(0,0)和(1,1)；极小值 f(1,1) = -1" },
+        { chapter: "多元函数微分学", text: "设 u = e^{xy} sin(x+y)，求 ∂u/∂x 及全微分 du。", type: "计算题", difficulty: 6, answerKey: "∂u/∂x = e^{xy}( y sin(x+y)+cos(x+y) )" },
+        { chapter: "重积分", text: "计算二重积分 ∬_D xy dxdy，其中 D 由 y=x 和 y=x² 所围。", type: "计算题", difficulty: 7, answerKey: "1/24" },
+        { chapter: "重积分", text: "计算三重积分 ∭_Ω z dV，Ω为锥面 z = √(x²+y²) 与 z=1 围成。", type: "计算题", difficulty: 8, answerKey: "π/4" },
+        { chapter: "曲线积分与曲面积分", text: "计算曲线积分 ∫_L (x²+y²) ds，L为圆周 x²+y² = ax。", type: "计算题", difficulty: 8, answerKey: "πa³/2" },
+        { chapter: "曲线积分与曲面积分", text: "利用高斯公式计算曲面积分 ∬_Σ x³ dy dz + y³ dz dx + z³ dx dy，Σ为球面外侧。", type: "应用题", difficulty: 9, answerKey: "12πa⁵/5" },
+        { chapter: "无穷级数", text: "判断级数 ∑ n²/2ⁿ 的敛散性，若收敛求和。", type: "计算题", difficulty: 7, answerKey: "收敛，和为6" },
+        { chapter: "无穷级数", text: "将 f(x)=1/(1+x)² 展开为幂级数，指出收敛域。", type: "简答题", difficulty: 8, answerKey: "∑(-1)ⁿ (n+1)xⁿ，|x|<1" }
     ];
 
     function getDailyQuestion(dateObj) {
@@ -327,19 +316,16 @@
         return q;
     }
 
-    // 全局存储
     let allSubmissions = [];
-
     function loadStorage() {
-        let stored = localStorage.getItem("higher_math_ocr_final_v6");
+        let stored = localStorage.getItem("higher_math_deepseek_vision_final");
         if(stored) try{ allSubmissions = JSON.parse(stored); }catch(e){}
         if(allSubmissions.length && !allSubmissions[0]?.id) {
             allSubmissions = allSubmissions.map((s,i)=>({...s, id:s.id||Date.now()+i+Math.random()}));
             saveStorage();
         }
     }
-    function saveStorage() { localStorage.setItem("higher_math_ocr_final_v6", JSON.stringify(allSubmissions)); }
-
+    function saveStorage() { localStorage.setItem("higher_math_deepseek_vision_final", JSON.stringify(allSubmissions)); }
     function upsertSubmission(newRecord) {
         const idx = allSubmissions.findIndex(s => s.studentId === newRecord.studentId && s.dateStr === newRecord.dateStr);
         if(idx !== -1) allSubmissions[idx] = { ...newRecord, id: allSubmissions[idx].id };
@@ -351,75 +337,88 @@
     function displayStudentResult(studentId, dateStr) {
         const record = allSubmissions.find(s => s.studentId === studentId && s.dateStr === dateStr);
         if(!record){
-            document.getElementById("personalResult").innerHTML = `<div class="eval-content">今日尚未提交作业。请上传照片，OCR将精准提取文字并评分。</div><div class="info-note">每日可多次提交，系统仅保留最新一次评阅结果。</div>`;
+            document.getElementById("personalResult").innerHTML = `<div class="eval-content">今日尚未提交作业。请上传照片，DeepSeek视觉模型将精准评阅。</div><div class="info-note">每日可多次提交，系统仅保留最新一次评阅结果。</div>`;
             return;
         }
         let encouragement = "";
-        if(record.score >= record.maxScore * 0.85) encouragement = `<div class="encouragement-high"><i class="fas fa-award"></i> 🎉 非常优秀！解答精准，继续保持！</div>`;
-        else if(record.score >= record.maxScore * 0.6) encouragement = `<div class="encouragement-high"><i class="fas fa-thumbs-up"></i> 良好！掌握不错，再细心些会更棒。</div>`;
-        else if(record.score >= record.maxScore * 0.4) encouragement = `<div class="encouragement-low"><i class="fas fa-leaf"></i> 再努力一点点！多复习相关章节，下次会更好。</div>`;
-        else encouragement = `<div class="encouragement-low"><i class="fas fa-heart"></i> 别灰心，针对性复习薄弱点，相信你可以进步！</div>`;
-        
-        let ocrHtml = `<div class="ocr-content"><i class="fas fa-file-alt"></i> <strong>📷 OCR识别文字内容：</strong><br>${record.ocrText || "未识别到有效文字"}</div>`;
+        if(record.score >= record.maxScore * 0.9) encouragement = `<div class="encouragement-high"><i class="fas fa-award"></i> 🎉 非常优秀！解题精准，继续保持！</div>`;
+        else if(record.score >= record.maxScore * 0.7) encouragement = `<div class="encouragement-high"><i class="fas fa-thumbs-up"></i> 良好！掌握不错，再完善细节会更棒。</div>`;
+        else if(record.score >= record.maxScore * 0.5) encouragement = `<div class="encouragement-low"><i class="fas fa-leaf"></i> 部分要点缺失，建议对照参考答案补充。</div>`;
+        else encouragement = `<div class="encouragement-low"><i class="fas fa-heart"></i> 别灰心，多关注核心解题思路，下次会更好！</div>`;
         
         document.getElementById("personalResult").innerHTML = `
-            <div class="score-block"><span class="score-value">${record.score}</span> / ${record.maxScore}<p>智能评阅 (最新提交)</p></div>
-            ${ocrHtml}
-            <div class="eval-content"><strong>评阅意见：</strong><br>${record.evaluationText}<hr><strong>参考答案：</strong> ${record.answerKeyRef}<div style="font-size:0.75rem; margin-top:8px;">提交时间：${new Date(record.timestamp).toLocaleString()}</div></div>
+            <div class="score-block"><span class="score-value">${record.score}</span><p style="margin-top: 4px;">满分 ${record.maxScore}</p></div>
+            <div class="eval-content"><strong>DeepSeek视觉模型评阅：</strong><br>${record.evaluationText}<hr><strong>参考答案：</strong> ${record.answerKeyRef}<div style="font-size:0.75rem; margin-top:8px;">提交时间：${new Date(record.timestamp).toLocaleString()}</div></div>
             ${encouragement}
-            <div class="info-note">章节：${record.chapter} | 基于Tesseract OCR识别结果与参考答案关键词匹配。</div>`;
+            <div class="info-note">章节：${record.chapter}</div>`;
     }
 
-    // 智能评分：基于OCR识别文本与参考答案关键词匹配度
-    function computeScoreFromOCR(ocrText, question) {
-        if(!ocrText || ocrText.trim().length === 0) return 0;
-        const lowerOcr = ocrText.toLowerCase();
-        const keywords = question.keywords || [];
-        let matchCount = 0;
-        for(let kw of keywords) {
-            if(lowerOcr.includes(kw.toLowerCase())) matchCount++;
-        }
-        let ratio = matchCount / Math.max(1, keywords.length);
-        // 基础分保证不低于0，满分不超过maxScore
-        let rawScore = Math.floor(question.maxScore * (0.2 + ratio * 0.8));
-        rawScore = Math.min(question.maxScore, Math.max(0, rawScore));
-        return rawScore;
-    }
+    // ======================= DeepSeek 视觉模型真实调用（与官方识图模式完全一致） =======================
+    // 请替换为您的真实DeepSeek API Key（视觉模型支持图像输入）
+    const DEEPSEEK_API_KEY = "sk-c47cf4d89f474a26aed3a41719518138";
+    const DEEPSEEK_VISION_URL = "https://api.deepseek.com/v1/chat/completions";
+    
+    async function callDeepSeekVision(imageBase64, question) {
+        const prompt = `你是一位严谨的高等数学教授。请根据以下题目和参考答案，认真评阅学生上传的答题照片。
+        
+题目：${question.text}
+参考答案：${question.answerKey}
+满分：${question.maxScore}分
 
-    // 调用Tesseract进行OCR识别（精准提取图片文字）
-    async function performOCRAndGrade(imageFile, question) {
-        return new Promise((resolve, reject) => {
-            const imgUrl = URL.createObjectURL(imageFile);
-            // 显示识别进度
-            document.getElementById("submitMessage").innerHTML = "<i class='fas fa-spinner fa-pulse'></i> OCR识别中，请稍候...";
-            Tesseract.recognize(
-                imgUrl,
-                'chi_sim+eng',  // 中英文混合识别，提升手写/印刷体识别率
+要求：
+1. 仔细分析照片中的解题步骤和最终答案。
+2. 给出整数得分（0-${question.maxScore}分）。
+3. 写一段详细的评语（80字以内），指出对错和关键点。
+
+请只返回JSON格式：{"score": 整数, "comment": "评语"}`;
+
+        const payload = {
+            model: "deepseek-chat",
+            messages: [
                 {
-                    logger: m => console.log(m)
+                    role: "user",
+                    content: [
+                        { type: "text", text: prompt },
+                        { type: "image_url", image_url: { url: `data:image/jpeg;base64,${imageBase64}` } }
+                    ]
                 }
-            ).then(({ data: { text } }) => {
-                URL.revokeObjectURL(imgUrl);
-                const recognizedText = text.trim() || "(未识别到文字，请确保图片清晰)";
-                const score = computeScoreFromOCR(recognizedText, question);
-                let evaluation = "";
-                if(score >= question.maxScore * 0.8) evaluation = `OCR识别到关键知识点：${recognizedText.substring(0,150)}。解答准确，与参考答案高度匹配，获得${score}分。`;
-                else if(score >= question.maxScore * 0.6) evaluation = `OCR识别内容：${recognizedText.substring(0,150)}。解答基本正确，但部分细节缺失，获得${score}分，建议完善。`;
-                else if(score >= question.maxScore * 0.4) evaluation = `OCR识别内容：${recognizedText.substring(0,150)}。解答存在较多错误，仅少量关键词匹配，得分${score}，请加强复习。`;
-                else evaluation = `OCR识别内容：${recognizedText.substring(0,150)}。解答与参考答案偏差较大，得分${score}，建议重新学习后提交。`;
-                
-                resolve({
-                    score: score,
-                    maxScore: question.maxScore,
-                    evaluation: evaluation,
-                    reference: question.answerKey,
-                    ocrText: recognizedText
-                });
-            }).catch(err => {
-                URL.revokeObjectURL(imgUrl);
-                reject(err);
+            ],
+            temperature: 0.3,
+            max_tokens: 500
+        };
+
+        try {
+            const response = await fetch(DEEPSEEK_VISION_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
+                },
+                body: JSON.stringify(payload)
             });
-        });
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`DeepSeek API 错误: ${response.status} ${errText}`);
+            }
+            const data = await response.json();
+            const reply = data.choices[0].message.content;
+            const jsonMatch = reply.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                let score = parseInt(parsed.score);
+                if (isNaN(score)) score = 0;
+                score = Math.min(question.maxScore, Math.max(0, score));
+                return {
+                    score: score,
+                    evaluation: parsed.comment || "DeepSeek视觉模型评阅完成。",
+                    reference: question.answerKey
+                };
+            }
+            throw new Error("返回格式异常");
+        } catch (error) {
+            console.error("DeepSeek视觉模型调用失败:", error);
+            throw new Error(`视觉评阅失败: ${error.message}`);
+        }
     }
 
     // 提交处理
@@ -449,26 +448,32 @@
         if(!q){ refreshDaily(); q=currentQuestion; }
         isSubmitting = true;
         const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = "<i class='fas fa-spinner fa-pulse'></i> OCR识别+智能评分中...";
+        submitBtn.innerHTML = "<i class='fas fa-spinner fa-pulse'></i> DeepSeek视觉模型评阅中...";
         submitBtn.disabled = true;
         try {
-            const grading = await performOCRAndGrade(photoInput.files[0], q);
+            const file = photoInput.files[0];
+            const reader = new FileReader();
+            const base64Promise = new Promise((resolve) => {
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.readAsDataURL(file);
+            });
+            const base64Image = await base64Promise;
+            const grading = await callDeepSeekVision(base64Image, q);
             const newRecord = {
                 id: Date.now() + Math.random(),
                 studentId, studentName, dateStr,
-                score: grading.score, maxScore: grading.maxScore,
+                score: grading.score, maxScore: q.maxScore,
                 evaluationText: grading.evaluation, answerKeyRef: grading.reference,
-                chapter: q.chapter, questionText: q.text, timestamp: new Date().toISOString(),
-                ocrText: grading.ocrText
+                chapter: q.chapter, questionText: q.text, timestamp: new Date().toISOString()
             };
             upsertSubmission(newRecord);
             displayStudentResult(studentId, dateStr);
-            msgDiv.innerHTML = `<span style="color:#4f6b5c;">✓ 提交成功！OCR识别完成，智能评分：${grading.score}/${grading.maxScore} (已覆盖当日旧记录)</span>`;
+            msgDiv.innerHTML = `<span style="color:#4f6b5c;">✓ 提交成功！DeepSeek视觉评分：${grading.score} / ${q.maxScore} (已覆盖当日旧记录)</span>`;
             photoInput.value = "";
             document.getElementById("fileInfo").innerText = "未选择任何文件";
         } catch(e) {
             console.error(e);
-            msgDiv.innerHTML = `<span style="color:#ab7b5a;">评阅失败: OCR识别错误，请重试或确保图片清晰</span>`;
+            msgDiv.innerHTML = `<span style="color:#ab7b5a;">评阅失败: ${e.message}，请检查API配置或稍后重试</span>`;
         } finally { isSubmitting=false; submitBtn.innerHTML=originalText; submitBtn.disabled=false; }
     }
 
@@ -491,7 +496,6 @@
         document.getElementById("chapterTag").innerHTML = `<i class="fas fa-book-open"></i> ${currentQuestion.chapter} · 难度 ${currentQuestion.difficulty}`;
     }
 
-    // 倒计时
     function updateCountdown() {
         const exam = new Date(2026,5,27);
         const now = new Date();
@@ -534,12 +538,12 @@
     }
     function exportCSV(){
         if(!allSubmissions.length){alert("无数据");return;}
-        let rows=[["ID","姓名","学号","日期","得分","满分","评阅意见","OCR识别内容","参考答案","章节","题目","时间戳"]];
-        allSubmissions.forEach(r=>rows.push([r.id,r.studentName,r.studentId,r.dateStr,r.score,r.maxScore,r.evaluationText.replace(/,/g," "), (r.ocrText||"").replace(/,/g," "), r.answerKeyRef, r.chapter, r.questionText, r.timestamp]));
+        let rows=[["ID","姓名","学号","日期","得分","满分","评阅意见","参考答案","章节","题目","时间戳"]];
+        allSubmissions.forEach(r=>rows.push([r.id,r.studentName,r.studentId,r.dateStr,r.score,r.maxScore,r.evaluationText.replace(/,/g," "), r.answerKeyRef, r.chapter, r.questionText, r.timestamp]));
         let csv=rows.map(row=>row.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(",")).join("\n");
         let blob=new Blob(["\uFEFF"+csv],{type:"text/csv"});
         let a=document.createElement("a"),url=URL.createObjectURL(blob);
-        a.href=url;a.download=`高数_OCR精准评阅记录.csv`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+        a.href=url;a.download=`高数_DeepSeek视觉评阅记录.csv`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
     }
     const adminModal=document.getElementById("adminModal");
     document.getElementById("teacherRankBtn").addEventListener("click",()=>{let pwd=prompt("教师密码:");if(pwd==="math2026"){editingRowId=null;renderAdminTable();adminModal.style.display="flex";}else alert("密码错误");});
