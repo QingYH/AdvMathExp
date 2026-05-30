@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>高数每日一题 | DeepSeek视觉模型精准评阅 | 名单验证 | 每日最新</title>
+    <title>高数每日一题 | 一次提交 | 累计总分 | 趣味激励 | 详细解析</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -103,17 +103,46 @@
             font-weight: 700;
             margin-bottom: 12px;
         }
-        .upload-box {
-            border: 2px dashed #cdbcab;
-            border-radius: 48px;
-            padding: 20px 12px;
-            text-align: center;
+        .options-container {
+            margin: 16px 0 8px;
+        }
+        .option-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 12px;
+            margin: 6px 0;
             background: #fefcf9;
-            cursor: pointer;
-            margin: 16px 0;
+            border-radius: 20px;
+            border: 1px solid #ede3d7;
             transition: 0.2s;
         }
-        .upload-box:hover { background: #f8f3ec; }
+        .option-item:hover { background: #f8f3ec; }
+        .option-item input {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            cursor: pointer;
+            accent-color: #6b8a78;
+        }
+        .option-item label {
+            flex: 1;
+            font-size: 0.88rem;
+            line-height: 1.45;
+            color: #3b3a36;
+            cursor: pointer;
+            font-weight: normal;
+        }
+        .question-type-badge {
+            display: inline-block;
+            background: #c9d9cf;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 10px;
+            color: #3b5a4b;
+        }
         .btn-primary {
             background: #6b8a78;
             width: 100%;
@@ -126,15 +155,21 @@
             cursor: pointer;
         }
         .btn-primary:disabled { background: #b7cdbf; cursor: not-allowed; }
-        .score-block {
-            background: #ecf3ef;
+        .score-card {
+            background: linear-gradient(135deg, #2c6e2f15 0%, #4a9e4e25 100%);
             border-radius: 28px;
-            padding: 18px;
+            padding: 16px;
             text-align: center;
-            margin: 14px 0;
+            margin: 10px 0;
+            border: 1px solid #9bc4a0;
         }
         .score-value {
-            font-size: 2.8rem;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #2c6e2f;
+        }
+        .total-score-value {
+            font-size: 1.8rem;
             font-weight: 800;
             color: #3b6b54;
         }
@@ -146,6 +181,15 @@
             font-size: 0.9rem;
             line-height: 1.5;
         }
+        .option-analysis {
+            background: #f8f0e8;
+            border-radius: 20px;
+            padding: 12px 16px;
+            margin: 10px 0;
+            font-size: 0.85rem;
+        }
+        .option-correct { color: #2c6e2f; font-weight: 600; }
+        .option-wrong { color: #b1624b; }
         .info-note {
             font-size: 0.7rem;
             background: #f1ede8;
@@ -188,9 +232,36 @@
         hr { margin: 12px 0; border-color: #e7dfd5; }
         i { margin-right: 6px; }
         .footer-text { text-align: center; margin-top: 32px; font-size: 0.7rem; color: #9b8c7a; }
-        .encouragement-high { color: #2c6e2f; font-weight: bold; margin-top: 8px; }
-        .encouragement-low { color: #b1624b; font-weight: 500; margin-top: 8px; }
-        @media (max-width: 700px) { body { padding: 16px 12px; } .header-section { flex-direction: column; align-items: flex-start; gap: 12px; } }
+        .encouragement-box {
+            background: linear-gradient(105deg, #fff7e8 0%, #feefd6 100%);
+            border-radius: 28px;
+            padding: 16px 20px;
+            margin: 14px 0;
+            text-align: center;
+            border-left: 8px solid #f0a34b;
+        }
+        .knowledge-box {
+            background: #eaf4ea;
+            border-radius: 20px;
+            padding: 14px 18px;
+            margin: 12px 0;
+            border-left: 4px solid #5a7c6b;
+        }
+        .solution-box {
+            background: #eef2fa;
+            border-radius: 20px;
+            padding: 14px 18px;
+            margin: 12px 0;
+            border-left: 4px solid #718b79;
+        }
+        .warning-box {
+            background: #fff0e0;
+            border-radius: 20px;
+            padding: 12px 16px;
+            margin: 12px 0;
+            border-left: 4px solid #e0a878;
+        }
+        @media (max-width: 700px) { body { padding: 16px 12px; } .header-section { flex-direction: column; align-items: flex-start; gap: 12px; } .option-item label { font-size: 0.8rem; } }
     </style>
 </head>
 <body>
@@ -201,8 +272,8 @@
     </div>
     <div class="header-section">
         <div class="title-area">
-            <h1><i class="fas fa-chalkboard-teacher"></i> 高等数学每日一题</h1>
-            <p>同济八版下册 · DeepSeek视觉模型精准评阅 · 名单验证 · 每日最新</p>
+            <h1><i class="fas fa-chalkboard-teacher"></i> 高等数学@每日一题</h1>
+            <p>同济八版下册 · 期末复习 · 积分累积 . 详细解析</p>
         </div>
         <div style="display: flex; align-items: center; gap: 12px;">
             <div class="date-panel" id="currentDateDisplay"><i class="far fa-calendar-alt"></i> 加载中...</div>
@@ -212,33 +283,28 @@
 
     <div class="two-columns">
         <div class="submit-area card">
-            <h3 style="margin-bottom: 16px;"><i class="fas fa-user-graduate"></i> 学生作业提交</h3>
+            <h3 style="margin-bottom: 16px;"><i class="fas fa-user-graduate"></i> 学生答题</h3>
             <div class="form-field"><label>姓名</label><input type="text" id="studentName" placeholder="请输入真实姓名"></div>
             <div class="form-field"><label>学号</label><input type="text" id="studentId" placeholder="请输入学号"></div>
             <div class="question-container">
                 <span class="chapter-badge" id="chapterTag">章节信息</span>
-                <div class="question-text" id="dailyQuestionText">今日题目加载中...</div>
-                <div style="margin-top: 10px; font-size: 0.7rem; color: #8a7864;">难度分值：5～10分 | DeepSeek视觉大模型精准评阅</div>
+                <div class="question-text" id="dailyQuestionText" style="font-weight: 600;">今日题目加载中...</div>
+                <div id="optionsArea" class="options-container"></div>
+                <div style="margin-top: 8px; font-size: 0.7rem; color: #8a7864;">难度分值：5～10分 | 每人每日仅有一次提交机会</div>
             </div>
-            <div class="upload-box" id="uploadTrigger">
-                <i class="fas fa-camera" style="font-size: 26px;"></i>
-                <p>点击上传答题照片（JPG/PNG）</p>
-                <input type="file" id="photoInput" accept="image/jpeg,image/png" style="display: none;">
-                <div class="file-name" id="fileInfo">未选择任何文件</div>
-            </div>
-            <button class="btn-primary" id="submitAnswerBtn"><i class="fas fa-robot"></i> 提交并调用DeepSeek视觉模型评阅</button>
+            <button class="btn-primary" id="submitAnswerBtn"><i class="fas fa-paper-plane"></i> 提交答案</button>
             <div id="submitMessage" style="margin-top: 16px; font-size: 0.8rem; text-align: center;"></div>
-            <div class="info-note"><i class="fas fa-database"></i> 每日可重复提交，系统只保留当日最后一次评阅结果。教师可后台修正。</div>
+            <div class="info-note"><i class="fas fa-exclamation-triangle"></i> 每位学生每日仅有一次提交机会，提交后不可更改。教师可后台修正异常分数。</div>
         </div>
         <div class="result-area card">
-            <h3 style="margin-bottom: 16px;"><i class="fas fa-brain"></i> DeepSeek视觉模型评阅结果</h3>
+            <h3 style="margin-bottom: 16px;"><i class="fas fa-chalkboard"></i> 批阅结果与详细解析</h3>
             <div id="personalResult">
-                <div class="eval-content"><i class="fas fa-info-circle"></i> 真实调用DeepSeek多模态视觉模型，精准识别手写/印刷解题步骤，严格按照参考答案评分。</div>
-                <div class="info-note">高分会获得表扬，低分会有委婉鼓励，每日多次提交仅保留最新得分。</div>
+                <div class="eval-content"><i class="fas fa-info-circle"></i> 选择答案后提交，系统将自动批阅并给出分数、鼓励评语、逐项分析、知识点解读、多解法及注意事项。</div>
+                <div class="info-note">答题错误时会明确指出错误选项及原因，帮助理解知识点。</div>
             </div>
         </div>
     </div>
-    <div class="footer-text"><i class="fas fa-clock"></i> 每日00:00更新题目 · 活动：2026.05.29 — 2026.06.26 (6月27日期末考试)</div>
+    <div class="footer-text"><i class="fas fa-clock"></i> 每日00:00更新题目 · 活动：2026.05.30 — 2026.06.26 (6月27日期末考试)</div>
 </div>
 
 <!-- 教师后台模态框 -->
@@ -256,13 +322,13 @@
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px;">
             <button class="btn-export" id="exportAdminCsvBtn"><i class="fas fa-download"></i> 导出全部记录 CSV</button>
-            <span style="font-size: 0.75rem;">教师可修正分数或删除记录</span>
+            <span style="font-size: 0.75rem;">教师可修正分数或删除记录，最后一列累计总分会在导出时重新计算。</span>
         </div>
     </div>
 </div>
 
 <script>
-    // ======================= 1. 学生名单 =======================
+    // ======================= 学生名单 =======================
     const validStudents = new Map();
     const rawList = [
         ["061025022","徐若伽"],["061025026","程子昂"],["170425048","李心然"],["061025041","朱静蕾"],["170425057","段诗雅"],
@@ -289,18 +355,24 @@
     ];
     rawList.forEach(([sid, sname]) => validStudents.set(sid, sname));
 
-    // ======================= 2. 高等数学下册题库 =======================
-    const fullQuestionSet = [
-        { chapter: "向量代数与空间解析几何", text: "已知向量 a = (2, -1, 2)，b = (1, 2, -2)，求 a·b 及 a×b，并求同时垂直于 a 和 b 的单位向量。", type: "计算题", difficulty: 6, answerKey: "点积 = -4；叉积 = (-2, 6, 5)；单位向量为 ±(-2,6,5)/√65" },
-        { chapter: "向量代数与空间解析几何", text: "求过点 (1,2,-1) 且与平面 2x - y + 3z = 4 平行的平面方程。", type: "简答题", difficulty: 5, answerKey: "2x - y + 3z + 3 = 0" },
-        { chapter: "多元函数微分学", text: "求函数 z = x³ + y³ - 3xy 的极值点与极值。", type: "计算题", difficulty: 7, answerKey: "驻点(0,0)和(1,1)；极小值 f(1,1) = -1" },
-        { chapter: "多元函数微分学", text: "设 u = e^{xy} sin(x+y)，求 ∂u/∂x 及全微分 du。", type: "计算题", difficulty: 6, answerKey: "∂u/∂x = e^{xy}( y sin(x+y)+cos(x+y) )" },
-        { chapter: "重积分", text: "计算二重积分 ∬_D xy dxdy，其中 D 由 y=x 和 y=x² 所围。", type: "计算题", difficulty: 7, answerKey: "1/24" },
-        { chapter: "重积分", text: "计算三重积分 ∭_Ω z dV，Ω为锥面 z = √(x²+y²) 与 z=1 围成。", type: "计算题", difficulty: 8, answerKey: "π/4" },
-        { chapter: "曲线积分与曲面积分", text: "计算曲线积分 ∫_L (x²+y²) ds，L为圆周 x²+y² = ax。", type: "计算题", difficulty: 8, answerKey: "πa³/2" },
-        { chapter: "曲线积分与曲面积分", text: "利用高斯公式计算曲面积分 ∬_Σ x³ dy dz + y³ dz dx + z³ dx dy，Σ为球面外侧。", type: "应用题", difficulty: 9, answerKey: "12πa⁵/5" },
-        { chapter: "无穷级数", text: "判断级数 ∑ n²/2ⁿ 的敛散性，若收敛求和。", type: "计算题", difficulty: 7, answerKey: "收敛，和为6" },
-        { chapter: "无穷级数", text: "将 f(x)=1/(1+x)² 展开为幂级数，指出收敛域。", type: "简答题", difficulty: 8, answerKey: "∑(-1)ⁿ (n+1)xⁿ，|x|<1" }
+    // ======================= 高等数学选择题库 =======================
+    const questionBank = [
+        { chapter: "向量代数与空间解析几何", text: "已知向量 a=(2,-1,2), b=(1,2,-2)，则下列选项中正确的是？", type: "多选题", difficulty: 7, maxScore: 7,
+          options: ["A. a·b = -4", "B. a×b = (-2,6,5)", "C. 与a,b都垂直的单位向量为 ±(-2,6,5)/√65", "D. a·b = 4", "E. a×b = (2,-6,-5)", "F. a与b的夹角为60°"],
+          correct: ["A","B","C"], 
+          explanation: "点积=2×1+(-1)×2+2×(-2)=2-2-4=-4；叉积由行列式计算得(-2,6,5)；单位向量需除以模长√(4+36+25)=√65。",
+          knowledge: "📖 知识点：向量的点积（数量积）公式a·b = a₁b₁+a₂b₂+a₃b₃；叉积（向量积）的计算可用三阶行列式；单位向量为向量除以自身模长；向量垂直的条件是点积为0。",
+          solutions: "🔹 解法一（直接计算）：点积按公式计算；叉积按i,j,k行列式展开。\n🔹 解法二（几何意义）：点积反映投影关系，叉积方向垂直于原向量平面。",
+          warnings: "⚠️ 注意事项：1. 叉积结果是一个向量，方向遵循右手定则；2. 单位向量有两个相反方向；3. 夹角公式cosθ = (a·b)/(|a||b|)。",
+          optionDetails: { "A":"✔ 正确，点积计算准确。", "B":"✔ 正确，叉积计算准确。", "C":"✔ 正确，叉积模长为√65，单位向量为±(叉积)/模长。", "D":"✘ 错误，a·b应为-4。", "E":"✘ 错误，叉积计算错误，符号有误。", "F":"✘ 错误，夹角cosθ=-4/9≈-0.444，不是60°。" } },
+        { chapter: "向量代数与空间解析几何", text: "过点(1,2,-1)且与平面2x-y+3z=4平行的平面方程是？", type: "单选题", difficulty: 5, maxScore: 5,
+          options: ["A. 2x-y+3z+3=0", "B. 2x-y+3z-3=0", "C. 2x-y+3z+1=0", "D. x+2y-z+4=0", "E. 2x-y+3z=0", "F. 2x-y+3z+4=0"],
+          correct: ["A"], 
+          explanation: "平行平面法向量相同为(2,-1,3)，设方程为2x-y+3z+D=0，代入点(1,2,-1)得2-2-3+D=0 → D=3，故2x-y+3z+3=0。",
+          knowledge: "📖 知识点：平面方程一般式Ax+By+Cz+D=0，法向量为(A,B,C)。平行平面具有相同的法向量，仅常数项D不同。",
+          solutions: "🔹 解法一：利用点法式，代入点坐标求D。\n🔹 解法二：设所求平面方程为2x-y+3z+λ=0，代入点解λ。",
+          warnings: "⚠️ 注意事项：1. 平行平面法向量必须成比例；2. 代入点坐标时注意符号；3. 化简后方程一般要求系数最简。",
+          optionDetails: { "A":"✔ 正确，代入验证成立。", "B":"✘ 代入得2-2-3-3=-6≠0。", "C":"✘ 代入得2-2-3+1=-2≠0。", "D":"✘ 法向量不同，不是平行平面。", "E":"✘ 代入得2-2-3=-3≠0。", "F":"✘ 代入得2-2-3+4=1≠0。" } }
     ];
 
     function getDailyQuestion(dateObj) {
@@ -309,157 +381,133 @@
         if(today < start) today = start;
         if(today > end) today = end;
         let diff = Math.floor((today - start) / (86400000));
-        let idx = diff % fullQuestionSet.length;
-        let q = {...fullQuestionSet[idx]};
-        q.maxScore = Math.min(10, Math.max(5, q.difficulty));
-        return q;
+        let idx = diff % questionBank.length;
+        return { ...questionBank[idx] };
     }
 
     let allSubmissions = [];
     function loadStorage() {
-        let stored = localStorage.getItem("higher_math_deepseek_vision_fixed");
+        let stored = localStorage.getItem("higher_math_fun_total");
         if(stored) try{ allSubmissions = JSON.parse(stored); }catch(e){}
         if(allSubmissions.length && !allSubmissions[0]?.id) {
             allSubmissions = allSubmissions.map((s,i)=>({...s, id:s.id||Date.now()+i+Math.random()}));
             saveStorage();
         }
     }
-    function saveStorage() { localStorage.setItem("higher_math_deepseek_vision_fixed", JSON.stringify(allSubmissions)); }
+    function saveStorage() { localStorage.setItem("higher_math_fun_total", JSON.stringify(allSubmissions)); }
     function upsertSubmission(newRecord) {
         const idx = allSubmissions.findIndex(s => s.studentId === newRecord.studentId && s.dateStr === newRecord.dateStr);
-        if(idx !== -1) allSubmissions[idx] = { ...newRecord, id: allSubmissions[idx].id };
-        else allSubmissions.push(newRecord);
+        if(idx !== -1) return false;
+        allSubmissions.push(newRecord);
         saveStorage();
+        return true;
+    }
+    function getUserTotalScore(studentId) {
+        return allSubmissions.filter(s => s.studentId === studentId).reduce((sum, s) => sum + s.score, 0);
+    }
+    function getMotivationMessage(score, maxScore) {
+        const percent = score / maxScore;
+        if(percent === 1) return "🏆 完美！你是数学之星！🎉 继续保持这份专注，期末稳了！";
+        if(percent >= 0.85) return "🌟 太棒了！离满分只差一步之遥，再细心一点就是满分大神！";
+        if(percent >= 0.7) return "📈 不错哦！基础扎实，再啃啃难点，你就是下一个高斯！";
+        if(percent >= 0.55) return "🌱 有进步空间！把错题吃透，下次争取全对，加油！";
+        if(percent >= 0.4) return "💪 别气馁！每个数学家都曾跌倒，分析错误原因，你会更强！";
+        return "🔥 乾坤未定，你我皆是黑马！认真看解析，下次逆袭！";
     }
 
     let currentQuestion = null;
+    function renderOptions(question) {
+        const container = document.getElementById("optionsArea");
+        if(!container) return;
+        const inputType = question.type === "多选题" ? "checkbox" : "radio";
+        const nameAttr = inputType === "radio" ? "questionOption" : "";
+        container.innerHTML = question.options.map(opt => {
+            const value = opt.charAt(0);
+            return `<div class="option-item">
+                        <input type="${inputType}" name="${nameAttr}" value="${value}" id="opt_${value}">
+                        <label for="opt_${value}">${opt}</label>
+                    </div>`;
+        }).join("");
+    }
+
+    function getSelectedAnswers() {
+        const selected = [];
+        const inputs = document.querySelectorAll('#optionsArea input:checked');
+        inputs.forEach(inp => selected.push(inp.value));
+        return selected.sort();
+    }
+
+    function generateOptionAnalysis(selectedAnswers, question) {
+        const optionDetails = question.optionDetails;
+        const correctSet = new Set(question.correct);
+        let html = '<div style="margin-top: 12px;"><strong>📋 选项逐项分析：</strong></div>';
+        for(let opt of question.options) {
+            const letter = opt.charAt(0);
+            const isSelected = selectedAnswers.includes(letter);
+            const isCorrect = correctSet.has(letter);
+            let status = "";
+            let detail = optionDetails[letter] || (isCorrect ? "正确选项" : "错误选项");
+            if(isSelected && isCorrect) status = "✔ 已选 ✓ 正确";
+            else if(isSelected && !isCorrect) status = "✘ 已选 ✗ 错误";
+            else if(!isSelected && isCorrect) status = "○ 未选 ● 正确（遗漏）";
+            else status = "○ 未选 ○ 错误";
+            html += `<div class="option-analysis"><span class="${isCorrect ? 'option-correct' : 'option-wrong'}">${opt}</span><br>${status}<br><span style="font-size:0.8rem;">📝 ${detail}</span></div>`;
+        }
+        return html;
+    }
+
     function displayStudentResult(studentId, dateStr) {
         const record = allSubmissions.find(s => s.studentId === studentId && s.dateStr === dateStr);
+        const totalScore = getUserTotalScore(studentId);
         if(!record){
-            document.getElementById("personalResult").innerHTML = `<div class="eval-content">今日尚未提交作业。请上传照片，DeepSeek视觉模型将精准评阅。</div><div class="info-note">每日可多次提交，系统仅保留最新一次评阅结果。</div>`;
+            document.getElementById("personalResult").innerHTML = `<div class="eval-content">今日尚未提交答案。请选择选项后提交，每人每日仅有一次机会。</div>
+                <div class="score-card"><span style="font-size:1rem;">📊 您的累计总分</span><br><span class="total-score-value">${totalScore}</span><span style="font-size:1rem;"> 分</span></div>
+                <div class="info-note">提交后不可修改，请认真作答。</div>`;
             return;
         }
-        let encouragement = "";
-        if(record.score >= record.maxScore * 0.9) encouragement = `<div class="encouragement-high"><i class="fas fa-award"></i> 🎉 非常优秀！解题精准，继续保持！</div>`;
-        else if(record.score >= record.maxScore * 0.7) encouragement = `<div class="encouragement-high"><i class="fas fa-thumbs-up"></i> 良好！掌握不错，再完善细节会更棒。</div>`;
-        else if(record.score >= record.maxScore * 0.5) encouragement = `<div class="encouragement-low"><i class="fas fa-leaf"></i> 部分要点缺失，建议对照参考答案补充。</div>`;
-        else encouragement = `<div class="encouragement-low"><i class="fas fa-heart"></i> 别灰心，多关注核心解题思路，下次会更好！</div>`;
-        
+        const motivation = getMotivationMessage(record.score, record.maxScore);
         document.getElementById("personalResult").innerHTML = `
-            <div class="score-block"><span class="score-value">${record.score}</span><p style="margin-top: 4px;">满分 ${record.maxScore}</p></div>
-            <div class="eval-content"><strong>DeepSeek视觉模型评阅：</strong><br>${record.evaluationText}<hr><strong>参考答案：</strong> ${record.answerKeyRef}<div style="font-size:0.75rem; margin-top:8px;">提交时间：${new Date(record.timestamp).toLocaleString()}</div></div>
-            ${encouragement}
-            <div class="info-note">章节：${record.chapter}</div>`;
+            <div class="score-card"><span class="score-value">${record.score}</span><span style="font-size:1rem;"> 分（满分 ${record.maxScore}）</span></div>
+            <div class="score-card"><span style="font-size:1rem;">🏅 累计总分</span><br><span class="total-score-value">${totalScore}</span><span style="font-size:1rem;"> 分</span></div>
+            <div class="encouragement-box"><i class="fas fa-comment-dots"></i> ${motivation}</div>
+            <div class="eval-content"><strong>📊 批阅结果：</strong><br>${record.evaluationText}</div>
+            ${record.optionAnalysis || ''}
+            <div class="knowledge-box"><strong>📖 知识点解读：</strong><br>${record.knowledge || '无'}</div>
+            <div class="solution-box"><strong>🔧 解题方法（含多种解法）：</strong><br>${record.solutions || '无'}</div>
+            <div class="warning-box"><strong>⚠️ 注意事项：</strong><br>${record.warnings || '无'}</div>
+            <div class="info-note">提交时间：${new Date(record.timestamp).toLocaleString()} | 章节：${record.chapter}</div>`;
     }
 
-    // ======================= DeepSeek 视觉模型调用（修复400错误） =======================
-    // 请替换为您的真实DeepSeek API Key
-    const DEEPSEEK_API_KEY = "sk-d7a2787dc7014a0db906a844af300a19";
-    const DEEPSEEK_VISION_URL = "https://api.deepseek.com/chat/completions";
-    
-    async function callDeepSeekVision(imageBase64, question) {
-        // 确保图片格式正确，添加正确的data URL前缀
-        const imageUrl = `data:image/jpeg;base64,${imageBase64}`;
-        
-        const prompt = `你是一位严谨的高等数学教授。请根据以下题目和参考答案，认真评阅学生上传的答题照片。
-
-题目：${question.text}
-参考答案：${question.answerKey}
-满分：${question.maxScore}分
-
-要求：
-1. 仔细分析照片中的解题步骤和最终答案。
-2. 给出整数得分（0-${question.maxScore}分）。
-3. 写一段详细的评语（80字以内），指出对错和关键点。
-
-请只返回JSON格式：{"score": 整数, "comment": "评语"}`;
-
-        const payload = {
-            model: "deepseek-chat",
-            messages: [
-                {
-                    role: "user",
-                    content: [
-                        {
-                            type: "text",
-                            text: prompt
-                        },
-                        {
-                            type: "image_url",
-                            image_url: {
-                                url: imageUrl
-                            }
-                        }
-                    ]
-                }
-            ],
-            max_tokens: 500,
-            temperature: 0.3,
-            response_format: { type: "json_object" }
-        };
-
-        try {
-            const response = await fetch(DEEPSEEK_VISION_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
-                },
-                body: JSON.stringify(payload)
-            });
-            
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error("API错误详情:", errorText);
-                throw new Error(`DeepSeek API 错误: ${response.status} - ${errorText.substring(0, 200)}`);
+    async function performGrading(selectedAnswers, question) {
+        return new Promise((resolve) => {
+            const correctSet = new Set(question.correct);
+            let correctCount = 0;
+            for(let ans of selectedAnswers) if(correctSet.has(ans)) correctCount++;
+            let wrongCount = selectedAnswers.length - correctCount;
+            const totalCorrect = question.correct.length;
+            let score = 0;
+            if(question.type === "单选题") {
+                score = (correctCount === 1 && wrongCount === 0) ? question.maxScore : 0;
+            } else {
+                let raw = (correctCount / totalCorrect) * question.maxScore;
+                if(wrongCount > 0) raw = raw * 0.7;
+                score = Math.max(0, Math.min(question.maxScore, Math.round(raw)));
             }
-            
-            const data = await response.json();
-            const reply = data.choices[0].message.content;
-            
-            // 尝试解析JSON响应
-            try {
-                const parsed = JSON.parse(reply);
-                let score = parseInt(parsed.score);
-                if (isNaN(score)) score = 0;
-                score = Math.min(question.maxScore, Math.max(0, score));
-                return {
-                    score: score,
-                    evaluation: parsed.comment || "DeepSeek视觉模型评阅完成。",
-                    reference: question.answerKey
-                };
-            } catch (e) {
-                // 如果返回的不是纯JSON，尝试提取JSON
-                const jsonMatch = reply.match(/\{[\s\S]*\}/);
-                if (jsonMatch) {
-                    const parsed = JSON.parse(jsonMatch[0]);
-                    let score = parseInt(parsed.score);
-                    if (isNaN(score)) score = 0;
-                    score = Math.min(question.maxScore, Math.max(0, score));
-                    return {
-                        score: score,
-                        evaluation: parsed.comment || "DeepSeek视觉模型评阅完成。",
-                        reference: question.answerKey
-                    };
-                }
-                throw new Error("返回格式异常");
-            }
-        } catch (error) {
-            console.error("DeepSeek视觉模型调用失败:", error);
-            throw error;
-        }
+            const selectedStr = selectedAnswers.join("、") || "无";
+            const correctStr = question.correct.join("、");
+            let evaluation = `您选择了 ${selectedStr}。正确答案是 ${correctStr}。${score === question.maxScore ? '完全正确！' : (score > 0 ? `获得${score}分，部分正确。` : '答案错误。')}`;
+            resolve({ score, evaluation, optionAnalysis: generateOptionAnalysis(selectedAnswers, question) });
+        });
     }
 
-    // 提交处理
     let isSubmitting = false;
     const submitBtn = document.getElementById("submitAnswerBtn");
     const nameInput = document.getElementById("studentName");
     const idInput = document.getElementById("studentId");
-    const photoInput = document.getElementById("photoInput");
     const msgDiv = document.getElementById("submitMessage");
 
     async function handleSubmit() {
-        if(isSubmitting){ msgDiv.innerHTML="评阅中，请稍后..."; return; }
+        if(isSubmitting){ msgDiv.innerHTML="处理中，请稍后..."; return; }
         let studentName = nameInput.value.trim();
         let studentId = idInput.value.trim();
         if(!studentName || !studentId){ alert("请完整填写姓名和学号"); return; }
@@ -468,51 +516,59 @@
             alert("验证失败：您输入的学号与姓名不在本课程名单中，无法提交。");
             return;
         }
-        if(!photoInput.files || photoInput.files.length === 0){ alert("请上传答题照片"); return; }
         let todayObj = new Date();
         let startValid = new Date(2026,4,29), endValid = new Date(2026,5,26);
         if(todayObj<startValid || todayObj>endValid){ alert("活动时间2026.05.29-2026.06.26"); return; }
         let dateStr = `${todayObj.getFullYear()}-${(todayObj.getMonth()+1).toString().padStart(2,'0')}-${todayObj.getDate().toString().padStart(2,'0')}`;
+        
+        const alreadySubmitted = allSubmissions.some(s => s.studentId === studentId && s.dateStr === dateStr);
+        if(alreadySubmitted) {
+            alert("您今日已经提交过答案，每人每日仅有一次提交机会，不可重复提交。");
+            return;
+        }
+        
         let q = currentQuestion;
         if(!q){ refreshDaily(); q=currentQuestion; }
+        const selected = getSelectedAnswers();
+        if(selected.length === 0){ alert("请至少选择一个选项"); return; }
+        
+        const confirmSubmit = confirm("⚠️ 确认提交？每人每日仅有一次提交机会，提交后不可修改。\n点击「确定」提交答案，「取消」返回检查。");
+        if(!confirmSubmit) return;
+        
         isSubmitting = true;
         const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = "<i class='fas fa-spinner fa-pulse'></i> DeepSeek视觉模型评阅中...";
+        submitBtn.innerHTML = "<i class='fas fa-spinner fa-pulse'></i> 批阅中...";
         submitBtn.disabled = true;
         try {
-            const file = photoInput.files[0];
-            const reader = new FileReader();
-            const base64Promise = new Promise((resolve, reject) => {
-                reader.onload = () => resolve(reader.result.split(',')[1]);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-            const base64Image = await base64Promise;
-            const grading = await callDeepSeekVision(base64Image, q);
+            const grading = await performGrading(selected, q);
             const newRecord = {
                 id: Date.now() + Math.random(),
                 studentId, studentName, dateStr,
                 score: grading.score, maxScore: q.maxScore,
-                evaluationText: grading.evaluation, answerKeyRef: grading.reference,
-                chapter: q.chapter, questionText: q.text, timestamp: new Date().toISOString()
+                evaluationText: grading.evaluation, answerKeyRef: q.correct.join(", "),
+                chapter: q.chapter, questionText: q.text, timestamp: new Date().toISOString(),
+                optionAnalysis: grading.optionAnalysis,
+                knowledge: q.knowledge,
+                solutions: q.solutions,
+                warnings: q.warnings
             };
-            upsertSubmission(newRecord);
-            displayStudentResult(studentId, dateStr);
-            msgDiv.innerHTML = `<span style="color:#4f6b5c;">✓ 提交成功！DeepSeek视觉评分：${grading.score} / ${q.maxScore} (已覆盖当日旧记录)</span>`;
-            photoInput.value = "";
-            document.getElementById("fileInfo").innerText = "未选择任何文件";
-        } catch(e) {
-            console.error(e);
-            msgDiv.innerHTML = `<span style="color:#ab7b5a;">评阅失败: ${e.message}，请检查API配置或稍后重试</span>`;
-        } finally { isSubmitting=false; submitBtn.innerHTML=originalText; submitBtn.disabled=false; }
+            const success = upsertSubmission(newRecord);
+            if(success) {
+                displayStudentResult(studentId, dateStr);
+                msgDiv.innerHTML = `<span style="color:#4f6b5c;">✓ 提交成功！得分：${grading.score} 分</span>`;
+                document.querySelectorAll('#optionsArea input').forEach(inp => inp.disabled = true);
+                submitBtn.disabled = true;
+                submitBtn.textContent = "已提交，不可修改";
+            } else {
+                msgDiv.innerHTML = `<span style="color:#ab7b5a;">提交失败：您今日已提交过，不可重复提交。</span>`;
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        } catch(e) { msgDiv.innerHTML = `<span style="color:#ab7b5a;">批阅失败，请重试</span>`; submitBtn.disabled = false; submitBtn.innerHTML = originalText; }
+        finally { isSubmitting=false; }
     }
 
     submitBtn.addEventListener("click", handleSubmit);
-    document.getElementById("uploadTrigger").addEventListener("click", ()=>photoInput.click());
-    photoInput.addEventListener("change", (e)=>{
-        if(e.target.files.length) document.getElementById("fileInfo").innerText = `已选：${e.target.files[0].name}`;
-        else document.getElementById("fileInfo").innerText = "未选择任何文件";
-    });
 
     function refreshDaily() {
         let today = new Date();
@@ -522,8 +578,12 @@
         let fmt = `${today.getFullYear()}-${(today.getMonth()+1).toString().padStart(2,'0')}-${today.getDate().toString().padStart(2,'0')}`;
         document.getElementById("currentDateDisplay").innerHTML = `<i class="far fa-calendar-alt"></i> ${fmt}`;
         currentQuestion = getDailyQuestion(today);
-        document.getElementById("dailyQuestionText").innerHTML = `<strong>${currentQuestion.type}</strong> · ${currentQuestion.text}`;
-        document.getElementById("chapterTag").innerHTML = `<i class="fas fa-book-open"></i> ${currentQuestion.chapter} · 难度 ${currentQuestion.difficulty}`;
+        document.getElementById("dailyQuestionText").innerHTML = `${currentQuestion.text} <span class="question-type-badge">${currentQuestion.type}</span>`;
+        document.getElementById("chapterTag").innerHTML = `<i class="fas fa-book-open"></i> ${currentQuestion.chapter} · 分值 ${currentQuestion.maxScore}分`;
+        renderOptions(currentQuestion);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = "<i class='fas fa-paper-plane'></i> 提交答案";
+        document.querySelectorAll('#optionsArea input').forEach(inp => inp.disabled = false);
     }
 
     function updateCountdown() {
@@ -543,6 +603,11 @@
         const tbody = document.getElementById("adminTableBody");
         if(!tbody) return;
         tbody.innerHTML="";
+        const studentTotalMap = new Map();
+        allSubmissions.forEach(s => {
+            const total = studentTotalMap.get(s.studentId) || 0;
+            studentTotalMap.set(s.studentId, total + s.score);
+        });
         [...allSubmissions].reverse().forEach(rec=>{
             const row = tbody.insertRow();
             row.insertCell(0).innerText=rec.studentName;
@@ -550,7 +615,9 @@
             row.insertCell(2).innerText=rec.dateStr;
             const scoreCell=row.insertCell(3);
             const maxCell=row.insertCell(4);
-            const actionCell=row.insertCell(5);
+            const totalCell=row.insertCell(5);
+            const actionCell=row.insertCell(6);
+            totalCell.innerText = studentTotalMap.get(rec.studentId) || 0;
             if(editingRowId===rec.id){
                 scoreCell.innerHTML=`<input type="number" id="editScore" value="${rec.score}" step="1" style="width:70px;" min="0" max="${rec.maxScore}"> / ${rec.maxScore}`;
                 maxCell.innerText=rec.maxScore;
@@ -568,12 +635,17 @@
     }
     function exportCSV(){
         if(!allSubmissions.length){alert("无数据");return;}
-        let rows=[["ID","姓名","学号","日期","得分","满分","评阅意见","参考答案","章节","题目","时间戳"]];
-        allSubmissions.forEach(r=>rows.push([r.id,r.studentName,r.studentId,r.dateStr,r.score,r.maxScore,r.evaluationText.replace(/,/g," "), r.answerKeyRef, r.chapter, r.questionText, r.timestamp]));
+        const studentTotalMap = new Map();
+        allSubmissions.forEach(s => {
+            const total = studentTotalMap.get(s.studentId) || 0;
+            studentTotalMap.set(s.studentId, total + s.score);
+        });
+        let rows=[["ID","姓名","学号","日期","得分","满分","累计总分","批阅意见","章节","题目","时间戳"]];
+        allSubmissions.forEach(r=>rows.push([r.id,r.studentName,r.studentId,r.dateStr,r.score,r.maxScore, studentTotalMap.get(r.studentId), r.evaluationText.replace(/,/g," "), r.chapter, r.questionText, r.timestamp]));
         let csv=rows.map(row=>row.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(",")).join("\n");
         let blob=new Blob(["\uFEFF"+csv],{type:"text/csv"});
         let a=document.createElement("a"),url=URL.createObjectURL(blob);
-        a.href=url;a.download=`高数_DeepSeek视觉评阅记录.csv`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+        a.href=url;a.download=`高数_每日一题记录.csv`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
     }
     const adminModal=document.getElementById("adminModal");
     document.getElementById("teacherRankBtn").addEventListener("click",()=>{let pwd=prompt("教师密码:");if(pwd==="math2026"){editingRowId=null;renderAdminTable();adminModal.style.display="flex";}else alert("密码错误");});
