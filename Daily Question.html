@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>高数每日一题 | 超详细解析 | 定理+结论+步骤+选项解读 | 举一反三</title>
+    <title>高数每日一题 | 超完整解析 | 定理+结论+步骤+选项解读 | 矩阵表可修改成绩</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -239,12 +239,13 @@
             text-align: center;
             border-left: 8px solid #f0a34b;
         }
-        .theorem-box, .solution-box, .warning-box, .example-box {
+        .theorem-box, .conclusion-box, .solution-box, .warning-box, .example-box {
             border-radius: 20px;
             padding: 14px 18px;
             margin: 12px 0;
         }
         .theorem-box { background: #eaf4ea; border-left: 4px solid #2c6e2f; }
+        .conclusion-box { background: #e0f0e0; border-left: 4px solid #3a7c3a; }
         .solution-box { background: #eef2fa; border-left: 4px solid #718b79; }
         .warning-box { background: #fff0e0; border-left: 4px solid #e0a878; }
         .example-box { background: #f0e6ff; border-left: 4px solid #8b72b0; }
@@ -270,7 +271,6 @@
         @media (max-width: 700px) { body { padding: 16px 12px; } .header-section { flex-direction: column; align-items: flex-start; gap: 12px; } .option-item label { font-size: 0.8rem; } .matrix-table { font-size: 0.7rem; } }
         .option-correct { color: #2c6e2f; font-weight: 600; }
         .option-wrong { color: #b1624b; }
-        .section-title { font-weight: 700; margin: 8px 0 4px; color: #3b5a4b; }
     </style>
 </head>
 <body>
@@ -282,11 +282,11 @@
     <div class="header-section">
         <div class="title-area">
             <h1><i class="fas fa-chalkboard-teacher"></i> 高等数学@每日一题</h1>
-            <p>同济八版下册 · 期末复习 · 举一反三</p>
+            <p>同济八版下册 · 期末复习 . 举一反三</p>
         </div>
         <div style="display: flex; align-items: center; gap: 12px;">
             <div class="date-panel" id="currentDateDisplay"></div>
-            <button class="teacher-button" id="teacherRankBtn"><i class="fas fa-chart-line"></i> 教师管理入口</button>
+            <button class="teacher-button" id="teacherRankBtn"><i class="fas fa-chart-line"></i>教师管理入口</button>
         </div>
     </div>
 
@@ -303,12 +303,12 @@
             </div>
             <button class="btn-primary" id="submitAnswerBtn"><i class="fas fa-paper-plane"></i> 提交答案</button>
             <div id="submitMessage" style="margin-top: 16px; font-size: 0.8rem; text-align: center;"></div>
-            <div class="info-note"><i class="fas fa-exclamation-triangle"></i> 每位学生每日仅有一次提交机会，提交后不可更改。教师可后台修正异常分数。</div>
+            <div class="info-note"><i class="fas fa-exclamation-triangle"></i> 每位学生每日仅有一次提交机会，提交后不可更改。教师可在成绩矩阵表中修正异常分数。</div>
         </div>
         <div class="result-area card">
-            <h3 style="margin-bottom: 16px;"><i class="fas fa-chalkboard"></i> 批阅结果与超详细解析</h3>
+            <h3 style="margin-bottom: 16px;"><i class="fas fa-chalkboard"></i> 批阅结果与超完整解析</h3>
             <div id="personalResult">
-                <div class="eval-content"><i class="fas fa-info-circle"></i> 选择答案后提交，系统将自动批阅并给出分数、鼓励评语、逐项分析、超详细解题过程（含主要定理、结论、步骤、注意事项）。</div>
+                <div class="eval-content"><i class="fas fa-info-circle"></i> 选择答案后提交，系统将自动批阅并给出分数、鼓励评语、逐项分析、超完整解题过程（含主要定理、主要结论、详细步骤、注意事项、举一反三）。</div>
                 <div class="info-note">每个选项都会给出详细的正确/错误解读，举一反三题可点击按钮查看答案。</div>
             </div>
         </div>
@@ -316,10 +316,11 @@
     <div class="footer-text"><i class="fas fa-clock"></i> 每日00:00更新题目 · 活动：2026.05.29 — 2026.06.26 (6月27日期末考试)</div>
 </div>
 
+<!-- 成绩矩阵表模态框（教师可修改分数） -->
 <div id="adminModal" class="modal-overlay">
     <div class="modal-window">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
-            <span style="font-weight: 700; font-size: 1.2rem;"><i class="fas fa-table-list"></i> 学生成绩矩阵表</span>
+            <span style="font-weight: 700; font-size: 1.2rem;"><i class="fas fa-table-list"></i> 学生成绩矩阵表（姓名+学号 + 每日得分 + 总分+正确率）</span>
             <button class="close-modal-btn" id="closeAdminBtn"><i class="fas fa-times"></i> 关闭</button>
         </div>
         <div style="overflow-x: auto;">
@@ -331,7 +332,7 @@
         <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
             <button class="btn-export" id="exportMatrixCsvBtn"><i class="fas fa-download"></i> 导出成绩矩阵 CSV</button>
         </div>
-        <div class="info-note" style="margin-top: 16px;">💡 正确率 = 当前总得分 ÷ 当前已出题的总分 × 100%（未到日期的题目不计算）。</div>
+        <div class="info-note" style="margin-top: 16px;">💡 正确率 = 当前总得分 ÷ 当前已出题的总分 × 100%（未到日期的题目不计算）。<br>🔧 教师点击得分数字可直接修改，输入新分数后按回车或点击确认即可生效。</div>
     </div>
 </div>
 
@@ -361,36 +362,36 @@
         ["081825032","姚猛"],["081825035","项可益"],["081825039","湛益阳"]
     ]);
 
-    // ======================= 题库（每题包含：主要定理、主要结论、解答过程、注意事项、每个选项详细解读）=======================
+    // ======================= 题库（每题包含：定理、结论、详细解答、注意事项、每个选项解读）=======================
     const questionBank = [
         { chapter: "向量代数与空间解析几何", text: "已知向量 a=(2,-1,2), b=(1,2,-2)，则下列选项中正确的是？", type: "多选题", difficulty: 7, maxScore: 7,
           options: ["A. a·b = -4", "B. a×b = (-2,6,5)", "C. 与a,b都垂直的单位向量为 ±(-2,6,5)/√65", "D. a·b = 4", "E. a×b = (2,-6,-5)", "F. a与b的夹角为60°"],
           correct: ["A","B","C"],
-          theorems: "【主要定理】\n1. 向量的点积（数量积）定理：a·b = |a||b|cosθ = a₁b₁ + a₂b₂ + a₃b₃\n2. 向量的叉积（向量积）定理：a×b = |i j k; a₁ a₂ a₃; b₁ b₂ b₃|，结果向量垂直于a,b\n3. 单位向量定理：与a同方向的单位向量为 a/|a|\n4. 向量垂直条件：a⊥b ⇔ a·b = 0\n5. 夹角公式：cosθ = (a·b)/(|a||b|)",
-          conclusions: "【主要结论】\n- a·b = -4，|a|=√(4+1+4)=3，|b|=√(1+4+4)=3\n- a×b = (-2,6,5)，|a×b|=√(4+36+25)=√65\n- 与a,b都垂直的单位向量为 ±(-2,6,5)/√65\n- cosθ = -4/9，θ≈116°，不是60°",
-          solution: "【详细解答过程】\n1. 计算点积：a·b = 2×1 + (-1)×2 + 2×(-2) = 2 - 2 - 4 = -4\n2. 计算叉积：用三阶行列式展开\na×b = |i  j  k; 2 -1 2; 1 2 -2| = i[(-1)×(-2)-2×2] - j[2×(-2)-2×1] + k[2×2-(-1)×1] = i(2-4) - j(-4-2) + k(4+1) = (-2, 6, 5)\n3. 计算模长：|a×b| = √[(-2)²+6²+5²] = √(4+36+25) = √65\n4. 单位向量公式：e = ±(a×b)/|a×b| = ±(-2,6,5)/√65\n5. 夹角：cosθ = (a·b)/(|a||b|) = (-4)/(3×3) = -4/9，θ = arccos(-4/9) ≈ 116°",
-          warnings: "【注意事项】\n1. 叉积计算时注意行列式展开的符号（第二项前有负号）\n2. 单位向量有两个方向（正负号）\n3. 点积结果是一个实数，叉积结果是一个向量\n4. 夹角公式中的分母是模长的乘积",
+          theorems: "【主要定理】\n1. 向量的点积（数量积）定理：a·b = |a||b|cosθ = a₁b₁ + a₂b₂ + a₃b₃\n2. 向量的叉积（向量积）定理：a×b = |i j k; a₁ a₂ a₃; b₁ b₂ b₃|，结果向量垂直于a,b\n3. 单位向量定理：与v同方向的单位向量为 v/|v|\n4. 向量垂直的充要条件：a⊥b ⇔ a·b = 0\n5. 夹角公式：cosθ = (a·b)/(|a||b|)",
+          conclusions: "【主要结论】\n- a·b = 2×1 + (-1)×2 + 2×(-2) = 2 - 2 - 4 = -4\n- |a| = √(2²+(-1)²+2²) = √9 = 3，|b| = √(1²+2²+(-2)²) = √9 = 3\n- a×b = (-2, 6, 5)，|a×b| = √(4+36+25) = √65\n- 与a,b都垂直的单位向量为 ±(a×b)/|a×b| = ±(-2,6,5)/√65\n- cosθ = (a·b)/(|a||b|) = -4/9，θ = arccos(-4/9) ≈ 116°，不是60°",
+          solution: "【详细解答过程】\n1. 点积计算：a·b = 2×1 + (-1)×2 + 2×(-2) = 2 - 2 - 4 = -4\n2. 叉积计算（三阶行列式展开）：\n   a×b = |i   j   k; 2  -1  2; 1  2  -2| \n       = i[(-1)×(-2) - 2×2] - j[2×(-2) - 2×1] + k[2×2 - (-1)×1]\n       = i(2 - 4) - j(-4 - 2) + k(4 + 1) = (-2, 6, 5)\n3. 叉积模长：|a×b| = √[(-2)² + 6² + 5²] = √(4+36+25) = √65\n4. 单位向量：±(a×b)/|a×b| = ±(-2,6,5)/√65\n5. 夹角：cosθ = (a·b)/(|a||b|) = -4/(3×3) = -4/9，θ = arccos(-4/9) ≈ 116°",
+          warnings: "【注意事项】\n1. 叉积计算时注意行列式第二项前的负号\n2. 单位向量有两个相反方向（正负号都要考虑）\n3. 点积是标量，叉积是向量\n4. 夹角公式中的分母是模长的乘积，不是点积",
           optionDetails: {
               A: "✓ 正确：点积 = 2×1 + (-1)×2 + 2×(-2) = 2-2-4 = -4",
               B: "✓ 正确：叉积行列式计算得(-2,6,5)",
               C: "✓ 正确：与a,b垂直的向量平行于a×b，单位化得±(-2,6,5)/√65",
-              D: "✗ 错误：点积应为-4，符号错误",
-              E: "✗ 错误：叉积应为(-2,6,5)，此处系数符号错误",
-              F: "✗ 错误：cosθ = -4/9 ≠ 1/2，夹角不是60°"
+              D: "✗ 错误：点积应为-4，符号错误，漏掉了负号",
+              E: "✗ 错误：叉积应为(-2,6,5)，此处系数符号和数值都不正确",
+              F: "✗ 错误：cosθ = -4/9 ≠ 1/2，θ≈116°不是60°"
           },
           exampleQuestion: "【举一反三】已知向量 a=(1,0,-1), b=(0,1,1)，求：(1) a·b；(2) a×b；(3) 与a,b都垂直的单位向量。",
           exampleAnswer: "(1) a·b = 1×0+0×1+(-1)×1 = -1；<br>(2) a×b = |i j k; 1 0 -1; 0 1 1| = i(0×1-(-1)×1) - j(1×1-(-1)×0) + k(1×1-0×0) = (1, -1, 1)；<br>(3) |a×b|=√3，单位向量为 ±(1/√3, -1/√3, 1/√3)。" },
         { chapter: "多元函数微分学", text: "函数 z = x³ + y³ - 3xy 的极值情况，下列说法正确的是？", type: "多选题", difficulty: 8, maxScore: 8,
           options: ["A. 驻点为(0,0)和(1,1)", "B. (0,0)是极小值点", "C. (1,1)是极小值点，极小值为-1", "D. 函数无极小值", "E. (0,0)是极大值点", "F. 函数无极大值"],
           correct: ["A","C"],
-          theorems: "【主要定理】\n1. 多元函数极值的必要条件：若f(x,y)在(x₀,y₀)处可导且取极值，则f_x(x₀,y₀)=0, f_y(x₀,y₀)=0\n2. 多元函数极值的充分条件（Hessian判别法）：设A=f_xx, B=f_xy, C=f_yy，Δ=AC-B²\n   - 若Δ>0且A>0，则(x₀,y₀)为极小值点\n   - 若Δ>0且A<0，则(x₀,y₀)为极大值点\n   - 若Δ<0，则(x₀,y₀)为鞍点\n   - 若Δ=0，需进一步判断",
-          conclusions: "【主要结论】\n- 驻点：(0,0)和(1,1)\n- 在(1,1)处：A=6，B=-3，C=6，Δ=36-9=27>0，A>0 ⇒ 极小值点，极小值为-1\n- 在(0,0)处：A=0，B=-3，C=0，Δ=0-9=-9<0 ⇒ 鞍点",
-          solution: "【详细解答过程】\n1. 求一阶偏导数：\n   z_x = 3x² - 3y，z_y = 3y² - 3x\n2. 解方程组求驻点：\n   3x²-3y=0 ⇒ y=x²，代入3y²-3x=0 ⇒ 3x⁴-3x=0 ⇒ x(x³-1)=0 ⇒ x=0或1\n   得驻点(0,0)和(1,1)\n3. 求二阶偏导数：\n   A=z_xx=6x，B=z_xy=-3，C=z_yy=6y\n4. 判别(1,1)：A=6>0，Δ=AC-B²=6×6-(-3)²=36-9=27>0 ⇒ 极小值点，z(1,1)=1+1-3=-1\n5. 判别(0,0)：A=0，Δ=0×0-9=-9<0 ⇒ 鞍点",
-          warnings: "【注意事项】\n1. 驻点只是极值候选点，还需用充分条件判别\n2. 当Δ=0时需用更高阶方法（如Taylor展开）\n3. 注意二阶偏导的求解顺序，混合偏导相等\n4. (0,0)处AC-B²=-9<0，是鞍点，不是极值点",
+          theorems: "【主要定理】\n1. 多元函数极值的必要条件：若f(x,y)在(x₀,y₀)处可微且取极值，则f_x(x₀,y₀)=0，f_y(x₀,y₀)=0\n2. 多元函数极值的充分条件（Hessian判别法）：设A=f_xx，B=f_xy，C=f_yy，Δ=AC-B²\n   - 若Δ>0且A>0，则(x₀,y₀)为极小值点\n   - 若Δ>0且A<0，则(x₀,y₀)为极大值点\n   - 若Δ<0，则(x₀,y₀)为鞍点（不是极值点）\n   - 若Δ=0，需进一步判断",
+          conclusions: "【主要结论】\n- f_x=3x²-3y=0，f_y=3y²-3x=0，联立得驻点(0,0)和(1,1)\n- A=f_xx=6x，B=f_xy=-3，C=f_yy=6y\n- 在(1,1)处：A=6>0，Δ=6×6-(-3)²=36-9=27>0，故(1,1)为极小值点，极小值f(1,1)=1+1-3=-1\n- 在(0,0)处：A=0，Δ=0×0-9=-9<0，故(0,0)为鞍点，不是极值点",
+          solution: "【详细解答过程】\n1. 求一阶偏导数：f_x=3x²-3y，f_y=3y²-3x\n2. 解方程组求驻点：3x²-3y=0 ⇒ y=x²，代入3y²-3x=0 ⇒ 3x⁴-3x=0 ⇒ x(x³-1)=0 ⇒ x=0或1\n   当x=0时y=0；当x=1时y=1，得驻点(0,0)和(1,1)\n3. 求二阶偏导数：f_xx=6x，f_xy=-3，f_yy=6y\n4. 判别(1,1)：A=6，B=-3，C=6，Δ=AC-B²=36-9=27>0，A>0 ⇒ 极小值点\n   f(1,1)=1+1-3=-1\n5. 判别(0,0)：A=0，Δ=0-9=-9<0 ⇒ 鞍点",
+          warnings: "【注意事项】\n1. 驻点只是极值的候选点，还需要用充分条件判别\n2. 当Δ=0时，判别法失效，需要用更高阶的方法（如Taylor展开）\n3. (0,0)处Δ<0，是鞍点，既不是极大值也不是极小值\n4. 注意混合偏导f_xy的求导顺序不影响结果",
           optionDetails: {
-              A: "✓ 正确：解方程组得(0,0)和(1,1)",
-              B: "✗ 错误：(0,0)处AC-B²=-9<0，是鞍点",
-              C: "✓ 正确：(1,1)处Δ=27>0，A=6>0，极小值-1",
+              A: "✓ 正确：解方程组得两个驻点(0,0)和(1,1)",
+              B: "✗ 错误：(0,0)处Δ=-9<0，是鞍点，不是极值点",
+              C: "✓ 正确：(1,1)处Δ=27>0，A=6>0，为极小值点，极小值为-1",
               D: "✗ 错误：函数在(1,1)处有极小值-1",
               E: "✗ 错误：(0,0)是鞍点，不是极大值点",
               F: "✗ 错误：函数虽无极大值，但该选项不完整且不是本题正确答案"
@@ -434,7 +435,7 @@
     // 数据存储
     let allSubmissions = [];
     function loadStorage() {
-        let stored = localStorage.getItem("higher_math_detailed_final");
+        let stored = localStorage.getItem("higher_math_complete_matrix");
         if(stored) {
             try { allSubmissions = JSON.parse(stored); } catch(e) { allSubmissions = []; }
         }
@@ -443,7 +444,7 @@
             saveStorage();
         }
     }
-    function saveStorage() { localStorage.setItem("higher_math_detailed_final", JSON.stringify(allSubmissions)); }
+    function saveStorage() { localStorage.setItem("higher_math_complete_matrix", JSON.stringify(allSubmissions)); }
     
     function upsertSubmission(newRecord) {
         if(allSubmissions.some(s => s.studentId === newRecord.studentId && s.dateStr === newRecord.dateStr)) return false;
@@ -469,7 +470,6 @@
     let currentQuestion = null;
     let currentDateStr = formatDate(new Date());
 
-    // 渲染选项
     function renderOptions(question) {
         const container = document.getElementById("optionsArea");
         if(!container) return;
@@ -533,7 +533,7 @@
             <div class="eval-content"><strong>📊 批阅结果：</strong><br>${record.evaluationText}</div>
             ${record.optionAnalysis || ''}
             <div class="theorem-box">${record.theorems}</div>
-            <div class="theorem-box">${record.conclusions}</div>
+            <div class="conclusion-box">${record.conclusions}</div>
             <div class="solution-box"><strong>🔧 详细解答过程：</strong><br>${record.solution}</div>
             <div class="warning-box">${record.warnings}</div>
             ${exampleHtml}
@@ -573,7 +573,6 @@
         };
     }
     
-    // 提交处理
     let isSubmitting = false;
     const submitBtn = document.getElementById("submitAnswerBtn");
     
@@ -649,7 +648,6 @@
         document.querySelectorAll('#optionsArea input').forEach(i => i.disabled = false);
     }
     
-    // 倒计时
     function updateCountdown() {
         let exam = new Date(2026,5,27);
         let now = new Date();
@@ -665,42 +663,116 @@
     setInterval(updateCountdown, 60000);
     updateCountdown();
     
-    // 矩阵渲染
+    // 矩阵渲染（教师可修改得分）
     function renderMatrixTable() {
         let studentsMap = new Map();
         allSubmissions.forEach(sub => {
-            if(!studentsMap.has(sub.studentId)) studentsMap.set(sub.studentId, { name: sub.studentName, scores: new Map() });
-            studentsMap.get(sub.studentId).scores.set(sub.dateStr, sub.score);
+            if(!studentsMap.has(sub.studentId)) studentsMap.set(sub.studentId, { name: sub.studentName, scoresByDate: new Map(), recordIds: new Map() });
+            studentsMap.get(sub.studentId).scoresByDate.set(sub.dateStr, sub.score);
+            studentsMap.get(sub.studentId).recordIds.set(sub.dateStr, sub.id);
         });
         for(let [sid, name] of validStudents) {
-            if(!studentsMap.has(sid)) studentsMap.set(sid, { name, scores: new Map() });
+            if(!studentsMap.has(sid)) studentsMap.set(sid, { name: name, scoresByDate: new Map(), recordIds: new Map() });
         }
         let totalPossible = getTotalPossibleScore();
         let rows = [];
         for(let [sid, data] of studentsMap) {
-            let scores = allDateColumns.map(d => data.scores.get(d) || 0);
-            let total = scores.reduce((a,b)=>a+b,0);
+            let scores = [];
+            let recordIds = [];
+            for(let date of allDateColumns) {
+                let score = data.scoresByDate.get(date);
+                scores.push(score !== undefined ? score : null);
+                recordIds.push(data.recordIds.get(date) || null);
+            }
+            let total = scores.filter(s => s !== null).reduce((a,b)=>a+b,0);
             let rate = totalPossible > 0 ? Math.round(total/totalPossible*100)+"%" : "0%";
-            rows.push({ name: data.name, sid, scores, total, rate });
+            rows.push({ name: data.name, sid, scores, recordIds, total, rate });
         }
         rows.sort((a,b)=>a.name.localeCompare(b.name));
-        document.getElementById("matrixHeader").innerHTML = `<tr><th>姓名</th><th>学号</th>${allDateColumns.map(d=>`<th>${d}</th>`).join('')}<th>总得分</th><th>正确率</th>`;
-        document.getElementById("matrixBody").innerHTML = rows.map(r => `<tr><td style="font-weight:500;">${r.name}</td><td>${r.sid}${r.scores.map(s=>`<td>${s}`).join('')}<td><strong>${r.total}</strong><td><strong>${r.rate}</strong>`).join('');
+        
+        let headerHtml = `<tr><th>姓名</th><th>学号</th>`;
+        for(let date of allDateColumns) headerHtml += `<th>${date}</th>`;
+        headerHtml += `<th>总得分</th><th>正确率</th>`;
+        document.getElementById("matrixHeader").innerHTML = headerHtml;
+        
+        let tbody = document.getElementById("matrixBody");
+        tbody.innerHTML = "";
+        
+        for(let row of rows) {
+            let tr = document.createElement("tr");
+            let tdName = document.createElement("td");
+            tdName.innerText = row.name;
+            tdName.style.fontWeight = "500";
+            tr.appendChild(tdName);
+            let tdSid = document.createElement("td");
+            tdSid.innerText = row.sid;
+            tr.appendChild(tdSid);
+            
+            for(let i = 0; i < allDateColumns.length; i++) {
+                let td = document.createElement("td");
+                let score = row.scores[i];
+                let recordId = row.recordIds[i];
+                if(score !== null) {
+                    td.innerHTML = `<span class="score-display" data-id="${recordId}" data-date="${allDateColumns[i]}" data-sid="${row.sid}" style="cursor:pointer; text-decoration:underline; color:#2c6e2f;">${score}</span>`;
+                } else {
+                    td.innerHTML = `<span style="color:#aaa;">—</span>`;
+                }
+                tr.appendChild(td);
+            }
+            
+            let tdTotal = document.createElement("td");
+            tdTotal.innerHTML = `<strong>${row.total}</strong>`;
+            tr.appendChild(tdTotal);
+            let tdRate = document.createElement("td");
+            tdRate.innerHTML = `<strong>${row.rate}</strong>`;
+            tr.appendChild(tdRate);
+            tbody.appendChild(tr);
+        }
+        
+        // 绑定点击编辑事件
+        document.querySelectorAll('.score-display').forEach(span => {
+            if(span.dataset.id && span.dataset.id !== "null") {
+                span.onclick = (e) => {
+                    e.stopPropagation();
+                    const recordId = span.dataset.id;
+                    const oldScore = parseInt(span.innerText);
+                    const maxScore = getDailyQuestionByDate(span.dataset.date).maxScore;
+                    const newScore = prompt(`请输入新得分（0-${maxScore}分）：`, oldScore);
+                    if(newScore !== null) {
+                        let scoreNum = parseInt(newScore);
+                        if(!isNaN(scoreNum) && scoreNum >= 0 && scoreNum <= maxScore) {
+                            const idx = allSubmissions.findIndex(s => s.id == recordId);
+                            if(idx !== -1) {
+                                allSubmissions[idx].score = scoreNum;
+                                allSubmissions[idx].evaluationText += ` [教师修正：得分调整为${scoreNum}]`;
+                                allSubmissions[idx].timestamp = new Date().toISOString();
+                                saveStorage();
+                                renderMatrixTable();
+                                const sid = document.getElementById("studentId").value.trim();
+                                if(sid) displayStudentResult(sid, formatDate(new Date()));
+                            }
+                        } else {
+                            alert(`分数必须在0~${maxScore}之间`);
+                        }
+                    }
+                };
+            }
+        });
     }
     
     function exportMatrixCSV() {
         let studentsMap = new Map();
         allSubmissions.forEach(sub => {
-            if(!studentsMap.has(sub.studentId)) studentsMap.set(sub.studentId, { name: sub.studentName, scores: new Map() });
-            studentsMap.get(sub.studentId).scores.set(sub.dateStr, sub.score);
+            if(!studentsMap.has(sub.studentId)) studentsMap.set(sub.studentId, { name: sub.studentName, scoresByDate: new Map() });
+            studentsMap.get(sub.studentId).scoresByDate.set(sub.dateStr, sub.score);
         });
         for(let [sid, name] of validStudents) {
-            if(!studentsMap.has(sid)) studentsMap.set(sid, { name, scores: new Map() });
+            if(!studentsMap.has(sid)) studentsMap.set(sid, { name, scoresByDate: new Map() });
         }
         let totalPossible = getTotalPossibleScore();
         let rows = [];
         for(let [sid, data] of studentsMap) {
-            let scores = allDateColumns.map(d => data.scores.get(d) || 0);
+            let scores = allDateColumns.map(d => data.scoresByDate.get(d) || 0);
             let total = scores.reduce((a,b)=>a+b,0);
             let rate = totalPossible > 0 ? Math.round(total/totalPossible*100)+"%" : "0%";
             rows.push({ name: data.name, sid, scores, total, rate });
@@ -712,18 +784,21 @@
         let blob = new Blob(["\uFEFF" + csvContent], {type: "text/csv;charset=utf-8;"});
         let a = document.createElement("a");
         let url = URL.createObjectURL(blob);
-        a.href = url; a.download = "高数成绩矩阵.csv"; a.click(); URL.revokeObjectURL(url);
+        a.href = url; a.download = `高数成绩矩阵_${formatDate(new Date())}.csv`; a.click(); URL.revokeObjectURL(url);
     }
     
+    const adminModal = document.getElementById("adminModal");
     document.getElementById("teacherRankBtn").addEventListener("click", () => {
-        let pwd = prompt("教师密码:");
+        let pwd = prompt("请输入教师密码:");
         if(pwd === "math2026") {
             renderMatrixTable();
-            document.getElementById("adminModal").style.display = "flex";
-        } else { alert("密码错误"); }
+            adminModal.style.display = "flex";
+        } else { alert("密码错误，无权访问！"); }
     });
-    document.getElementById("closeAdminBtn").addEventListener("click", () => document.getElementById("adminModal").style.display = "none");
+    document.getElementById("closeAdminBtn").addEventListener("click", () => adminModal.style.display = "none");
     document.getElementById("exportMatrixCsvBtn").addEventListener("click", exportMatrixCSV);
+    window.onclick = (e) => { if(e.target === adminModal) adminModal.style.display = "none"; };
+    
     document.getElementById("studentId").addEventListener("blur", function() {
         let sid = this.value.trim();
         if(sid) displayStudentResult(sid, formatDate(new Date()));
