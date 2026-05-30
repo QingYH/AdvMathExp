@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>高数每日一题 | 一次提交 | 累计总分 | 趣味激励 | 详细解析</title>
+    <title>高数每日一题 | 一次提交 | 成绩矩阵 | 得分率统计 | 详细解析</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -103,9 +103,7 @@
             font-weight: 700;
             margin-bottom: 12px;
         }
-        .options-container {
-            margin: 16px 0 8px;
-        }
+        .options-container { margin: 16px 0 8px; }
         .option-item {
             display: flex;
             align-items: flex-start;
@@ -163,16 +161,8 @@
             margin: 10px 0;
             border: 1px solid #9bc4a0;
         }
-        .score-value {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #2c6e2f;
-        }
-        .total-score-value {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #3b6b54;
-        }
+        .score-value { font-size: 2.5rem; font-weight: 800; color: #2c6e2f; }
+        .total-score-value { font-size: 1.8rem; font-weight: 800; color: #3b6b54; }
         .eval-content {
             background: #fefaf5;
             border-radius: 28px;
@@ -188,8 +178,6 @@
             margin: 10px 0;
             font-size: 0.85rem;
         }
-        .option-correct { color: #2c6e2f; font-weight: 600; }
-        .option-wrong { color: #b1624b; }
         .info-note {
             font-size: 0.7rem;
             background: #f1ede8;
@@ -213,15 +201,31 @@
         .modal-window {
             background: white;
             width: 100%;
-            max-width: 1300px;
+            max-width: 98%;
             border-radius: 44px;
             padding: 24px 20px;
             max-height: 85vh;
             overflow-y: auto;
         }
-        .admin-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-        .admin-table th, .admin-table td { border: 1px solid #e2d9cf; padding: 10px 8px; text-align: left; }
-        .admin-table th { background: #f2ede6; position: sticky; top: 0; }
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            min-width: 800px;
+        }
+        .admin-table th, .admin-table td {
+            border: 1px solid #e2d9cf;
+            padding: 10px 8px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .admin-table th {
+            background: #f2ede6;
+            position: sticky;
+            top: 0;
+            font-weight: 700;
+        }
+        .admin-table tr:hover { background: #faf5ef; }
         .btn-icon { background: none; border: none; cursor: pointer; margin: 0 5px; padding: 4px 8px; border-radius: 20px; }
         .btn-edit { color: #5a7c6b; }
         .btn-delete { color: #b1624b; }
@@ -261,7 +265,9 @@
             margin: 12px 0;
             border-left: 4px solid #e0a878;
         }
-        @media (max-width: 700px) { body { padding: 16px 12px; } .header-section { flex-direction: column; align-items: flex-start; gap: 12px; } .option-item label { font-size: 0.8rem; } }
+        @media (max-width: 700px) { body { padding: 16px 12px; } .header-section { flex-direction: column; align-items: flex-start; gap: 12px; } .option-item label { font-size: 0.8rem; } .admin-table { font-size: 0.7rem; min-width: 600px; } }
+        .option-correct { color: #2c6e2f; font-weight: 600; }
+        .option-wrong { color: #b1624b; }
     </style>
 </head>
 <body>
@@ -272,12 +278,12 @@
     </div>
     <div class="header-section">
         <div class="title-area">
-            <h1><i class="fas fa-chalkboard-teacher"></i> 高等数学@每日一题</h1>
-            <p>同济八版下册 · 期末复习 · 积分累积 . 详细解析</p>
+            <h1><i class="fas fa-chalkboard-teacher"></i> 高等数学每日一题</h1>
+            <p>同济八版下册 · 详细解析</p>
         </div>
         <div style="display: flex; align-items: center; gap: 12px;">
             <div class="date-panel" id="currentDateDisplay"><i class="far fa-calendar-alt"></i> 加载中...</div>
-            <button class="teacher-button" id="teacherRankBtn"><i class="fas fa-chart-line"></i> 教师后台管理</button>
+            <button class="teacher-button" id="teacherRankBtn"><i class="fas fa-chart-line"></i> 教师成绩管理</button>
         </div>
     </div>
 
@@ -299,36 +305,40 @@
         <div class="result-area card">
             <h3 style="margin-bottom: 16px;"><i class="fas fa-chalkboard"></i> 批阅结果与详细解析</h3>
             <div id="personalResult">
-                <div class="eval-content"><i class="fas fa-info-circle"></i> 选择答案后提交，系统将自动批阅并给出分数、鼓励评语、逐项分析、知识点解读、多解法及注意事项。</div>
+                <div class="eval-content"><i class="fas fa-info-circle"></i> 选择答案后提交，系统将自动批阅并给出分数、鼓励评语、逐项分析、知识点解读及注意事项。</div>
                 <div class="info-note">答题错误时会明确指出错误选项及原因，帮助理解知识点。</div>
             </div>
         </div>
     </div>
-    <div class="footer-text"><i class="fas fa-clock"></i> 每日00:00更新题目 · 活动：2026.05.30 — 2026.06.26 (6月27日期末考试)</div>
+    <div class="footer-text"><i class="fas fa-clock"></i> 每日00:00更新题目 · 活动：2026.05.29 — 2026.06.26 (6月27日期末考试)</div>
 </div>
 
-<!-- 教师后台模态框 -->
+<!-- 教师后台模态框 - 新版成绩表格 -->
 <div id="adminModal" class="modal-overlay">
     <div class="modal-window">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <span style="font-weight: 700; font-size: 1.2rem;"><i class="fas fa-user-cog"></i> 成绩管理 (修改/删除)</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+            <span style="font-weight: 700; font-size: 1.2rem;"><i class="fas fa-table-list"></i> 学生成绩明细表</span>
             <button class="close-modal-btn" id="closeAdminBtn"><i class="fas fa-times"></i> 关闭</button>
         </div>
         <div style="overflow-x: auto;">
             <table class="admin-table" id="adminRecordsTable">
-                <thead><tr><th>姓名</th><th>学号</th><th>日期</th><th>得分</th><th>满分</th><th>操作</th></thead>
+                <thead>
+                    <tr>
+                        <th>姓名</th><th>学号</th><th>日期</th><th>得分</th><th>满分</th><th>个人总分</th><th>得分率</th><th>操作</th>
+                    </tr>
+                </thead>
                 <tbody id="adminTableBody"></tbody>
             </table>
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px;">
-            <button class="btn-export" id="exportAdminCsvBtn"><i class="fas fa-download"></i> 导出全部记录 CSV</button>
-            <span style="font-size: 0.75rem;">教师可修正分数或删除记录，最后一列累计总分会在导出时重新计算。</span>
+        <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+            <button class="btn-export" id="exportAdminCsvBtn"><i class="fas fa-download"></i> 导出成绩表 CSV</button>
         </div>
+        <div class="info-note" style="margin-top: 16px;">💡 得分率为：个人总分 ÷ 该学生所有提交记录的满分总和 × 100%。教师可修改单次得分，系统自动重新计算总分和得分率。</div>
     </div>
 </div>
 
 <script>
-    // ======================= 学生名单 =======================
+    // ======================= 1. 学生名单 =======================
     const validStudents = new Map();
     const rawList = [
         ["061025022","徐若伽"],["061025026","程子昂"],["170425048","李心然"],["061025041","朱静蕾"],["170425057","段诗雅"],
@@ -355,24 +365,24 @@
     ];
     rawList.forEach(([sid, sname]) => validStudents.set(sid, sname));
 
-    // ======================= 高等数学选择题库 =======================
+    // ======================= 题库 =======================
     const questionBank = [
         { chapter: "向量代数与空间解析几何", text: "已知向量 a=(2,-1,2), b=(1,2,-2)，则下列选项中正确的是？", type: "多选题", difficulty: 7, maxScore: 7,
           options: ["A. a·b = -4", "B. a×b = (-2,6,5)", "C. 与a,b都垂直的单位向量为 ±(-2,6,5)/√65", "D. a·b = 4", "E. a×b = (2,-6,-5)", "F. a与b的夹角为60°"],
           correct: ["A","B","C"], 
-          explanation: "点积=2×1+(-1)×2+2×(-2)=2-2-4=-4；叉积由行列式计算得(-2,6,5)；单位向量需除以模长√(4+36+25)=√65。",
-          knowledge: "📖 知识点：向量的点积（数量积）公式a·b = a₁b₁+a₂b₂+a₃b₃；叉积（向量积）的计算可用三阶行列式；单位向量为向量除以自身模长；向量垂直的条件是点积为0。",
-          solutions: "🔹 解法一（直接计算）：点积按公式计算；叉积按i,j,k行列式展开。\n🔹 解法二（几何意义）：点积反映投影关系，叉积方向垂直于原向量平面。",
-          warnings: "⚠️ 注意事项：1. 叉积结果是一个向量，方向遵循右手定则；2. 单位向量有两个相反方向；3. 夹角公式cosθ = (a·b)/(|a||b|)。",
-          optionDetails: { "A":"✔ 正确，点积计算准确。", "B":"✔ 正确，叉积计算准确。", "C":"✔ 正确，叉积模长为√65，单位向量为±(叉积)/模长。", "D":"✘ 错误，a·b应为-4。", "E":"✘ 错误，叉积计算错误，符号有误。", "F":"✘ 错误，夹角cosθ=-4/9≈-0.444，不是60°。" } },
+          explanation: "点积=2×1+(-1)×2+2×(-2)=2-2-4=-4；叉积由行列式计算得(-2,6,5)；单位向量需除以模长√65。",
+          knowledge: "📖 知识点：向量的点积、叉积计算；单位向量公式；垂直判定。",
+          solutions: "🔹 解法一：直接计算点积和叉积。\n🔹 解法二：利用行列式求叉积。",
+          warnings: "⚠️ 注意：叉积方向遵循右手定则；单位向量有两个方向。",
+          optionDetails: { "A":"✔ 正确，点积=-4。", "B":"✔ 正确，叉积=(-2,6,5)。", "C":"✔ 正确。", "D":"✘ 应为-4。", "E":"✘ 符号错误。", "F":"✘ cosθ=-4/9≠0.5。" } },
         { chapter: "向量代数与空间解析几何", text: "过点(1,2,-1)且与平面2x-y+3z=4平行的平面方程是？", type: "单选题", difficulty: 5, maxScore: 5,
           options: ["A. 2x-y+3z+3=0", "B. 2x-y+3z-3=0", "C. 2x-y+3z+1=0", "D. x+2y-z+4=0", "E. 2x-y+3z=0", "F. 2x-y+3z+4=0"],
           correct: ["A"], 
-          explanation: "平行平面法向量相同为(2,-1,3)，设方程为2x-y+3z+D=0，代入点(1,2,-1)得2-2-3+D=0 → D=3，故2x-y+3z+3=0。",
-          knowledge: "📖 知识点：平面方程一般式Ax+By+Cz+D=0，法向量为(A,B,C)。平行平面具有相同的法向量，仅常数项D不同。",
-          solutions: "🔹 解法一：利用点法式，代入点坐标求D。\n🔹 解法二：设所求平面方程为2x-y+3z+λ=0，代入点解λ。",
-          warnings: "⚠️ 注意事项：1. 平行平面法向量必须成比例；2. 代入点坐标时注意符号；3. 化简后方程一般要求系数最简。",
-          optionDetails: { "A":"✔ 正确，代入验证成立。", "B":"✘ 代入得2-2-3-3=-6≠0。", "C":"✘ 代入得2-2-3+1=-2≠0。", "D":"✘ 法向量不同，不是平行平面。", "E":"✘ 代入得2-2-3=-3≠0。", "F":"✘ 代入得2-2-3+4=1≠0。" } }
+          explanation: "平行平面法向量相同(2,-1,3)，代入点得D=3。",
+          knowledge: "📖 知识点：平面方程、平行平面法向量相同。",
+          solutions: "🔹 解法一：点法式代入求常数项。",
+          warnings: "⚠️ 注意：代入点坐标时符号不要错。",
+          optionDetails: { "A":"✔ 正确。", "B":"✘ 代入得-6。", "C":"✘ 代入得-2。", "D":"✘ 法向量不同。", "E":"✘ 代入得-3。", "F":"✘ 代入得1。" } }
     ];
 
     function getDailyQuestion(dateObj) {
@@ -387,14 +397,14 @@
 
     let allSubmissions = [];
     function loadStorage() {
-        let stored = localStorage.getItem("higher_math_fun_total");
+        let stored = localStorage.getItem("higher_math_score_table");
         if(stored) try{ allSubmissions = JSON.parse(stored); }catch(e){}
         if(allSubmissions.length && !allSubmissions[0]?.id) {
             allSubmissions = allSubmissions.map((s,i)=>({...s, id:s.id||Date.now()+i+Math.random()}));
             saveStorage();
         }
     }
-    function saveStorage() { localStorage.setItem("higher_math_fun_total", JSON.stringify(allSubmissions)); }
+    function saveStorage() { localStorage.setItem("higher_math_score_table", JSON.stringify(allSubmissions)); }
     function upsertSubmission(newRecord) {
         const idx = allSubmissions.findIndex(s => s.studentId === newRecord.studentId && s.dateStr === newRecord.dateStr);
         if(idx !== -1) return false;
@@ -404,6 +414,15 @@
     }
     function getUserTotalScore(studentId) {
         return allSubmissions.filter(s => s.studentId === studentId).reduce((sum, s) => sum + s.score, 0);
+    }
+    function getUserTotalMaxScore(studentId) {
+        return allSubmissions.filter(s => s.studentId === studentId).reduce((sum, s) => sum + s.maxScore, 0);
+    }
+    function getScoreRate(studentId) {
+        const total = getUserTotalScore(studentId);
+        const maxTotal = getUserTotalMaxScore(studentId);
+        if(maxTotal === 0) return "0%";
+        return Math.round((total / maxTotal) * 100) + "%";
     }
     function getMotivationMessage(score, maxScore) {
         const percent = score / maxScore;
@@ -429,14 +448,12 @@
                     </div>`;
         }).join("");
     }
-
     function getSelectedAnswers() {
         const selected = [];
         const inputs = document.querySelectorAll('#optionsArea input:checked');
         inputs.forEach(inp => selected.push(inp.value));
         return selected.sort();
     }
-
     function generateOptionAnalysis(selectedAnswers, question) {
         const optionDetails = question.optionDetails;
         const correctSet = new Set(question.correct);
@@ -455,20 +472,21 @@
         }
         return html;
     }
-
     function displayStudentResult(studentId, dateStr) {
         const record = allSubmissions.find(s => s.studentId === studentId && s.dateStr === dateStr);
         const totalScore = getUserTotalScore(studentId);
+        const maxTotal = getUserTotalMaxScore(studentId);
+        const rate = maxTotal > 0 ? Math.round((totalScore / maxTotal) * 100) + "%" : "0%";
         if(!record){
             document.getElementById("personalResult").innerHTML = `<div class="eval-content">今日尚未提交答案。请选择选项后提交，每人每日仅有一次机会。</div>
-                <div class="score-card"><span style="font-size:1rem;">📊 您的累计总分</span><br><span class="total-score-value">${totalScore}</span><span style="font-size:1rem;"> 分</span></div>
+                <div class="score-card"><span style="font-size:1rem;">📊 您的累计总分</span><br><span class="total-score-value">${totalScore}</span><span style="font-size:1rem;"> 分</span><br><span style="font-size:0.8rem;">得分率：${rate}</span></div>
                 <div class="info-note">提交后不可修改，请认真作答。</div>`;
             return;
         }
         const motivation = getMotivationMessage(record.score, record.maxScore);
         document.getElementById("personalResult").innerHTML = `
             <div class="score-card"><span class="score-value">${record.score}</span><span style="font-size:1rem;"> 分（满分 ${record.maxScore}）</span></div>
-            <div class="score-card"><span style="font-size:1rem;">🏅 累计总分</span><br><span class="total-score-value">${totalScore}</span><span style="font-size:1rem;"> 分</span></div>
+            <div class="score-card"><span style="font-size:1rem;">🏅 累计总分：${totalScore} 分 | 得分率：${rate}</span></div>
             <div class="encouragement-box"><i class="fas fa-comment-dots"></i> ${motivation}</div>
             <div class="eval-content"><strong>📊 批阅结果：</strong><br>${record.evaluationText}</div>
             ${record.optionAnalysis || ''}
@@ -520,21 +538,13 @@
         let startValid = new Date(2026,4,29), endValid = new Date(2026,5,26);
         if(todayObj<startValid || todayObj>endValid){ alert("活动时间2026.05.29-2026.06.26"); return; }
         let dateStr = `${todayObj.getFullYear()}-${(todayObj.getMonth()+1).toString().padStart(2,'0')}-${todayObj.getDate().toString().padStart(2,'0')}`;
-        
         const alreadySubmitted = allSubmissions.some(s => s.studentId === studentId && s.dateStr === dateStr);
-        if(alreadySubmitted) {
-            alert("您今日已经提交过答案，每人每日仅有一次提交机会，不可重复提交。");
-            return;
-        }
-        
+        if(alreadySubmitted) { alert("您今日已经提交过答案，不可重复提交。"); return; }
         let q = currentQuestion;
         if(!q){ refreshDaily(); q=currentQuestion; }
         const selected = getSelectedAnswers();
         if(selected.length === 0){ alert("请至少选择一个选项"); return; }
-        
-        const confirmSubmit = confirm("⚠️ 确认提交？每人每日仅有一次提交机会，提交后不可修改。\n点击「确定」提交答案，「取消」返回检查。");
-        if(!confirmSubmit) return;
-        
+        if(!confirm("⚠️ 确认提交？每人每日仅有一次提交机会，提交后不可修改。\n点击「确定」提交答案，「取消」返回检查。")) return;
         isSubmitting = true;
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = "<i class='fas fa-spinner fa-pulse'></i> 批阅中...";
@@ -552,18 +562,13 @@
                 solutions: q.solutions,
                 warnings: q.warnings
             };
-            const success = upsertSubmission(newRecord);
-            if(success) {
+            if(upsertSubmission(newRecord)) {
                 displayStudentResult(studentId, dateStr);
                 msgDiv.innerHTML = `<span style="color:#4f6b5c;">✓ 提交成功！得分：${grading.score} 分</span>`;
                 document.querySelectorAll('#optionsArea input').forEach(inp => inp.disabled = true);
                 submitBtn.disabled = true;
                 submitBtn.textContent = "已提交，不可修改";
-            } else {
-                msgDiv.innerHTML = `<span style="color:#ab7b5a;">提交失败：您今日已提交过，不可重复提交。</span>`;
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
-            }
+            } else { msgDiv.innerHTML = `<span style="color:#ab7b5a;">提交失败：您今日已提交过</span>`; submitBtn.disabled = false; submitBtn.innerHTML = originalText; }
         } catch(e) { msgDiv.innerHTML = `<span style="color:#ab7b5a;">批阅失败，请重试</span>`; submitBtn.disabled = false; submitBtn.innerHTML = originalText; }
         finally { isSubmitting=false; }
     }
@@ -597,55 +602,69 @@
     }
     setInterval(updateCountdown,60000); updateCountdown();
 
-    // 教师后台管理
+    // 教师后台管理 - 新版表格（得分只显示整数，不显示分数形式）
     let editingRowId = null;
     function renderAdminTable(){
         const tbody = document.getElementById("adminTableBody");
         if(!tbody) return;
         tbody.innerHTML="";
-        const studentTotalMap = new Map();
+        // 预先计算每个学生的总分和满分总和用于得分率
+        const studentTotalScoreMap = new Map();
+        const studentTotalMaxMap = new Map();
         allSubmissions.forEach(s => {
-            const total = studentTotalMap.get(s.studentId) || 0;
-            studentTotalMap.set(s.studentId, total + s.score);
+            studentTotalScoreMap.set(s.studentId, (studentTotalScoreMap.get(s.studentId) || 0) + s.score);
+            studentTotalMaxMap.set(s.studentId, (studentTotalMaxMap.get(s.studentId) || 0) + s.maxScore);
         });
-        [...allSubmissions].reverse().forEach(rec=>{
+        const sorted = [...allSubmissions].sort((a,b)=>a.dateStr.localeCompare(b.dateStr));
+        sorted.forEach(rec => {
+            const totalScore = studentTotalScoreMap.get(rec.studentId) || 0;
+            const totalMax = studentTotalMaxMap.get(rec.studentId) || 0;
+            const rate = totalMax > 0 ? Math.round((totalScore / totalMax) * 100) + "%" : "0%";
             const row = tbody.insertRow();
-            row.insertCell(0).innerText=rec.studentName;
-            row.insertCell(1).innerText=rec.studentId;
-            row.insertCell(2).innerText=rec.dateStr;
-            const scoreCell=row.insertCell(3);
-            const maxCell=row.insertCell(4);
-            const totalCell=row.insertCell(5);
-            const actionCell=row.insertCell(6);
-            totalCell.innerText = studentTotalMap.get(rec.studentId) || 0;
-            if(editingRowId===rec.id){
-                scoreCell.innerHTML=`<input type="number" id="editScore" value="${rec.score}" step="1" style="width:70px;" min="0" max="${rec.maxScore}"> / ${rec.maxScore}`;
-                maxCell.innerText=rec.maxScore;
-                actionCell.innerHTML=`<button class="btn-icon btn-save" data-id="${rec.id}">保存</button> <button class="btn-icon btn-cancel">取消</button>`;
+            row.insertCell(0).innerText = rec.studentName;
+            row.insertCell(1).innerText = rec.studentId;
+            row.insertCell(2).innerText = rec.dateStr;
+            const scoreCell = row.insertCell(3);
+            const maxCell = row.insertCell(4);
+            const totalCell = row.insertCell(5);
+            const rateCell = row.insertCell(6);
+            const actionCell = row.insertCell(7);
+            totalCell.innerText = totalScore;
+            rateCell.innerText = rate;
+            maxCell.innerText = rec.maxScore;
+            if(editingRowId === rec.id){
+                scoreCell.innerHTML = `<input type="number" id="editScore" value="${rec.score}" step="1" style="width:70px; padding:4px;" min="0" max="${rec.maxScore}">`;
+                actionCell.innerHTML = `<button class="btn-icon btn-save" data-id="${rec.id}">保存</button> <button class="btn-icon btn-cancel">取消</button>`;
             } else {
-                scoreCell.innerHTML=`${rec.score} / ${rec.maxScore}`;
-                maxCell.innerText=rec.maxScore;
-                actionCell.innerHTML=`<button class="btn-icon btn-edit" data-id="${rec.id}"><i class="fas fa-edit"></i> 修改</button> <button class="btn-icon btn-delete" data-id="${rec.id}"><i class="fas fa-trash-alt"></i> 删除</button>`;
+                scoreCell.innerText = rec.score;
+                actionCell.innerHTML = `<button class="btn-icon btn-edit" data-id="${rec.id}"><i class="fas fa-edit"></i> 修改</button> <button class="btn-icon btn-delete" data-id="${rec.id}"><i class="fas fa-trash-alt"></i> 删除</button>`;
             }
         });
+        // 绑定事件
         document.querySelectorAll('.btn-edit').forEach(btn=>btn.addEventListener('click',(e)=>{editingRowId=btn.getAttribute('data-id');renderAdminTable();}));
-        document.querySelectorAll('.btn-delete').forEach(btn=>btn.addEventListener('click',()=>{if(confirm("删除记录？")){const id=btn.getAttribute('data-id');allSubmissions=allSubmissions.filter(s=>s.id!=id);saveStorage();editingRowId=null;renderAdminTable();const sid=idInput.value.trim();if(sid)displayStudentResult(sid,new Date().toISOString().slice(0,10));}}));
+        document.querySelectorAll('.btn-delete').forEach(btn=>btn.addEventListener('click',()=>{if(confirm("永久删除该条记录？")){const id=btn.getAttribute('data-id');allSubmissions=allSubmissions.filter(s=>s.id!=id);saveStorage();editingRowId=null;renderAdminTable();const sid=idInput.value.trim();if(sid)displayStudentResult(sid,new Date().toISOString().slice(0,10));}}));
         document.querySelectorAll('.btn-save').forEach(btn=>btn.addEventListener('click',()=>{const id=btn.getAttribute('data-id');const inp=document.getElementById('editScore');if(inp){let newScore=parseInt(inp.value);const idx=allSubmissions.findIndex(s=>s.id==id);if(idx!==-1&&!isNaN(newScore)&&newScore>=0&&newScore<=allSubmissions[idx].maxScore){allSubmissions[idx].score=newScore;allSubmissions[idx].evaluationText+=` [教师修正：得分调整为${newScore}]`;allSubmissions[idx].timestamp=new Date().toISOString();saveStorage();}}editingRowId=null;renderAdminTable();const sid=idInput.value.trim();if(sid)displayStudentResult(sid,new Date().toISOString().slice(0,10));}));
         document.querySelectorAll('.btn-cancel').forEach(btn=>btn.addEventListener('click',()=>{editingRowId=null;renderAdminTable();}));
     }
     function exportCSV(){
         if(!allSubmissions.length){alert("无数据");return;}
-        const studentTotalMap = new Map();
+        const studentTotalScoreMap = new Map();
+        const studentTotalMaxMap = new Map();
         allSubmissions.forEach(s => {
-            const total = studentTotalMap.get(s.studentId) || 0;
-            studentTotalMap.set(s.studentId, total + s.score);
+            studentTotalScoreMap.set(s.studentId, (studentTotalScoreMap.get(s.studentId) || 0) + s.score);
+            studentTotalMaxMap.set(s.studentId, (studentTotalMaxMap.get(s.studentId) || 0) + s.maxScore);
         });
-        let rows=[["ID","姓名","学号","日期","得分","满分","累计总分","批阅意见","章节","题目","时间戳"]];
-        allSubmissions.forEach(r=>rows.push([r.id,r.studentName,r.studentId,r.dateStr,r.score,r.maxScore, studentTotalMap.get(r.studentId), r.evaluationText.replace(/,/g," "), r.chapter, r.questionText, r.timestamp]));
+        let rows=[["姓名","学号","日期","得分","满分","个人总分","得分率","评阅意见","章节","题目","提交时间"]];
+        allSubmissions.forEach(r=>{
+            const totalScore = studentTotalScoreMap.get(r.studentId) || 0;
+            const totalMax = studentTotalMaxMap.get(r.studentId) || 0;
+            const rate = totalMax > 0 ? Math.round((totalScore / totalMax) * 100) + "%" : "0%";
+            rows.push([r.studentName, r.studentId, r.dateStr, r.score, r.maxScore, totalScore, rate, r.evaluationText.replace(/,/g," "), r.chapter, r.questionText, r.timestamp]);
+        });
         let csv=rows.map(row=>row.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(",")).join("\n");
         let blob=new Blob(["\uFEFF"+csv],{type:"text/csv"});
         let a=document.createElement("a"),url=URL.createObjectURL(blob);
-        a.href=url;a.download=`高数_每日一题记录.csv`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+        a.href=url;a.download=`高数成绩表.csv`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
     }
     const adminModal=document.getElementById("adminModal");
     document.getElementById("teacherRankBtn").addEventListener("click",()=>{let pwd=prompt("教师密码:");if(pwd==="math2026"){editingRowId=null;renderAdminTable();adminModal.style.display="flex";}else alert("密码错误");});
