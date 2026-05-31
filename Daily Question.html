@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>高数每日一题 | 每日轮换 | 超详细解析 | 云端同步</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- 引入 KaTeX 用于数学公式渲染 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] });"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -262,12 +266,15 @@
             margin-top: 8px;
         }
         .example-answer {
-            display: block;
+            display: none;
             margin-top: 10px;
             padding: 10px;
             background: #e8e0d6;
             border-radius: 16px;
             font-size: 0.85rem;
+        }
+        .example-answer.show {
+            display: block;
         }
         .detail-text { color: #4a5b52; font-size: 0.8rem; margin-top: 4px; }
         .refresh-btn { background: #718b79; color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; cursor: pointer; margin-left: 10px; }
@@ -291,6 +298,7 @@
             white-space: nowrap;
         }
         @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
+        .math-inline { font-family: monospace; background: #f5f5f5; padding: 2px 4px; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -301,9 +309,9 @@
     </div>
     <div class="header-section">
         <div class="title-area">
-            <h1><i class="fas fa-chalkboard-teacher"></i> 高等数学@每日一题</h1>
-            <p>同济八版下册 · 每日轮换新题 · 云端同步 · 助力期末复习</p>
-            <p>高数B3班特供 . 每天免费品尝</p>
+            <h1><i class="fas fa-chalkboard-teacher"></i> 高等数学每日一题</h1>
+            <p>同济八版下册 · 每日有新题 · 云端同步 · 助力期末备考</p>
+            <p>高数B3班特供 . 每天免费品尝备考</p>
         </div>
         <div style="display: flex; align-items: center; gap: 12px;">
             <div class="date-panel" id="currentDateDisplay"></div>
@@ -356,7 +364,7 @@
         <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
             <button class="btn-export" id="exportMatrixCsvBtn"><i class="fas fa-download"></i> 导出成绩矩阵 CSV</button>
         </div>
-        <div class="info-note" style="margin-top: 16px;">💡 正确率 = 当前总得分 ÷ 当前已出题的总分 × 100%。<br>📅 未到来的日期显示"—"，已过日期未作答显示"未作答"（按0分计）。<br>🔧 教师可查看下载得分表。</div>
+        <div class="info-note" style="margin-top: 16px;">💡 正确率 = 当前总得分 ÷ 当前已出题的总分 × 100%。<br>📅 未到来的日期显示"—"，已过日期未作答显示"未作答"（按0分计）。<br>🔧 教师可修改学生成绩（点击得分数字直接编辑）。</div>
     </div>
 </div>
 
@@ -392,70 +400,72 @@
         ["081825032","姚猛"],["081825035","项可益"],["081825039","湛益阳"]
     ]);
 
-    // ======================= 完整题库（五大章节全覆盖，储备足够题目）=======================
-    // 选项设计包含解题过程，提升学生对解题步骤的辨别能力
+    // ======================= 完整题库（五大章节全覆盖）=======================
     const fullQuestionSet = [
-        { chapter: "向量代数与空间解析几何", text: "已知向量 a=(2,-1,2), b=(1,2,-2)，则下列选项中正确的是？", type: "多选题", difficulty: 7, maxScore: 7,
-          options: ["A. a·b = 2×1+(-1)×2+2×(-2)= -4", "B. a×b = 行列式|i j k;2 -1 2;1 2 -2| = (-2,6,5)", "C. 与a,b都垂直的单位向量 = ±(a×b)/|a×b| = ±(-2,6,5)/√65", "D. a·b = 2+(-2)+(-4)= -4？不对，应该是4", "E. a×b = (2×2-(-1)×2, 2×1-2×2, 2×2-(-1)×1) = (6,-2,5)？", "F. 夹角cosθ = (a·b)/(|a||b|) = -4/9 = -0.444，θ=60°"],
+        { chapter: "向量代数与空间解析几何", text: "已知向量 $\\vec{a}=(2,-1,2)$, $\\vec{b}=(1,2,-2)$，则下列选项中正确的是？", type: "多选题", difficulty: 7, maxScore: 7,
+          options: ["A. $\\vec{a}\\cdot\\vec{b} = 2\\times1+(-1)\\times2+2\\times(-2)= -4$", "B. $\\vec{a}\\times\\vec{b} = \\begin{vmatrix} \\mathbf{i} & \\mathbf{j} & \\mathbf{k} \\\\ 2 & -1 & 2 \\\\ 1 & 2 & -2 \\end{vmatrix} = (-2,6,5)$", "C. 与$\\vec{a},\\vec{b}$都垂直的单位向量为 $\\pm\\dfrac{\\vec{a}\\times\\vec{b}}{|\\vec{a}\\times\\vec{b}|} = \\pm\\dfrac{(-2,6,5)}{\\sqrt{65}}$", "D. $\\vec{a}\\cdot\\vec{b} = 2+(-2)+(-4)= -4$？不对，应该是4", "E. $\\vec{a}\\times\\vec{b} = (2\\times2-(-1)\\times2,\\;2\\times1-2\\times2,\\;2\\times2-(-1)\\times1) = (6,-2,5)$？", "F. 夹角$\\cos\\theta = \\dfrac{\\vec{a}\\cdot\\vec{b}}{|\\vec{a}||\\vec{b}|} = -\\dfrac{4}{9} = -0.444$，$\\theta=60^\\circ$"],
           correct: ["A","B","C"],
-          theorems: "【主要定理】\n1️⃣ 点积：a·b = a₁b₁+a₂b₂+a₃b₃ = |a||b|cosθ\n2️⃣ 叉积：a×b = |i j k; a₁ a₂ a₃; b₁ b₂ b₃|\n3️⃣ 单位向量：e = v/|v|\n4️⃣ 夹角公式：cosθ = (a·b)/(|a||b|)",
-          conclusions: "✅ a·b=-4，|a|=3，|b|=3\n✅ a×b=(-2,6,5)，|a×b|=√65\n✅ 单位向量=±(-2,6,5)/√65\n✅ cosθ = -4/9，θ≈116°",
+          theorems: "【主要定理】\n1️⃣ 点积公式：$\\vec{a}\\cdot\\vec{b} = a_1b_1+a_2b_2+a_3b_3 = |\\vec{a}||\\vec{b}|\\cos\\theta$\n2️⃣ 叉积公式：$\\vec{a}\\times\\vec{b} = \\begin{vmatrix} \\mathbf{i} & \\mathbf{j} & \\mathbf{k} \\\\ a_1 & a_2 & a_3 \\\\ b_1 & b_2 & b_3 \\end{vmatrix}$\n3️⃣ 单位向量：$\\vec{e} = \\dfrac{\\vec{v}}{|\\vec{v}|}$\n4️⃣ 夹角公式：$\\cos\\theta = \\dfrac{\\vec{a}\\cdot\\vec{b}}{|\\vec{a}||\\vec{b}|}$",
+          conclusions: "✅ $\\vec{a}\\cdot\\vec{b}=-4$，$|\\vec{a}|=3$，$|\\vec{b}|=3$\n✅ $\\vec{a}\\times\\vec{b}=(-2,6,5)$，$|\\vec{a}\\times\\vec{b}|=\\sqrt{65}$\n✅ 单位向量 $= \\pm\\dfrac{(-2,6,5)}{\\sqrt{65}}$\n✅ $\\cos\\theta = -\\dfrac{4}{9}$，$\\theta \\approx 116^\\circ$",
           method: "直接计算点积；行列式计算叉积；标准化得单位向量",
-          solution: "点积=2×1+(-1)×2+2×(-2)=2-2-4=-4；叉积行列式得(-2,6,5)；单位向量=±(-2,6,5)/√65",
+          solution: "点积 $=2\\times1+(-1)\\times2+2\\times(-2)=2-2-4=-4$；叉积行列式得 $(-2,6,5)$；单位向量 $= \\pm\\dfrac{(-2,6,5)}{\\sqrt{65}}$",
           warnings: "⚠️ 叉积第二项有负号；单位向量有两个方向；夹角公式分母是模长乘积",
-          optionDetails: { A:"✓ 点积计算正确", B:"✓ 叉积行列式计算正确", C:"✓ 单位向量计算正确", D:"✗ 点积应为-4", E:"✗ 叉积计算公式错误", F:"✗ cosθ=-4/9≠1/2，θ≈116°" },
-          exampleQuestion: "已知a=(1,0,-1), b=(0,1,1)，求a·b、a×b及单位向量",
-          exampleAnswer: "a·b=-1；a×b=(1,-1,1)；单位向量=±(1/√3,-1/√3,1/√3)" },
-        { chapter: "多元函数微分学", text: "函数 z = x³ + y³ - 3xy 的极值情况，正确的是？", type: "多选题", difficulty: 8, maxScore: 8,
-          options: ["A. 驻点：解∂z/∂x=3x²-3y=0, ∂z/∂y=3y²-3x=0，得(0,0)和(1,1)", "B. (0,0)处A=0,Δ=AC-B²=-9<0，是极小值点", "C. (1,1)处A=6>0,Δ=27>0，是极小值点，极小值-1", "D. 函数没有极值点", "E. (0,0)是极大值点", "F. 函数无极大值，但有极小值"],
+          optionDetails: { A:"✓ 点积计算正确", B:"✓ 叉积行列式计算正确", C:"✓ 单位向量计算正确", D:"✗ 点积应为-4", E:"✗ 叉积计算公式错误", F:"✗ $\\cos\\theta=-4/9\\neq1/2$，$\\theta\\approx116^\\circ$" },
+          exampleQuestion: "已知 $\\vec{a}=(1,0,-1)$, $\\vec{b}=(0,1,1)$，求 $\\vec{a}\\cdot\\vec{b}$、$\\vec{a}\\times\\vec{b}$ 及单位向量",
+          exampleAnswer: "$\\vec{a}\\cdot\\vec{b}=-1$；$\\vec{a}\\times\\vec{b}=(1,-1,1)$；单位向量 $= \\pm\\left(\\dfrac{1}{\\sqrt{3}},-\\dfrac{1}{\\sqrt{3}},\\dfrac{1}{\\sqrt{3}}\\right)$" },
+        { chapter: "多元函数微分学", text: "函数 $z = x^3 + y^3 - 3xy$ 的极值情况，正确的是？", type: "多选题", difficulty: 8, maxScore: 8,
+          options: ["A. 驻点：解 $\\dfrac{\\partial z}{\\partial x}=3x^2-3y=0$，$\\dfrac{\\partial z}{\\partial y}=3y^2-3x=0$，得 $(0,0)$ 和 $(1,1)$", "B. $(0,0)$ 处 $A=0,\\Delta=AC-B^2=-9<0$，是极小值点", "C. $(1,1)$ 处 $A=6>0,\\Delta=27>0$，是极小值点，极小值 $-1$", "D. 函数没有极值点", "E. $(0,0)$ 是极大值点", "F. 函数无极大值，但有极小值"],
           correct: ["A","C"],
-          theorems: "极值必要条件：f_x=0,f_y=0；Hessian判别：Δ=AC-B²",
-          conclusions: "驻点(0,0)和(1,1)；(1,1)处极小值-1；(0,0)为鞍点",
+          theorems: "极值必要条件：$f_x=0,f_y=0$；Hessian判别：$\\Delta=AC-B^2$",
+          conclusions: "驻点 $(0,0)$ 和 $(1,1)$；$(1,1)$ 处极小值 $-1$；$(0,0)$ 为鞍点",
           method: "求偏导→解方程组→二阶偏导→判别",
-          solution: "f_x=3x²-3y=0，f_y=3y²-3x=0→(0,0),(1,1)；A=6x,B=-3,C=6y；在(1,1)处A=6>0,Δ=27>0→极小值-1",
-          warnings: "(0,0)处Δ=-9<0是鞍点；Δ=AC-B²>0且A>0为极小值",
+          solution: "$f_x=3x^2-3y=0$，$f_y=3y^2-3x=0$ → $(0,0),(1,1)$；$A=6x,B=-3,C=6y$；在 $(1,1)$ 处 $A=6>0,\\Delta=27>0$ → 极小值 $-1$",
+          warnings: "$(0,0)$ 处 $\\Delta=-9<0$ 是鞍点；$\\Delta=AC-B^2>0$ 且 $A>0$ 为极小值",
           optionDetails: { A:"✓ 驻点正确", B:"✗ (0,0)是鞍点", C:"✓ 正确", D:"✗ 有极小值", E:"✗ 鞍点", F:"✗ 选项不完整" },
-          exampleQuestion: "f(x,y)=x²+xy+y²-3x-3y的极值",
-          exampleAnswer: "驻点(1,1)，极小值-3" },
-        { chapter: "重积分", text: "二重积分 ∬_D xy dxdy，D由y=x和y=x²所围，积分值为？", type: "单选题", difficulty: 7, maxScore: 7,
-          options: ["A. 先y后x：∫₀¹∫_{x²}^{x} xy dy dx = 1/24", "B. 先x后y：∫₀¹∫_{y}^{√y} xy dx dy = 1/12", "C. ∫₀¹ x·(x-x²)dx = 1/6", "D. 积分区域不对应，结果为0", "E. 1/8", "F. 1/3"],
+          exampleQuestion: "求 $f(x,y)=x^2+xy+y^2-3x-3y$ 的极值",
+          exampleAnswer: "驻点 $(1,1)$，极小值 $-3$" },
+        { chapter: "重积分", text: "二重积分 $\\iint_D xy\\,dxdy$，$D$ 由 $y=x$ 和 $y=x^2$ 所围，积分值为？", type: "单选题", difficulty: 7, maxScore: 7,
+          options: ["A. 先 $y$ 后 $x$：$\\int_0^1\\int_{x^2}^{x} xy\\,dy\\,dx = \\dfrac{1}{24}$", "B. 先 $x$ 后 $y$：$\\int_0^1\\int_{y}^{\\sqrt{y}} xy\\,dx\\,dy = \\dfrac{1}{12}$", "C. $\\int_0^1 x\\cdot(x-x^2)dx = \\dfrac{1}{6}$", "D. 积分区域不对应，结果为0", "E. $\\dfrac{1}{8}$", "F. $\\dfrac{1}{3}$"],
           correct: ["A"],
           theorems: "二重积分的累次积分法",
-          conclusions: "积分值为1/24",
+          conclusions: "积分值为 $\\dfrac{1}{24}$",
           method: "先确定积分区域，再化为累次积分",
-          solution: "∫₀¹ dx ∫_{x²}^{x} xy dy = ∫₀¹ x·(x²/2 - x⁴/2)dx = 1/24",
-          warnings: "注意积分上下限：x从0到1，y从x²到x",
+          solution: "$\\int_0^1 dx \\int_{x^2}^{x} xy\\,dy = \\int_0^1 x\\cdot\\left(\\dfrac{x^2}{2} - \\dfrac{x^4}{2}\\right)dx = \\dfrac{1}{24}$",
+          warnings: "注意积分上下限：$x$ 从 $0$ 到 $1$，$y$ 从 $x^2$ 到 $x$",
           optionDetails: { A:"✓ 正确", B:"✗ 计算错误", C:"✗ 漏了y积分", D:"✗ 区域正确", E:"✗ 1/8错误", F:"✗ 1/3错误" },
-          exampleQuestion: "∬_D (x+y) dxdy，D由y=x和y=x²所围",
-          exampleAnswer: "3/20" },
-        { chapter: "曲线积分与曲面积分", text: "曲线积分 ∫_L (x²+y²) ds，L为圆周 x²+y²=ax，结果为？", type: "单选题", difficulty: 8, maxScore: 8,
-          options: ["A. 利用对称性：x²+y²=ax，∫_L ax ds = a·(圆心横坐标×弧长)= a·(a/2)·πa = πa³/2", "B. 直接计算得πa³", "C. 参数方程法得2πa³", "D. πa²", "E. πa³/4", "F. a³π/3"],
+          exampleQuestion: "$\\iint_D (x+y)\\,dxdy$，$D$ 由 $y=x$ 和 $y=x^2$ 所围",
+          exampleAnswer: "$\\dfrac{3}{20}$" },
+        { chapter: "曲线积分与曲面积分", text: "曲线积分 $\\int_L (x^2+y^2)\\,ds$，$L$ 为圆周 $x^2+y^2=ax\\;(a>0)$，结果为？", type: "单选题", difficulty: 8, maxScore: 8,
+          options: ["A. 利用对称性：$x^2+y^2=ax$，$\\int_L ax\\,ds = a\\cdot$圆心横坐标$\\times$弧长 $= a\\cdot\\dfrac{a}{2}\\cdot\\pi a = \\dfrac{\\pi a^3}{2}$", "B. 直接计算得 $\\pi a^3$", "C. 参数方程法得 $2\\pi a^3$", "D. $\\pi a^2$", "E. $\\dfrac{\\pi a^3}{4}$", "F. $\\dfrac{a^3\\pi}{3}$"],
           correct: ["A"],
           theorems: "第一类曲线积分的参数方程法及对称性",
-          conclusions: "结果为πa³/2",
-          method: "利用对称性，x²+y²=ax，∫_L ax ds",
-          solution: "a·(圆心横坐标×弧长)= a·(a/2)·πa = πa³/2",
-          warnings: "注意圆的圆心横坐标为a/2，弧长为πa",
+          conclusions: "结果为 $\\dfrac{\\pi a^3}{2}$",
+          method: "利用对称性，$x^2+y^2=ax$，$\\int_L ax\\,ds$",
+          solution: "$a\\cdot(圆心横坐标\\times弧长)= a\\cdot\\dfrac{a}{2}\\cdot\\pi a = \\dfrac{\\pi a^3}{2}$",
+          warnings: "注意圆的圆心横坐标为 $\\dfrac{a}{2}$，弧长为 $\\pi a$",
           optionDetails: { A:"✓ 正确", B:"✗ 多乘2", C:"✗ 多乘4", D:"✗ 量纲错误", E:"✗ 少一半", F:"✗ 分母错误" },
-          exampleQuestion: "∫_L (x+y) ds，L为单位圆",
-          exampleAnswer: "0" },
-        { chapter: "无穷级数", text: "级数 ∑ n²/2ⁿ 的敛散性与和，正确的是？", type: "单选题", difficulty: 7, maxScore: 7,
-          options: ["A. 比值法：lim (n+1)²/2ⁿ⁺¹·2ⁿ/n²=1/2<1，收敛", "B. 根值法也判收敛，和为4", "C. 收敛，和为6", "D. 收敛，和为8", "E. 发散", "F. 条件收敛"],
+          exampleQuestion: "$\\int_L (x+y)\\,ds$，$L$ 为单位圆",
+          exampleAnswer: "$0$" },
+        { chapter: "无穷级数", text: "级数 $\\sum_{n=1}^{\\infty} \\dfrac{n^2}{2^n}$ 的敛散性与和，正确的是？", type: "单选题", difficulty: 7, maxScore: 7,
+          options: ["A. 比值法：$\\lim_{n\\to\\infty} \\dfrac{(n+1)^2}{2^{n+1}}\\cdot\\dfrac{2^n}{n^2} = \\dfrac{1}{2}<1$，收敛", "B. 根值法也判收敛，和为4", "C. 收敛，和为6", "D. 收敛，和为8", "E. 发散", "F. 条件收敛"],
           correct: ["C"],
           theorems: "比值判别法；幂级数求和公式",
           conclusions: "收敛，和为6",
-          method: "比值法判敛；利用∑n²xⁿ = x(1+x)/(1-x)³ (|x|<1)",
-          solution: "比值=1/2<1收敛；令x=1/2，S=(1/2×3/2)/(1/2)³=6",
-          warnings: "注意幂级数收敛域|x|<1，x=1/2在收敛域内",
+          method: "比值法判敛；利用 $\\sum n^2 x^n = \\dfrac{x(1+x)}{(1-x)^3}\\;(|x|<1)$",
+          solution: "比值 $=\\dfrac{1}{2}<1$ 收敛；令 $x=\\dfrac{1}{2}$，$S=\\dfrac{\\frac{1}{2}\\times\\frac{3}{2}}{(\\frac{1}{2})^3}=6$",
+          warnings: "注意幂级数收敛域 $|x|<1$，$x=\\dfrac{1}{2}$ 在收敛域内",
           optionDetails: { A:"✗ 比值正确但未求和", B:"✗ 和为4错误", C:"✓ 正确", D:"✗ 和为8错误", E:"✗ 收敛", F:"✗ 绝对收敛" },
-          exampleQuestion: "∑ n/2ⁿ的和",
-          exampleAnswer: "2" }
+          exampleQuestion: "$\\sum_{n=1}^{\\infty} \\dfrac{n}{2^n}$ 的和",
+          exampleAnswer: "$2$" }
     ];
 
     // 扩展题库确保足够覆盖活动期间每一天
     while(fullQuestionSet.length < 35) {
         for(let q of [...fullQuestionSet.slice(0,5)]) {
-            fullQuestionSet.push({ ...q, chapter: q.chapter + " (今日题)" });
+            let newQ = JSON.parse(JSON.stringify(q));
+            newQ.chapter = q.chapter + " (变式)";
+            newQ.text = q.text.replace(/[\？\?]/, "（变式）？");
+            fullQuestionSet.push(newQ);
         }
     }
 
@@ -538,9 +548,7 @@
         let total = 0;
         for(let date of getPastDatesUntilToday()) {
             let q = getDailyQuestionByDate(date);
-            let submission = allSubmissions.find(s => s.studentId === studentId && s.dateStr === date);
-            if(submission) total += submission.maxScore;
-            else total += q.maxScore;
+            total += q.maxScore;
         }
         return total;
     }
@@ -624,7 +632,11 @@
         }
         
         let motivation = getMotivationMessage(record.score, record.maxScore, missedDays);
-        let exampleHtml = `<div class="example-box"><strong>📚 ${record.exampleQuestion}</strong><div><button class="toggle-btn" onclick="toggleExampleAnswer(this)">🔍 查看参考答案</button></div><div class="example-answer" style="display:none;">📌 参考答案：<br>${record.exampleAnswer}</div></div>`;
+        let exampleHtml = `<div class="example-box">
+                            <strong>📚 ${record.exampleQuestion}</strong>
+                            <div><button class="toggle-btn" onclick="toggleExampleAnswer(this)">🔍 查看参考答案</button></div>
+                            <div class="example-answer" id="exampleAnswer_${record.id}">📌 参考答案：<br>${record.exampleAnswer}</div>
+                        </div>`;
         
         document.getElementById("personalResult").innerHTML = `
             <div class="score-card"><span class="score-value">${record.score}</span><span style="font-size:1rem;"> 分（满分 ${record.maxScore}）</span></div>
@@ -639,18 +651,25 @@
             <div class="warning-box">${record.warnings}</div>
             ${exampleHtml}
             <div class="info-note">提交时间：${new Date(record.timestamp).toLocaleString()} | 章节：${record.chapter}</div>`;
+        
+        // 重新渲染数学公式
+        if(window.renderMathInElement) {
+            window.renderMathInElement(document.getElementById("personalResult"), {
+                delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]
+            });
+        }
     }
     
     window.toggleExampleAnswer = function(btn) {
-        let parent = btn.parentElement;
+        let parent = btn.parentElement.parentElement;
         let answerDiv = parent.querySelector('.example-answer');
         if(answerDiv) {
-            if(answerDiv.style.display === 'none' || !answerDiv.style.display) {
-                answerDiv.style.display = 'block';
-                btn.textContent = "🔒 隐藏参考答案";
-            } else {
-                answerDiv.style.display = 'none';
+            if(answerDiv.classList.contains('show')) {
+                answerDiv.classList.remove('show');
                 btn.textContent = "🔍 查看参考答案";
+            } else {
+                answerDiv.classList.add('show');
+                btn.textContent = "🔒 隐藏参考答案";
             }
         }
     };
@@ -744,6 +763,16 @@
             submitBtn.textContent = "提交答案";
             document.querySelectorAll('#optionsArea input').forEach(i => i.disabled = false);
         }
+        
+        // 重新渲染数学公式
+        if(window.renderMathInElement) {
+            window.renderMathInElement(document.getElementById("dailyQuestionText"), {
+                delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]
+            });
+            window.renderMathInElement(document.getElementById("optionsArea"), {
+                delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]
+            });
+        }
     }
     
     function updateCountdown() {
@@ -805,7 +834,7 @@
         let tbody = document.getElementById("matrixBody");
         tbody.innerHTML = "";
         for(let row of rows) {
-            let tr = `<tr><td style="font-weight:500;">${row.name}</td><td style="font-family:monospace;">${row.sid}${row.scores.map(s => {
+            let tr = `<td><td style="font-weight:500;">${row.name}</td><td style="font-family:monospace;">${row.sid}${row.scores.map(s => {
                 if(s === "—") return `<td class="future-date">${s}`;
                 if(s === "未作答") return `<td class="not-submitted">${s}`;
                 return `<td>${s}`;
@@ -817,59 +846,69 @@
         document.querySelectorAll('.matrix-table td').forEach(td => {
             let val = td.innerText;
             if(!isNaN(parseInt(val)) && td.innerText !== "—" && td.innerText !== "未作答") {
-                let studentRow = td.parentElement;
-                let studentId = studentRow.cells[1].innerText;
-                let date = studentRow.cells[2].innerText;
-                let originalScore = parseInt(val);
-                td.style.cursor = "pointer";
-                td.style.backgroundColor = "#eef2fa";
-                td.title = "点击修改分数";
-                td.onclick = async () => {
-                    let newScore = prompt(`请输入新得分（0-10之间的整数）：`, originalScore);
-                    if(newScore !== null && !isNaN(parseInt(newScore))) {
-                        let scoreNum = parseInt(newScore);
-                        if(scoreNum >= 0 && scoreNum <= 10) {
-                            // 查找并更新记录
-                            let record = allSubmissions.find(s => s.studentId === studentId && s.dateStr === date);
-                            if(record) {
-                                record.score = scoreNum;
-                                record.evaluationText += ` [教师修正：得分调整为${scoreNum}]`;
-                                await saveToCloud(record);
-                                await renderMatrixTable();
-                                alert("分数已修改并同步到云端！");
-                            } else {
-                                // 如果没有记录，创建一个新记录
-                                let q = getDailyQuestionByDate(date);
-                                let newRecord = {
-                                    id: Date.now() + Math.random(),
-                                    studentId: studentId,
-                                    studentName: row.cells[0].innerText,
-                                    dateStr: date,
-                                    score: scoreNum,
-                                    maxScore: q.maxScore,
-                                    evaluationText: `[教师手动录入] 得分：${scoreNum}`,
-                                    chapter: q.chapter,
-                                    questionText: q.text,
-                                    timestamp: new Date().toISOString(),
-                                    optionAnalysis: "",
-                                    theorems: q.theorems,
-                                    conclusions: q.conclusions,
-                                    method: q.method,
-                                    solution: q.solution,
-                                    warnings: q.warnings,
-                                    exampleQuestion: q.exampleQuestion,
-                                    exampleAnswer: q.exampleAnswer
-                                };
-                                allSubmissions.push(newRecord);
-                                await saveToCloud(newRecord);
-                                await renderMatrixTable();
-                                alert("新成绩已创建并同步到云端！");
-                            }
-                        } else {
-                            alert("分数必须在0-10之间！");
+                let row = td.parentElement;
+                let cells = row.cells;
+                if(cells.length >= 3) {
+                    let studentId = cells[1].innerText;
+                    let dateIndex = -1;
+                    for(let i = 2; i < cells.length - 2; i++) {
+                        if(cells[i] === td) {
+                            dateIndex = i - 2;
+                            break;
                         }
                     }
-                };
+                    if(dateIndex !== -1) {
+                        let date = allDateColumns[dateIndex];
+                        let originalScore = parseInt(val);
+                        td.style.cursor = "pointer";
+                        td.style.backgroundColor = "#eef2fa";
+                        td.title = "点击修改分数";
+                        td.onclick = async () => {
+                            let newScore = prompt(`请输入新得分（0-10之间的整数）：`, originalScore);
+                            if(newScore !== null && !isNaN(parseInt(newScore))) {
+                                let scoreNum = parseInt(newScore);
+                                if(scoreNum >= 0 && scoreNum <= 10) {
+                                    let record = allSubmissions.find(s => s.studentId === studentId && s.dateStr === date);
+                                    if(record) {
+                                        record.score = scoreNum;
+                                        record.evaluationText += ` [教师修正：得分调整为${scoreNum}]`;
+                                        await saveToCloud(record);
+                                        await renderMatrixTable();
+                                        alert("分数已修改并同步到云端！");
+                                    } else {
+                                        let q = getDailyQuestionByDate(date);
+                                        let newRecord = {
+                                            id: Date.now() + Math.random(),
+                                            studentId: studentId,
+                                            studentName: cells[0].innerText,
+                                            dateStr: date,
+                                            score: scoreNum,
+                                            maxScore: q.maxScore,
+                                            evaluationText: `[教师手动录入] 得分：${scoreNum}`,
+                                            chapter: q.chapter,
+                                            questionText: q.text,
+                                            timestamp: new Date().toISOString(),
+                                            optionAnalysis: "",
+                                            theorems: q.theorems,
+                                            conclusions: q.conclusions,
+                                            method: q.method,
+                                            solution: q.solution,
+                                            warnings: q.warnings,
+                                            exampleQuestion: q.exampleQuestion,
+                                            exampleAnswer: q.exampleAnswer
+                                        };
+                                        allSubmissions.push(newRecord);
+                                        await saveToCloud(newRecord);
+                                        await renderMatrixTable();
+                                        alert("新成绩已创建并同步到云端！");
+                                    }
+                                } else {
+                                    alert("分数必须在0-10之间！");
+                                }
+                            }
+                        };
+                    }
+                }
             }
         });
     }
