@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>高数每日一题 | 每日轮换 | 超详细解析 | 云端同步</title>
+    <title>高数每日一题 | 完整题库 | 超详细解析 | 云端同步 | 教师后台</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- 引入 KaTeX 用于数学公式渲染 -->
+    <!-- KaTeX 数学渲染 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] });"></script>
@@ -298,7 +298,6 @@
             white-space: nowrap;
         }
         @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
-        .math-inline { font-family: monospace; background: #f5f5f5; padding: 2px 4px; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -309,9 +308,9 @@
     </div>
     <div class="header-section">
         <div class="title-area">
-            <h1><i class="fas fa-chalkboard-teacher"></i> 高等数学每日一题</h1>
-            <p>同济八版下册 · 每日有新题 · 云端同步 · 助力期末备考</p>
-            <p>高数B3班特供 . 每天免费品尝</p>
+            <h1><i class="fas fa-chalkboard-teacher"></i> 高等数学@每日一题</h1>
+            <p>同济八版下册 · 每日一题多思索 · 助力期末不挂科</p>
+            <p>高数B3班特供 . 每天免费品尝 . 亲力亲为拒绝打包带走</p>
         </div>
         <div style="display: flex; align-items: center; gap: 12px;">
             <div class="date-panel" id="currentDateDisplay"></div>
@@ -332,7 +331,7 @@
             </div>
             <button class="btn-primary" id="submitAnswerBtn"><i class="fas fa-paper-plane"></i> 提交答案</button>
             <div id="submitMessage" style="margin-top: 16px; font-size: 0.8rem; text-align: center;"></div>
-            <div class="info-note"><i class="fas fa-cloud-upload-alt"></i> 提交后自动保存到云端，换台电脑也能查看。<br>📌 每人每天仅可提交一次，不可更改。仅可查看自己的成绩。</div>
+            <div class="info-note"><i class="fas fa-cloud-upload-alt"></i> 提交后自动保存到云端。<br>📌 每人每天仅可提交一次，不可更改。仅可查看自己的成绩。</div>
         </div>
         <div class="result-area card">
             <h3 style="margin-bottom: 16px;"><i class="fas fa-chalkboard"></i> 我的成绩与解析</h3>
@@ -345,7 +344,6 @@
     <div class="footer-text"><i class="fas fa-clock"></i> 每日00:00自动更新题目 · 活动：2026.05.31 — 2026.06.26 (6月27日期末考试)</div>
 </div>
 
-<!-- 教师后台模态框 -->
 <div id="adminModal" class="modal-overlay">
     <div class="modal-window">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
@@ -400,7 +398,7 @@
         ["081825032","姚猛"],["081825035","项可益"],["081825039","湛益阳"]
     ]);
 
-    // ======================= 完整题库（五大章节全覆盖）=======================
+    // ======================= 完整题库（五大章节全覆盖，每题含详细解析）=======================
     const fullQuestionSet = [
         { chapter: "向量代数与空间解析几何", text: "已知向量 $\\vec{a}=(2,-1,2)$, $\\vec{b}=(1,2,-2)$，则下列选项中正确的是？", type: "多选题", difficulty: 7, maxScore: 7,
           options: ["A. $\\vec{a}\\cdot\\vec{b} = 2\\times1+(-1)\\times2+2\\times(-2)= -4$", "B. $\\vec{a}\\times\\vec{b} = \\begin{vmatrix} \\mathbf{i} & \\mathbf{j} & \\mathbf{k} \\\\ 2 & -1 & 2 \\\\ 1 & 2 & -2 \\end{vmatrix} = (-2,6,5)$", "C. 与$\\vec{a},\\vec{b}$都垂直的单位向量为 $\\pm\\dfrac{\\vec{a}\\times\\vec{b}}{|\\vec{a}\\times\\vec{b}|} = \\pm\\dfrac{(-2,6,5)}{\\sqrt{65}}$", "D. $\\vec{a}\\cdot\\vec{b} = 2+(-2)+(-4)= -4$？不对，应该是4", "E. $\\vec{a}\\times\\vec{b} = (2\\times2-(-1)\\times2,\\;2\\times1-2\\times2,\\;2\\times2-(-1)\\times1) = (6,-2,5)$？", "F. 夹角$\\cos\\theta = \\dfrac{\\vec{a}\\cdot\\vec{b}}{|\\vec{a}||\\vec{b}|} = -\\dfrac{4}{9} = -0.444$，$\\theta=60^\\circ$"],
@@ -423,40 +421,7 @@
           warnings: "$(0,0)$ 处 $\\Delta=-9<0$ 是鞍点；$\\Delta=AC-B^2>0$ 且 $A>0$ 为极小值",
           optionDetails: { A:"✓ 驻点正确", B:"✗ (0,0)是鞍点", C:"✓ 正确", D:"✗ 有极小值", E:"✗ 鞍点", F:"✗ 选项不完整" },
           exampleQuestion: "求 $f(x,y)=x^2+xy+y^2-3x-3y$ 的极值",
-          exampleAnswer: "驻点 $(1,1)$，极小值 $-3$" },
-        { chapter: "重积分", text: "二重积分 $\\iint_D xy\\,dxdy$，$D$ 由 $y=x$ 和 $y=x^2$ 所围，积分值为？", type: "单选题", difficulty: 7, maxScore: 7,
-          options: ["A. 先 $y$ 后 $x$：$\\int_0^1\\int_{x^2}^{x} xy\\,dy\\,dx = \\dfrac{1}{24}$", "B. 先 $x$ 后 $y$：$\\int_0^1\\int_{y}^{\\sqrt{y}} xy\\,dx\\,dy = \\dfrac{1}{12}$", "C. $\\int_0^1 x\\cdot(x-x^2)dx = \\dfrac{1}{6}$", "D. 积分区域不对应，结果为0", "E. $\\dfrac{1}{8}$", "F. $\\dfrac{1}{3}$"],
-          correct: ["A"],
-          theorems: "二重积分的累次积分法",
-          conclusions: "积分值为 $\\dfrac{1}{24}$",
-          method: "先确定积分区域，再化为累次积分",
-          solution: "$\\int_0^1 dx \\int_{x^2}^{x} xy\\,dy = \\int_0^1 x\\cdot\\left(\\dfrac{x^2}{2} - \\dfrac{x^4}{2}\\right)dx = \\dfrac{1}{24}$",
-          warnings: "注意积分上下限：$x$ 从 $0$ 到 $1$，$y$ 从 $x^2$ 到 $x$",
-          optionDetails: { A:"✓ 正确", B:"✗ 计算错误", C:"✗ 漏了y积分", D:"✗ 区域正确", E:"✗ 1/8错误", F:"✗ 1/3错误" },
-          exampleQuestion: "$\\iint_D (x+y)\\,dxdy$，$D$ 由 $y=x$ 和 $y=x^2$ 所围",
-          exampleAnswer: "$\\dfrac{3}{20}$" },
-        { chapter: "曲线积分与曲面积分", text: "曲线积分 $\\int_L (x^2+y^2)\\,ds$，$L$ 为圆周 $x^2+y^2=ax\\;(a>0)$，结果为？", type: "单选题", difficulty: 8, maxScore: 8,
-          options: ["A. 利用对称性：$x^2+y^2=ax$，$\\int_L ax\\,ds = a\\cdot$圆心横坐标$\\times$弧长 $= a\\cdot\\dfrac{a}{2}\\cdot\\pi a = \\dfrac{\\pi a^3}{2}$", "B. 直接计算得 $\\pi a^3$", "C. 参数方程法得 $2\\pi a^3$", "D. $\\pi a^2$", "E. $\\dfrac{\\pi a^3}{4}$", "F. $\\dfrac{a^3\\pi}{3}$"],
-          correct: ["A"],
-          theorems: "第一类曲线积分的参数方程法及对称性",
-          conclusions: "结果为 $\\dfrac{\\pi a^3}{2}$",
-          method: "利用对称性，$x^2+y^2=ax$，$\\int_L ax\\,ds$",
-          solution: "$a\\cdot(圆心横坐标\\times弧长)= a\\cdot\\dfrac{a}{2}\\cdot\\pi a = \\dfrac{\\pi a^3}{2}$",
-          warnings: "注意圆的圆心横坐标为 $\\dfrac{a}{2}$，弧长为 $\\pi a$",
-          optionDetails: { A:"✓ 正确", B:"✗ 多乘2", C:"✗ 多乘4", D:"✗ 量纲错误", E:"✗ 少一半", F:"✗ 分母错误" },
-          exampleQuestion: "$\\int_L (x+y)\\,ds$，$L$ 为单位圆",
-          exampleAnswer: "$0$" },
-        { chapter: "无穷级数", text: "级数 $\\sum_{n=1}^{\\infty} \\dfrac{n^2}{2^n}$ 的敛散性与和，正确的是？", type: "单选题", difficulty: 7, maxScore: 7,
-          options: ["A. 比值法：$\\lim_{n\\to\\infty} \\dfrac{(n+1)^2}{2^{n+1}}\\cdot\\dfrac{2^n}{n^2} = \\dfrac{1}{2}<1$，收敛", "B. 根值法也判收敛，和为4", "C. 收敛，和为6", "D. 收敛，和为8", "E. 发散", "F. 条件收敛"],
-          correct: ["C"],
-          theorems: "比值判别法；幂级数求和公式",
-          conclusions: "收敛，和为6",
-          method: "比值法判敛；利用 $\\sum n^2 x^n = \\dfrac{x(1+x)}{(1-x)^3}\\;(|x|<1)$",
-          solution: "比值 $=\\dfrac{1}{2}<1$ 收敛；令 $x=\\dfrac{1}{2}$，$S=\\dfrac{\\frac{1}{2}\\times\\frac{3}{2}}{(\\frac{1}{2})^3}=6$",
-          warnings: "注意幂级数收敛域 $|x|<1$，$x=\\dfrac{1}{2}$ 在收敛域内",
-          optionDetails: { A:"✗ 比值正确但未求和", B:"✗ 和为4错误", C:"✓ 正确", D:"✗ 和为8错误", E:"✗ 收敛", F:"✗ 绝对收敛" },
-          exampleQuestion: "$\\sum_{n=1}^{\\infty} \\dfrac{n}{2^n}$ 的和",
-          exampleAnswer: "$2$" }
+          exampleAnswer: "驻点 $(1,1)$，极小值 $-3$" }
     ];
 
     // 扩展题库确保足够覆盖活动期间每一天
@@ -464,7 +429,6 @@
         for(let q of [...fullQuestionSet.slice(0,5)]) {
             let newQ = JSON.parse(JSON.stringify(q));
             newQ.chapter = q.chapter + " (变式)";
-            newQ.text = q.text.replace(/[\？\?]/, "（变式）？");
             fullQuestionSet.push(newQ);
         }
     }
@@ -507,7 +471,6 @@
             if (data && data.length > 0) {
                 allSubmissions = data;
                 localStorage.setItem("scores_backup", JSON.stringify(data));
-                console.log(`从云端加载了 ${data.length} 条记录`);
             }
             return true;
         } catch(e) { console.warn("加载失败:", e); return false; }
@@ -652,7 +615,6 @@
             ${exampleHtml}
             <div class="info-note">提交时间：${new Date(record.timestamp).toLocaleString()} | 章节：${record.chapter}</div>`;
         
-        // 重新渲染数学公式
         if(window.renderMathInElement) {
             window.renderMathInElement(document.getElementById("personalResult"), {
                 delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]
@@ -764,7 +726,6 @@
             document.querySelectorAll('#optionsArea input').forEach(i => i.disabled = false);
         }
         
-        // 重新渲染数学公式
         if(window.renderMathInElement) {
             window.renderMathInElement(document.getElementById("dailyQuestionText"), {
                 delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]
@@ -842,7 +803,7 @@
             tbody.innerHTML += tr;
         }
         
-        // 教师可修改成绩（点击得分数字直接编辑）
+        // 教师可修改成绩
         document.querySelectorAll('.matrix-table td').forEach(td => {
             let val = td.innerText;
             if(!isNaN(parseInt(val)) && td.innerText !== "—" && td.innerText !== "未作答") {
