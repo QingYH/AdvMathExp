@@ -545,6 +545,47 @@
       optionDetails: { A:"✓", B:"✓", C:"✓", D:"✗", E:"✗", F:"✓" },
       exampleQuestion: "计算 $\\oint_\\Gamma y^2 dx + z^2 dy + x^2 dz$，$\\Gamma$为单位圆$x^2+y^2+z^2=1, x+y+z=0$",
       exampleAnswer: "由对称性得0" },
+
+    // ========== 第26-30题（2道拉格朗日应用题 + 3道其他章节）==========
+
+// 第26题：拉格朗日乘数法应用1——利润最大化
+{ chapter: "多元函数极值（拉格朗日乘数法）", text: "某工厂生产两种产品，产量分别为 $x$ 和 $y$，利润函数为 $P(x,y)=100x+120y-2x^2-3y^2-xy$，生产受原材料限制满足 $x+y=50$，则最大利润为？", type: "多选题", difficulty: 9, maxScore: 9,
+  options: ["A. 拉格朗日函数 $L=100x+120y-2x^2-3y^2-xy+\\lambda(x+y-50)$", "B. 求偏导得：$\\begin{cases} 100-4x-y+\\lambda=0 \\\\ 120-6y-x+\\lambda=0 \\\\ x+y=50 \\end{cases}$", "C. 解得 $x=30, y=20$", "D. 最大利润 $P=100\\times30+120\\times20-2\\times900-3\\times400-600=2700$", "E. 解得 $x=20, y=30$", "F. 最大利润为 $2800$"],
+  correct: ["A","B","C","D"],
+  theorems: "【拉格朗日乘数法】求 $f(x,y)$ 在约束 $g(x,y)=0$ 下的极值，构造 $L=f+\\lambda g$，解 $\\nabla L=0$。",
+  conclusions: "最优产量 $x=30$，$y=20$，最大利润 $2700$。",
+  method: "构造拉格朗日函数 → 求偏导 → 解线性方程组 → 代入得利润。",
+  solution: "由 $100-4x-y+\\lambda=0$，$120-6y-x+\\lambda=0$，两式相减得 $20+3y-3x=0$，结合 $x+y=50$，解得 $x=30,y=20$，代入得 $P=2700$。",
+  warnings: "注意利润函数中的交叉项 $-xy$ 求导时不要遗漏。",
+  optionDetails: { A:"✓", B:"✓", C:"✓", D:"✓", E:"✗", F:"✗" },
+  exampleQuestion: "求 $P=80x+100y-x^2-2y^2-xy$ 在 $x+y=40$ 下的最大值",
+  exampleAnswer: "$x=15,y=25$，最大利润 $2075$" },
+
+// 第29题：二重积分（极坐标）
+{ chapter: "重积分", text: "用极坐标计算二重积分 $\\iint_D e^{-x^2-y^2} d\\sigma$，其中 $D: x^2+y^2 \\le R^2$，则正确的是？", type: "多选题", difficulty: 7, maxScore: 7,
+  options: ["A. 极坐标变换 $x=r\\cos\\theta, y=r\\sin\\theta$", "B. 积分限 $0\\le r\\le R, 0\\le\\theta\\le 2\\pi$", "C. 被积函数变为 $e^{-r^2}$", "D. 面积元 $d\\sigma = r dr d\\theta$", "E. 积分值为 $\\pi(1-e^{-R^2})$", "F. 积分值为 $2\\pi(1-e^{-R^2})$"],
+  correct: ["A","B","C","D","E"],
+  theorems: "极坐标变换：$x=r\\cos\\theta, y=r\\sin\\theta$，$d\\sigma = r dr d\\theta$。",
+  conclusions: "$\\iint_D e^{-x^2-y^2} d\\sigma = \\pi(1-e^{-R^2})$。",
+  method: "极坐标变换后先对 $r$ 积分。",
+  solution: "$\\int_0^{2\\pi}d\\theta\\int_0^R e^{-r^2} r dr = 2\\pi \\cdot [-\\frac{1}{2}e^{-r^2}]_0^R = \\pi(1-e^{-R^2})$。",
+  warnings: "注意 $d\\sigma$ 要多一个 $r$。",
+  optionDetails: { A:"✓", B:"✓", C:"✓", D:"✓", E:"✓", F:"✗ 多乘2" },
+  exampleQuestion: "计算 $\\iint_D \\sqrt{x^2+y^2} d\\sigma$，$D: x^2+y^2\\le1$",
+  exampleAnswer: "$\\frac{2\\pi}{3}$" },
+
+// 第30题：幂级数求和
+{ chapter: "幂级数", text: "幂级数 $\\sum_{n=0}^\\infty \\frac{x^n}{n!}$ 的和函数是？", type: "多选题", difficulty: 7, maxScore: 7,
+  options: ["A. $e^x$", "B. $\\sin x$", "C. 收敛域为 $(-\\infty,+\\infty)$", "D. 收敛域为 $(-1,1)$", "E. 收敛半径为 $+\\infty$", "F. 和函数为 $\\cos x$"],
+  correct: ["A","C","E"],
+  theorems: "指数函数泰勒展开：$e^x=\\sum_{n=0}^\\infty \\frac{x^n}{n!}$，收敛半径 $+\\infty$。",
+  conclusions: "和函数为 $e^x$，收敛域为全体实数。",
+  method: "直接识别标准展开式。",
+  solution: "这是 $e^x$ 的麦克劳林展开，收敛于全体实数。",
+  warnings: "注意阶乘在分母，收敛半径无穷大。",
+  optionDetails: { A:"✓", B:"✗", C:"✓", D:"✗", E:"✓", F:"✗" },
+  exampleQuestion: "求 $\\sum_{n=0}^\\infty \\frac{(-1)^n x^{2n}}{(2n)!}$",
+  exampleAnswer: "$\\cos x$" }
     
     // ========== 第13-16题：曲线积分与路径无关、全微分 ==========
     { chapter: "曲线积分与路径无关", text: "下列积分与路径无关的是？", type: "多选题", difficulty: 7, maxScore: 7,
@@ -596,6 +637,19 @@
       optionDetails: { A:"✓", C:"✓", E:"✓", B:"✗", D:"✗", F:"✗" },
       exampleQuestion: "求 $\\sum_{n=0}^\\infty \\frac{(-1)^n x^{2n}}{(2n)!}$",
       exampleAnswer: "$\\cos x$" },
+
+    // 第27题：拉格朗日乘数法应用2——几何最短距离
+{ chapter: "多元函数极值（拉格朗日乘数法）", text: "求原点到平面 $2x+3y+4z=29$ 的最短距离，下列步骤正确的是？", type: "多选题", difficulty: 8, maxScore: 8,
+  options: ["A. 目标函数为 $d^2=x^2+y^2+z^2$（距离平方）", "B. 约束条件为 $2x+3y+4z=29$", "C. 拉格朗日函数 $L=x^2+y^2+z^2+\\lambda(2x+3y+4z-29)$", "D. 偏导得 $2x+2\\lambda=0$，$2y+3\\lambda=0$，$2z+4\\lambda=0$", "E. 解得 $x=\\frac{29}{\\sqrt{29}},\\cdots$", "F. 最短距离为 $\\frac{29}{\\sqrt{29}}=\\sqrt{29}$"],
+  correct: ["A","B","C","D","F"],
+  theorems: "点到平面的最短距离问题转化为条件极值。",
+  conclusions: "最短距离为 $\\sqrt{29}$。",
+  method: "设点坐标，用距离平方为目标函数，平面方程为约束。",
+  solution: "$x=-\\lambda$，$y=-\\frac{3}{2}\\lambda$，$z=-2\\lambda$，代入平面得 $(-2\\lambda)+3(-\\frac{3}{2}\\lambda)+4(-2\\lambda)=-2\\lambda-\\frac{9}{2}\\lambda-8\\lambda=-\\frac{29}{2}\\lambda=29$，解得 $\\lambda=-2$，则 $(x,y,z)=(2,3,4)$，距离 $\\sqrt{4+9+16}=\\sqrt{29}$。",
+  warnings: "也可以用点到平面距离公式直接验证。",
+  optionDetails: { A:"✓", B:"✓", C:"✓", D:"✓", E:"✗ 计算错误", F:"✓" },
+  exampleQuestion: "求点$(1,2,3)$到平面$x+2y+3z=14$的距离",
+  exampleAnswer: "$\\frac{|1+4+9-14|}{\\sqrt{1+4+9}}=\\frac{0}{\\sqrt{14}}=0$，点在平面上" },
     
     { chapter: "幂级数", text: "幂级数 $\\sum_{n=1}^\\infty \\frac{x^n}{n}$ 的收敛域和和函数？", type: "多选题", difficulty: 8, maxScore: 8,
       options: ["A. 收敛半径 $R=1$", "B. 收敛域为 $(-1,1)$", "C. 收敛域为 $[-1,1)$", "D. 和函数为 $-\\ln(1-x)$", "E. 和函数为 $\\ln(1+x)$", "F. 端点$x=1$处发散"],
