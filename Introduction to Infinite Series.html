@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>无穷级数 · 第一堂课 | 高等数学可视化</title>
+    <!-- 字体与图标库 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700&family=Cormorant+Garamond:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- MathJax 数学渲染 -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: radial-gradient(circle at 10% 20%, #0a0f1e, #03060c);
+            font-family: 'Inter', system-ui, sans-serif;
+            color: #eef4ff;
+            padding: 1.5rem;
+            line-height: 1.5;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .hero { text-align: center; margin-bottom: 2rem; }
+        .hero h1 {
+            font-size: 2.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFE6B0, #6EA8FE, #B388FF);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .badge {
+            background: rgba(15, 25, 55, 0.8);
+            backdrop-filter: blur(5px);
+            border-radius: 40px;
+            padding: 0.3rem 1.2rem;
+            font-size: 0.85rem;
+            display: inline-block;
+            margin-bottom: 0.8rem;
+            border: 1px solid #3b82f6;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .card {
+            background: rgba(12, 20, 35, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            border: 1px solid rgba(70, 130, 255, 0.35);
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
+            transition: transform 0.2s, border-color 0.2s;
+            padding: 1.2rem 1.2rem 1.5rem;
+        }
+        .card:hover { border-color: #5f8eff; transform: translateY(-4px); }
+        .card-title {
+            font-size: 1.45rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            border-left: 4px solid #3b82f6;
+            padding-left: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            background: #010418;
+            border-radius: 1.2rem;
+            margin: 0.5rem 0;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+        }
+        .interactive-control {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.8rem;
+            margin-top: 0.8rem;
+        }
+        button {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid #3b82f6;
+            color: #d6e5ff;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:hover { background: #3b82f6; color: white; box-shadow: 0 0 8px #3b82f6; }
+        input[type="range"] { width: 180px; background: #1e2a4a; height: 4px; border-radius: 10px; }
+        .value-display {
+            background: #00000066;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+        .theory-text { font-size: 0.95rem; text-align: justify; margin-top: 1rem; }
+        hr { border-color: #2f4172; margin: 0.8rem 0; }
+        .curve-note { font-size: 0.75rem; text-align: center; color: #aab9f0; margin-top: 6px; }
+        .avatar-icon { font-size: 1.6rem; filter: drop-shadow(0 0 3px #8aadff); }
+        .fourier-detail { background: #0a1222; border-radius: 1rem; padding: 0.5rem; margin-top: 0.5rem; }
+        .milestone-desc { font-size: 0.7rem; color: #ccd9ff; }
+        .classical-quote { background: #0a122e; border-radius: 1rem; padding: 0.6rem; margin-bottom: 0.5rem; border-left: 3px solid #f5bc70; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="hero">
+        <div class="badge"><i class="fas fa-infinity"></i> 无穷级数 · 第一讲 | 极限思想与级数之美</div>
+        <h1>∞ 从芝诺悖论到傅里叶级数 ∞</h1>
+        <p style="margin-top: 0.5rem;">有限项之和 · 窥见无限真理 | 割圆术 | 几何收敛 | 调和发散</p>
+    </div>
+
+    <!-- 第一行: 芝诺悖论 + 割圆术 -->
+    <div class="grid-2">
+        <!-- 芝诺悖论 完整表述，方向修正：阿基里斯在左，乌龟在右（阿基里斯追龟）且图标朝向右侧 -->
+        <div class="card">
+            <div class="card-title"><i class="fas fa-running"></i> 芝诺悖论 · 阿基里斯追龟</div>
+            <div class="classical-quote">
+                <p><strong>📜 完整表述（公元前5世纪）</strong><br>
+                古希腊哲学家芝诺（Zeno of Elea）提出：跑得最快的英雄阿基里斯（Achilles）永远追不上一只慢悠悠的乌龟。设乌龟先出发一段距离，当阿基里斯跑到乌龟的起始点时，乌龟已向前爬了一小段；阿基里斯再追这一小段，乌龟又前进更短的一截……如此无限重复。芝诺认为，由于追赶过程包含无穷多个阶段，阿基里斯只能无限逼近却永远无法追上。—— 这一悖论困扰了数学家两千年，直到无穷级数理论给出解答：<strong>无穷个越来越小的量之和可以是有限值</strong>，因此阿基里斯在有限时间内必然追上乌龟。</p>
+            </div>
+            <canvas id="zenoCanvas" width="550" height="320" style="width:100%; aspect-ratio:550/320;"></canvas>
+            <div class="interactive-control">
+                <button id="resetZenoBtn"><i class="fas fa-sync-alt"></i> 重置 n=21 (接近追上)</button>
+                <div><span>级数项数 n: </span><input type="range" id="zenoSlider" min="0" max="30" step="1" value="10"></div>
+                <span id="zenoValue" class="value-display">n=10</span>
+            </div>
+            <div class="theory-text">
+                <p><strong>🏃 数学建模：</strong> 初始距离 \(d_0 = 100\)，速度比 \(r = v_{龟}/v_{阿}=0.85\)。追及路程构成等比级数：
+                \[ S = d_0 + d_0 r + d_0 r^2 + \cdots = \frac{d_0}{1-r} = 666.667 \]
+                部分和 \(S_n = d_0\frac{1-r^n}{1-r}\) 随着 n 增大趋近极限。当 \(n \ge 21\) 时，\(S_n\) 已超过极限的 99.9%，阿基里斯实际已追上。下方曲线图横轴 n ∈ [0,25]，展示部分和逐步收敛。</p>
+                <canvas id="zenoCurveCanvas" width="500" height="110" style="width:100%; height:110px; margin-top:6px;"></canvas>
+                <div class="curve-note">📈 红色虚线=极限路程 (666.67) ，蓝色曲线=部分和 S_n，n≈21 时几乎重合 → 级数收敛</div>
+            </div>
+        </div>
+
+        <!-- 割圆术 完整说明，纵坐标为面积值 -->
+        <div class="card">
+            <div class="card-title"><i class="fas fa-circle-notch"></i> 刘徽割圆术 · 极限思想东方源流</div>
+            <div class="classical-quote">
+                <p><strong>📜 历史原文与思想（公元263年）</strong><br>
+                魏晋数学家刘徽在《九章算术注》中提出：“割之弥细，所失弥少。割之又割，以至于不可割，则与圆合体，而无所失矣。” 他通过不断增加圆内接正多边形的边数，用多边形面积逼近圆面积。这是世界上最早将极限思想用于数学计算的典范，也是<strong>无穷级数思想的几何前身</strong>——正多边形面积序列 \(A_3, A_4, A_5, \dots\) 收敛于圆面积 \(\pi R^2\)。</p>
+            </div>
+            <canvas id="liuhuiCanvas" width="550" height="320" style="width:100%; aspect-ratio:550/320;"></canvas>
+            <div class="interactive-control">
+                <button id="resetCircleBtn"><i class="fas fa-redo-alt"></i> 演示16边形</button>
+                <div><span>正n边形: </span><input type="range" id="polygonSlider" min="3" max="16" step="1" value="6"></div>
+                <span id="polygonValue" class="value-display">n=6</span>
+            </div>
+            <div class="theory-text">
+                <p>📐 内接正n边形面积公式：\(A_n = \frac{n}{2}R^2\sin\frac{2\pi}{n}\)。取圆半径 \(R=1\)，则圆面积 \(A_{\text{圆}} = \pi \approx 3.141593\)。<strong>下方曲线图纵坐标为多边形实际面积，红色虚线为圆面积极限</strong>。随着边数 n 从 3 增加到 16，面积值迅速趋近于 \(\pi\)，直观体现“割之又割，则与圆合体”。</p>
+                <canvas id="circleCurveCanvas" width="500" height="110" style="width:100%; height:110px; margin-top:6px;"></canvas>
+                <div class="curve-note">📊 多边形面积 → 圆面积 (π ≈ 3.1416)，n=16 时面积 ≈ 3.096，相对误差仅 1.45%</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第二行: 傅里叶级数 + 核心理论(动态点列：只显示前N个点) -->
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-title"><i class="fas fa-waveform"></i> 傅里叶级数 · 方波分解与实际应用</div>
+            <div class="theory-text">
+                <p><strong>🎯 方波的实际背景：</strong> 方波广泛存在于数字电路（时钟信号）、音频合成（电子音乐）、电力电子（逆变器输出）等场景。理想方波在跳变处不连续，但可通过傅里叶级数用正弦波无限逼近：</p>
+                <p style="text-align:center; background:#0f1730; border-radius:12px; padding:6px; margin:6px 0;">\[ f(x)=\frac{4}{\pi}\sum_{k=1,3,5}^{\infty}\frac{\sin(kx)}{k} \]</p>
+                <div class="fourier-detail">
+                    <i class="fas fa-microchip"></i> <strong>数字电路</strong>：CPU时钟信号本质是方波，谐波分量影响电磁兼容性。<br>
+                    <i class="fas fa-music"></i> <strong>电子音乐合成</strong>：方波是经典电子音色（如8-bit游戏音乐）的基础。<br>
+                    <i class="fas fa-charging-station"></i> <strong>电力电子</strong>：逆变器输出的PWM波近似方波，经滤波后得到正弦交流电。
+                </div>
+                <canvas id="fourierCanvas" width="500" height="160" style="width:100%; aspect-ratio:500/160; margin-top: 8px;"></canvas>
+                <div class="interactive-control" style="margin-top: 6px;">
+                    <button id="addHarmonicBtn"><i class="fas fa-plus"></i> 增加谐波</button>
+                    <button id="resetHarmonicBtn"><i class="fas fa-undo-alt"></i> 重置1次谐波</button>
+                    <span id="harmonicsCount" class="value-display">谐波项数: 1</span>
+                </div>
+                <p class="curve-note">📌 灰色虚线: 理想方波，黄色曲线: 傅里叶级数逼近，谐波越多边缘越陡（吉布斯现象）。</p>
+            </div>
+        </div>
+
+        <!-- 级数核心理论：点从左向右均匀出现，只显示前N个点 (N为当前滑块值) -->
+        <div class="card">
+            <div class="card-title"><i class="fas fa-chart-line"></i> 级数理论核心 · 收敛 vs 发散 (动态点列)</div>
+            <canvas id="seriesCoreCanvas" width="500" height="280" style="width:100%; aspect-ratio:500/280;"></canvas>
+            <div class="interactive-control">
+                <div><button id="toggleSeriesTypeBtn"><i class="fas fa-exchange-alt"></i> 切换 几何/调和</button></div>
+                <div><span>当前显示项数 N: </span><input type="range" id="coreNSlider" min="1" max="40" step="1" value="10"></div>
+                <span id="coreNVal" class="value-display">N=10</span>
+            </div>
+            <div class="theory-text">
+                <p>✅ <strong>几何级数</strong> \(\sum_{n=0}^{\infty} r^n\) 当 \(|r|<1\) 收敛于 \(\frac{1}{1-r}\)。取 \(r=0.6\)，极限为 2.5，部分和逐渐趋近。<br>
+                ⚠️ <strong>调和级数</strong> \(\sum_{n=1}^{\infty} \frac{1}{n}\) 尽管通项趋于0，但部分和无界，缓慢发散到无穷。<br>
+                <strong>🎬 动态规则：</strong> 拖动滑块，图形只显示前 N 个点 (N=1,2,...,40)，每个点对应项数的部分和，点列从左向右逐个出现，后面的点暂不显示，直观感受“逐项叠加”的过程。</p>
+                <div id="divergenceHint" style="font-size:0.8rem; background:#0f172f; border-radius: 12px; padding: 5px; text-align:center; margin-top:4px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 历史里程碑 -->
+    <div class="card">
+        <div class="card-title"><i class="fas fa-timeline"></i> 无穷级数的历史长河 · 里程碑与成果</div>
+        <canvas id="timelineCanvas" width="800" height="150" style="width:100%; height:150px; background:#040a1a; border-radius: 24px; margin: 10px 0;"></canvas>
+        <div class="theory-text" style="display: flex; flex-wrap: wrap; justify-content: space-between; text-align:center; gap:5px;">
+            <div style="flex:1; min-width:90px;"><span class="avatar-icon">🏛️</span><br>芝诺 (前450)<br><span class="milestone-desc">悖论激发无限思想</span></div>
+            <div style="flex:1; min-width:90px;"><span class="avatar-icon">📐</span><br>刘徽 (263)<br><span class="milestone-desc">割圆术 · 极限雏形</span></div>
+            <div style="flex:1; min-width:90px;"><span class="avatar-icon">🍎</span><br>牛顿/莱布尼茨 (1665)<br><span class="milestone-desc">广义二项式级数</span></div>
+            <div style="flex:1; min-width:90px;"><span class="avatar-icon">📊</span><br>欧拉 (1735)<br><span class="milestone-desc">Σ1/n²=π²/6</span></div>
+            <div style="flex:1; min-width:90px;"><span class="avatar-icon">📖</span><br>柯西 (1821)<br><span class="milestone-desc">严格收敛判别法</span></div>
+            <div style="flex:1; min-width:90px;"><span class="avatar-icon">🌊</span><br>傅里叶 (1807)<br><span class="milestone-desc">三角级数，热传导</span></div>
+        </div>
+        <p style="margin-top: 0.5rem; text-align:center;">⏳ 从哲学思辨到现代数学基石，级数连接离散与连续，解析与逼近。</p>
+    </div>
+</div>
+
+<script>
+    (function(){
+        // 通用 canvas 尺寸调整
+        function resizeCanvasById(id, setHeight=null) {
+            const canvas = document.getElementById(id);
+            if(!canvas) return;
+            const w = canvas.clientWidth;
+            if(w>10) canvas.width = w;
+            else canvas.width = 500;
+            if(setHeight) canvas.height = setHeight;
+            else if(id==="zenoCanvas") canvas.height = 320;
+            else if(id==="liuhuiCanvas") canvas.height = 320;
+            else if(id==="seriesCoreCanvas") canvas.height = 280;
+            else if(id==="fourierCanvas") canvas.height = 160;
+            else if(id==="zenoCurveCanvas") canvas.height = 110;
+            else if(id==="circleCurveCanvas") canvas.height = 110;
+            else if(id==="timelineCanvas") canvas.height = 150;
+        }
+        
+        // ========== 芝诺悖论：修正方向，阿基里斯在左（起点），乌龟在右前方，图标朝向右侧 ==========
+        let zenoN = 10;
+        const D0 = 100;      // 初始距离（乌龟在阿基里斯前方 D0 像素）
+        const RATIO = 0.85;   // 速度比 v_龟/v_阿
+        
+        // 阿基里斯跑过的路程（从起点开始）
+        function getAchillesDist(n) {
+            let sum = 0;
+            for(let k=0;k<n;k++) sum += D0 * Math.pow(RATIO, k);
+            return Math.min(sum, D0/(1-RATIO));
+        }
+        // 乌龟跑过的路程 = 阿基里斯跑过的路程 * RATIO
+        function getTurtleDist(n) {
+            return getAchillesDist(n) * RATIO;
+        }
+        // 乌龟的绝对位置 = 初始位置(D0) + 乌龟跑过的路程
+        function getTurtlePos(n) {
+            return D0 + getTurtleDist(n);
+        }
+        // 阿基里斯的绝对位置 = 0 + 阿基里斯跑过的路程
+        function getAchillesPos(n) {
+            return getAchillesDist(n);
+        }
+        
+        const zenoCanvas = document.getElementById('zenoCanvas');
+        const zenoCurve = document.getElementById('zenoCurveCanvas');
+        function drawZenoAnimation() {
+            const ctx = zenoCanvas.getContext('2d');
+            if(!ctx || zenoCanvas.width<20) return;
+            const w = zenoCanvas.width, h = zenoCanvas.height;
+            ctx.clearRect(0,0,w,h);
+            ctx.fillStyle = "#010418"; ctx.fillRect(0,0,w,h);
+            ctx.strokeStyle = "#2c4270"; ctx.lineWidth=0.5;
+            for(let i=0;i<w;i+=50){ ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,h); ctx.stroke(); }
+            
+            const achPos = getAchillesPos(zenoN);
+            const turPos = getTurtlePos(zenoN);
+            const maxDist = D0/(1-RATIO) + 30;   // 极限距离 + 余量
+            const scaleX = (w-80) / maxDist;
+            const baseY = h-65;
+            // 阿基里斯 (左侧) 和 乌龟 (右侧前方)
+            const achPx = 40 + achPos * scaleX;
+            const turPx = 40 + turPos * scaleX;
+            
+            // 使用 CSS 变换来水平翻转图标方向：让它们面朝右侧（追赶方向）
+            ctx.save();
+            ctx.font = "26px 'Segoe UI'";
+            // 阿基里斯图标水平翻转（面朝右）
+            ctx.translate(achPx, baseY-22);
+            ctx.scale(-1, 1);
+            ctx.fillStyle = "#FFD966";
+            ctx.fillText("🏃‍♂️", 0, 0);
+            ctx.restore();
+            
+            ctx.save();
+            ctx.font = "26px 'Segoe UI'";
+            ctx.translate(turPx, baseY-22);
+            ctx.scale(-1, 1);
+            ctx.fillStyle = "#9bcd6c";
+            ctx.fillText("🐢", 0, 0);
+            ctx.restore();
+            
+            ctx.font = "bold 11px 'Inter'";
+            ctx.fillStyle = "#f2e8cf";
+            ctx.fillText("阿基里斯", achPx-18, baseY-36);
+            ctx.fillText("乌龟", turPx-12, baseY-38);
+            
+            // 极限点（追上位置）
+            const endX = 40 + (D0/(1-RATIO)) * scaleX;
+            ctx.beginPath(); ctx.moveTo(endX, baseY-45); ctx.lineTo(endX, baseY-5);
+            ctx.strokeStyle = "#ff9966"; ctx.lineWidth=2; ctx.stroke();
+            ctx.fillStyle = "#ffaa77"; ctx.fillText("极限点(追上)", endX-35, baseY-55);
+            
+            let currSum = getAchillesDist(zenoN);
+            let limit = D0/(1-RATIO);
+            ctx.fillStyle = "#bbddff"; ctx.font="10px monospace";
+            ctx.fillText(`S_${zenoN} = ${currSum.toFixed(2)} / ${limit.toFixed(2)}`, 20, baseY-70);
+            if(currSum >= limit-0.5) ctx.fillStyle = "#aaffaa", ctx.fillText("✓ 已追上 (级数收敛)", w-130, 30);
+        }
+        
+        function drawZenoCurve() {
+            const ctx = zenoCurve.getContext('2d');
+            if(!ctx || zenoCurve.width<20) return;
+            const w = zenoCurve.width, h = zenoCurve.height;
+            ctx.clearRect(0,0,w,h);
+            ctx.fillStyle="#010418"; ctx.fillRect(0,0,w,h);
+            let maxN = 25;
+            let limitVal = D0/(1-RATIO);
+            let points = [];
+            for(let i=0;i<=maxN;i++){
+                let s=0; for(let k=0;k<i;k++) s+= D0*Math.pow(RATIO,k);
+                points.push({n:i, val:s});
+            }
+            const xStart = 50, yStart = h-25;
+            const xStep = (w-70)/(maxN);
+            const yRange = limitVal+20;
+            ctx.strokeStyle = "#6e8bc0"; ctx.lineWidth=1;
+            ctx.beginPath(); ctx.moveTo(xStart-5, yStart); ctx.lineTo(w-15, yStart); ctx.moveTo(xStart-5, 15); ctx.lineTo(xStart-5, yStart);
+            ctx.stroke();
+            ctx.fillStyle = "#b0c4ff"; ctx.font="9px 'Inter'";
+            ctx.fillText("项数 n", w-45, yStart+12);
+            ctx.fillText("路程 S_n", 15, 35);
+            for(let i=0;i<=5;i++){ let y = yStart - i*(yStart-25)/5; ctx.beginPath(); ctx.moveTo(xStart-8,y); ctx.lineTo(xStart-3,y); ctx.stroke(); ctx.fillText((i*(yRange/5)).toFixed(0), xStart-35, y+3); }
+            for(let i=0;i<=5;i++){ let x = xStart + i*(w-70)/5; ctx.beginPath(); ctx.moveTo(x, yStart); ctx.lineTo(x, yStart+5); ctx.stroke(); ctx.fillText(i*5, x-4, yStart+15); }
+            function mapX(n){ return xStart + n*xStep; }
+            function mapY(val){ return yStart - (val / yRange)*(h-45); }
+            ctx.beginPath();
+            for(let i=0;i<=maxN;i++){
+                let x = mapX(points[i].n);
+                let y = mapY(points[i].val);
+                if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+            }
+            ctx.strokeStyle = "#6ea8fe"; ctx.lineWidth=2.2; ctx.stroke();
+            let ylim = mapY(limitVal);
+            ctx.beginPath(); ctx.moveTo(xStart,ylim); ctx.lineTo(w-15,ylim);
+            ctx.strokeStyle = "#ff7e5e"; ctx.setLineDash([5,5]); ctx.stroke(); ctx.setLineDash([]);
+            ctx.fillStyle = "#ffb57c"; ctx.fillText(`极限=${limitVal.toFixed(1)}`, w-100, ylim-5);
+            let currX = mapX(Math.min(zenoN,maxN)), currY = mapY(points[Math.min(zenoN,maxN)].val);
+            ctx.beginPath(); ctx.arc(currX, currY, 6, 0, 2*Math.PI); ctx.fillStyle="#ffcc66"; ctx.fill();
+            ctx.fillStyle="#fff"; ctx.fillText(`n=${zenoN}`, currX-12, currY-6);
+        }
+        
+        // ========== 割圆术 (纵坐标面积) ==========
+        let sides = 6;
+        const circleCanvas = document.getElementById('liuhuiCanvas');
+        const circleCurve = document.getElementById('circleCurveCanvas');
+        function drawLiuHui() {
+            const ctx = circleCanvas.getContext('2d');
+            const w = circleCanvas.width, h = circleCanvas.height;
+            if(!ctx || w<20) return;
+            ctx.clearRect(0,0,w,h);
+            const cx = w/2, cy = h/2, r = Math.min(w,h)*0.34;
+            ctx.beginPath(); ctx.arc(cx,cy,r,0,2*Math.PI);
+            ctx.strokeStyle = "#5f9eff"; ctx.lineWidth=2; ctx.stroke();
+            ctx.fillStyle = "#08143088"; ctx.fill();
+            if(sides>=3){
+                ctx.beginPath();
+                for(let i=0;i<=sides;i++){
+                    let angle = -Math.PI/2 + 2*Math.PI*i/sides;
+                    let x = cx+r*Math.cos(angle), y = cy+r*Math.sin(angle);
+                    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                }
+                ctx.closePath();
+                ctx.strokeStyle = "#fdba6a"; ctx.lineWidth=1.8; ctx.stroke();
+                ctx.fillStyle = "#ffaa4455"; ctx.fill();
+            }
+            let areaPoly = sides * 0.5 * r * r * Math.sin(2*Math.PI/sides);
+            let areaCircle = Math.PI * r * r;
+            ctx.fillStyle = "#f2e8cf"; ctx.font="11px monospace";
+            ctx.fillText(`正${sides}边形, 面积=${areaPoly.toFixed(4)} / 圆面积=${areaCircle.toFixed(4)}`, cx-120, cy+r+20);
+        }
+        function drawCircleRatioCurve() {
+            const ctx = circleCurve.getContext('2d');
+            const w = circleCurve.width, h = circleCurve.height;
+            if(!ctx || w<20) return;
+            ctx.clearRect(0,0,w,h);
+            ctx.fillStyle="#010418"; ctx.fillRect(0,0,w,h);
+            let maxN = 16;
+            let points=[];
+            let circleArea = Math.PI;
+            for(let n=3;n<=maxN;n++){
+                let areaPoly = n * 0.5 * 1 * 1 * Math.sin(2*Math.PI/n);
+                points.push({n, area: areaPoly});
+            }
+            const xStart=50, yStart=h-25;
+            const xStep = (w-70)/(maxN-3);
+            const maxArea = 3.2;
+            function mapX(n){ return xStart + (n-3)*xStep; }
+            function mapY(area){ return yStart - (area / maxArea)*(h-45); }
+            ctx.strokeStyle = "#6e8bc0"; ctx.lineWidth=1;
+            ctx.beginPath(); ctx.moveTo(xStart-5, yStart); ctx.lineTo(w-15, yStart); ctx.moveTo(xStart-5, 15); ctx.lineTo(xStart-5, yStart);
+            ctx.stroke();
+            ctx.fillStyle = "#b0c4ff"; ctx.font="9px 'Inter'";
+            ctx.fillText("边数 n", w-45, yStart+12); ctx.fillText("多边形面积", 15, 35);
+            for(let i=0;i<=5;i++){ let y = yStart - i*(yStart-25)/5; ctx.beginPath(); ctx.moveTo(xStart-8,y); ctx.lineTo(xStart-3,y); ctx.stroke(); ctx.fillText((i*maxArea/5).toFixed(2), xStart-35, y+3); }
+            for(let i=0;i<=4;i++){ let x = xStart + i*(w-70)/4; ctx.beginPath(); ctx.moveTo(x, yStart); ctx.lineTo(x, yStart+5); ctx.stroke(); ctx.fillText(3+i*((maxN-3)/4), x-4, yStart+15); }
+            ctx.beginPath();
+            for(let i=0;i<points.length;i++){
+                let x = mapX(points[i].n), y = mapY(points[i].area);
+                if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+            }
+            ctx.strokeStyle = "#80c0ff"; ctx.lineWidth=2; ctx.stroke();
+            let limitY = mapY(circleArea);
+            ctx.beginPath(); ctx.moveTo(xStart, limitY); ctx.lineTo(w-15, limitY);
+            ctx.strokeStyle = "#ff7e5e"; ctx.setLineDash([5,5]); ctx.stroke(); ctx.setLineDash([]);
+            ctx.fillStyle = "#ffb57c"; ctx.fillText(`圆面积≈${circleArea.toFixed(4)}`, w-110, limitY-3);
+            let idx = Math.max(0, sides-3);
+            let currX = mapX(sides), currY = mapY(points[idx]?.area||0);
+            ctx.beginPath(); ctx.arc(currX, currY, 6, 0, 2*Math.PI); ctx.fillStyle="#ffcc88"; ctx.fill();
+            ctx.fillStyle="#fff"; ctx.fillText(`n=${sides}`, currX-12, currY-6);
+        }
+        
+        // ========== 傅里叶级数 ==========
+        let harmonics = 1;
+        function drawFourier() {
+            const canvas = document.getElementById('fourierCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            if(!ctx) return;
+            ctx.clearRect(0,0,w,h);
+            ctx.fillStyle="#010418"; ctx.fillRect(0,0,w,h);
+            const steps = 500;
+            let dataFourier = [];
+            for(let i=0;i<=steps;i++){
+                let x = -Math.PI + 2*Math.PI*i/steps;
+                let ideal = (x >= 0) ? 1 : -1;
+                let fourierY = 0;
+                for(let k=1;k<=harmonics;k+=2) fourierY += (4/Math.PI) * Math.sin(k*x)/k;
+                let px = 40 + (i/steps)*(w-80);
+                let pyIdeal = h/2 - ideal*(h/3.5);
+                let pyFourier = h/2 - fourierY*(h/3.5);
+                dataFourier.push({px, pyIdeal, pyFourier});
+            }
+            ctx.beginPath();
+            for(let i=0;i<dataFourier.length;i++){
+                if(i===0) ctx.moveTo(dataFourier[i].px, dataFourier[i].pyIdeal);
+                else ctx.lineTo(dataFourier[i].px, dataFourier[i].pyIdeal);
+            }
+            ctx.strokeStyle = "#aa8888"; ctx.lineWidth=1.5; ctx.setLineDash([6,6]); ctx.stroke();
+            ctx.beginPath();
+            for(let i=0;i<dataFourier.length;i++){
+                if(i===0) ctx.moveTo(dataFourier[i].px, dataFourier[i].pyFourier);
+                else ctx.lineTo(dataFourier[i].px, dataFourier[i].pyFourier);
+            }
+            ctx.strokeStyle = "#fccf7c"; ctx.lineWidth=2.5; ctx.setLineDash([]); ctx.stroke();
+            ctx.fillStyle = "#bfd9ff"; ctx.font="9px monospace";
+            ctx.fillText(`傅里叶逼近 · ${harmonics}次谐波 (黄色)`, w-180, 25);
+            ctx.fillStyle = "#aa8888"; ctx.fillText("理想方波 (红色虚线)", w-150, 45);
+        }
+        
+        // ========== 级数核心：只显示前 N 个点 (N 为当前滑块值) ==========
+        let seriesMode = "geometric";
+        let displayN = 10;
+        function drawCoreSeries() {
+            const canvas = document.getElementById('seriesCoreCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            if(!ctx || w<20) return;
+            ctx.clearRect(0,0,w,h);
+            ctx.fillStyle="#020617"; ctx.fillRect(0,0,w,h);
+            
+            const maxPossible = 40;
+            let allPoints = [];
+            let limitGeo = 1/(1-0.6);
+            for(let n=1; n<=maxPossible; n++){
+                let sum = 0;
+                if(seriesMode === "geometric"){
+                    for(let i=0;i<=n;i++) sum += Math.pow(0.6, i);
+                } else {
+                    for(let i=1;i<=n;i++) sum += 1/i;
+                }
+                allPoints.push({n, sum});
+            }
+            let points = allPoints.slice(0, displayN);
+            
+            const maxY = seriesMode === "geometric" ? 2.8 : Math.min(allPoints[displayN-1]?.sum + 0.8 || 6.0, 6.0);
+            const xStart = 60, yStart = h-35;
+            const xEnd = w-25;
+            const totalMaxN = maxPossible;
+            function mapX(n){ 
+                let t = (n-1) / (totalMaxN-1);
+                return xStart + t * (xEnd - xStart);
+            }
+            function mapY(y){ return yStart - (y/maxY)*(h-60); }
+            
+            ctx.strokeStyle="#6e8bc0"; ctx.beginPath(); ctx.moveTo(xStart-5,yStart); ctx.lineTo(xEnd+5,yStart); ctx.moveTo(xStart-5,15); ctx.lineTo(xStart-5,yStart); ctx.stroke();
+            ctx.fillStyle="#b0c4ff"; ctx.fillText("项数 N", xEnd-10, yStart+12); ctx.fillText("部分和 S_N", 15, 35);
+            for(let i=0;i<=5;i++){ let y = yStart - i*(yStart-25)/5; ctx.beginPath(); ctx.moveTo(xStart-8,y); ctx.lineTo(xStart-3,y); ctx.stroke(); ctx.fillText((i*(maxY/5)).toFixed(2), xStart-35, y+3); }
+            for(let tick of [1, 10, 20, 30, 40]){
+                if(tick <= totalMaxN){
+                    let x = mapX(tick);
+                    ctx.beginPath(); ctx.moveTo(x, yStart); ctx.lineTo(x, yStart+5); ctx.stroke();
+                    ctx.fillText(tick, x-4, yStart+15);
+                }
+            }
+            
+            for(let i=0;i<points.length;i++){
+                let xp = mapX(points[i].n);
+                let yp = mapY(points[i].sum);
+                ctx.fillStyle = seriesMode==="geometric"?"#3b82f6":"#f97316";
+                ctx.beginPath(); ctx.arc(xp, yp, 5, 0, 2*Math.PI); ctx.fill();
+                ctx.fillStyle = "#ffffffcc"; ctx.font="8px monospace";
+                ctx.fillText(points[i].sum.toFixed(2), xp-10, yp-6);
+            }
+            ctx.beginPath();
+            for(let i=0;i<points.length;i++){
+                let xp = mapX(points[i].n), yp = mapY(points[i].sum);
+                if(i===0) ctx.moveTo(xp,yp); else ctx.lineTo(xp,yp);
+            }
+            ctx.strokeStyle = seriesMode==="geometric"?"#5cdb7a":"#f5a65b";
+            ctx.lineWidth=2; ctx.stroke();
+            
+            if(seriesMode==="geometric"){
+                let limitY = mapY(limitGeo);
+                ctx.beginPath(); ctx.moveTo(xStart,limitY); ctx.lineTo(xEnd,limitY);
+                ctx.strokeStyle="#ff8866"; ctx.setLineDash([5,5]); ctx.stroke(); ctx.setLineDash([]);
+                ctx.fillStyle="#ffa875"; ctx.fillText(`极限≈${limitGeo.toFixed(2)}`, xEnd-100, limitY-5);
+            } else {
+                ctx.fillStyle="#f09866"; ctx.fillText("调和级数: 部分和持续增长(发散)", xEnd-220, 40);
+                let divHint = document.getElementById('divergenceHint');
+                if(points.length>0) divHint.innerHTML = `📈 当前显示到 N = ${displayN} ，部分和 H_${displayN} = ${points[points.length-1].sum.toFixed(4)} ，点列持续上升，永不收敛。`;
+                else divHint.innerHTML = "";
+            }
+            ctx.fillStyle="#eef"; ctx.font="bold 12px";
+            ctx.fillText(seriesMode==="geometric"?"几何级数 收敛 (r=0.6)":"调和级数 发散 (∑1/n)", 70, 35);
+        }
+        
+        // 历史里程碑
+        function drawTimeline() {
+            const canvas = document.getElementById('timelineCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            if(!ctx) return;
+            ctx.clearRect(0,0,w,h);
+            ctx.beginPath(); ctx.moveTo(20, h/2-10); ctx.lineTo(w-20, h/2-10);
+            ctx.strokeStyle = "#5c79b0"; ctx.lineWidth=2; ctx.stroke();
+            const events = [
+                {year:"-450", name:"芝诺", icon:"🏛️", desc:"悖论激发无限思想", x:0.05},
+                {year:"263", name:"刘徽", icon:"📐", desc:"割圆术 · 极限雏形", x:0.2},
+                {year:"1665", name:"牛顿/莱布尼茨", icon:"🍎", desc:"广义二项式级数", x:0.4},
+                {year:"1735", name:"欧拉", icon:"📊", desc:"Σ1/n²=π²/6", x:0.58},
+                {year:"1821", name:"柯西", icon:"📖", desc:"严格收敛判别法", x:0.75},
+                {year:"1807", name:"傅里叶", icon:"🌊", desc:"三角级数，热传导", x:0.88}
+            ];
+            events.forEach(e=>{
+                let px = 20 + e.x*(w-40);
+                ctx.beginPath(); ctx.moveTo(px, h/2-18); ctx.lineTo(px, h/2-2); ctx.stroke();
+                ctx.font = "20px 'Segoe UI'"; ctx.fillStyle = "#ffdd99";
+                ctx.fillText(e.icon, px-14, h/2-28);
+                ctx.font = "9px 'Inter'"; ctx.fillStyle = "#b8d0ff";
+                ctx.fillText(e.year, px-14, h/2+8);
+                ctx.fillStyle = "#aac9ff"; ctx.font="8px";
+                ctx.fillText(e.desc, px-35, h/2+24);
+            });
+        }
+        
+        // ========== 事件绑定 ==========
+        const zenoSlider = document.getElementById('zenoSlider');
+        const zenoVal = document.getElementById('zenoValue');
+        function updateZeno(){ zenoN=parseInt(zenoSlider.value); zenoVal.innerText=`n=${zenoN}`; drawZenoAnimation(); drawZenoCurve(); }
+        zenoSlider.addEventListener('input',updateZeno);
+        document.getElementById('resetZenoBtn').addEventListener('click',()=>{ zenoSlider.value="21"; updateZeno(); });
+        
+        const polySlider = document.getElementById('polygonSlider');
+        const polyVal = document.getElementById('polygonValue');
+        function updatePoly(){ sides=parseInt(polySlider.value); polyVal.innerText=`n=${sides}`; drawLiuHui(); drawCircleRatioCurve(); }
+        polySlider.addEventListener('input',updatePoly);
+        document.getElementById('resetCircleBtn').addEventListener('click',()=>{ polySlider.value="16"; updatePoly(); });
+        
+        const addHarmonic = document.getElementById('addHarmonicBtn');
+        const resetHarmonic = document.getElementById('resetHarmonicBtn');
+        const harmCountSpan = document.getElementById('harmonicsCount');
+        addHarmonic.addEventListener('click',()=>{ if(harmonics+2<=29) harmonics+=2; harmCountSpan.innerText=`谐波项数: ${harmonics}`; drawFourier(); });
+        resetHarmonic.addEventListener('click',()=>{ harmonics=1; harmCountSpan.innerText=`谐波项数: 1`; drawFourier(); });
+        
+        const toggleBtn = document.getElementById('toggleSeriesTypeBtn');
+        const coreSlider = document.getElementById('coreNSlider');
+        const coreVal = document.getElementById('coreNVal');
+        function updateCore(){ 
+            displayN = parseInt(coreSlider.value); 
+            coreVal.innerText=`N=${displayN}`; 
+            drawCoreSeries(); 
+        }
+        coreSlider.addEventListener('input',updateCore);
+        toggleBtn.addEventListener('click',()=>{ 
+            seriesMode = seriesMode==="geometric"?"harmonic":"geometric"; 
+            toggleBtn.innerHTML = seriesMode==="geometric"?'<i class="fas fa-exchange-alt"></i> 切换到调和级数':'<i class="fas fa-exchange-alt"></i> 切换到几何级数'; 
+            updateCore(); 
+        });
+        
+        function resizeAll(){
+            resizeCanvasById('zenoCanvas',320); resizeCanvasById('liuhuiCanvas',320); resizeCanvasById('seriesCoreCanvas',280);
+            resizeCanvasById('fourierCanvas',160); resizeCanvasById('zenoCurveCanvas',110); resizeCanvasById('circleCurveCanvas',110);
+            resizeCanvasById('timelineCanvas',150);
+            drawZenoAnimation(); drawZenoCurve(); drawLiuHui(); drawCircleRatioCurve(); drawCoreSeries(); drawFourier(); drawTimeline();
+        }
+        window.addEventListener('resize',resizeAll);
+        window.addEventListener('load',()=>{ resizeAll(); updateZeno(); updatePoly(); updateCore(); drawFourier(); drawTimeline(); });
+        setInterval(()=>{ drawZenoAnimation(); drawZenoCurve(); drawLiuHui(); drawCircleRatioCurve(); drawCoreSeries(); drawFourier(); drawTimeline(); }, 130);
+    })();
+</script>
+</body>
+</html>
