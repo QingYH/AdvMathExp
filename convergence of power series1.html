@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>高等数学：阿贝尔定理 | 幂级数收敛半径与收敛域 (中心 x₀=0)</title>
+    <!-- MathJax 3 配置：将所有数学内容渲染为可视化数学符号，绝不显示LaTeX源码 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                tags: 'none'
+            },
+            options: {
+                ignoreHtmlClass: 'no-mathjax',
+                processHtmlClass: 'math'
+            },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    MathJax.startup.promise.then(() => {
+                        document.querySelectorAll('.math-source').forEach(el => el.style.display = 'none');
+                    });
+                }
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <!-- Plotly 核心库 -->
+    <script src="https://cdn.plot.ly/plotly-3.1.0.min.js" charset="utf-8"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: radial-gradient(circle at 15% 30%, #0a0f1c, #020617);
+            font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, 'Noto Sans', sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .master-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(8, 18, 32, 0.82);
+            backdrop-filter: blur(14px);
+            border-radius: 2rem;
+            border: 1px solid rgba(0, 210, 255, 0.5);
+            box-shadow: 0 25px 45px rgba(0,0,0,0.6), 0 0 0 1px rgba(0, 230, 250, 0.2) inset;
+            padding: 1.6rem;
+            transition: all 0.2s;
+        }
+        .title-section {
+            text-align: center;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid rgba(0, 200, 255, 0.6);
+            padding-bottom: 0.5rem;
+        }
+        .title-section h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #E0F2FE, #3CE0FF, #D9A7FC);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        .subhead {
+            color: #b8dcff;
+            font-size: 0.9rem;
+        }
+        .abel-card {
+            background: rgba(0, 25, 50, 0.85);
+            border-radius: 1.5rem;
+            padding: 1rem 1.6rem;
+            margin: 1rem 0 1.2rem 0;
+            border-left: 8px solid #0ff;
+            border-right: 1px solid rgba(0, 230, 255, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        .abel-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #7df9ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .abel-statement {
+            font-size: 1rem;
+            color: #f0f9ff;
+            line-height: 1.55;
+            margin-bottom: 12px;
+        }
+        .abel-statement strong {
+            color: #ffdf8c;
+        }
+        .abel-explain {
+            background: rgba(0, 0, 0, 0.55);
+            border-radius: 1rem;
+            padding: 0.8rem 1rem;
+            font-size: 0.88rem;
+            color: #cfe6ff;
+            border-top: 1px solid #2d8faa;
+        }
+        .highlight-gold {
+            color: #ffda7c;
+            font-weight: 500;
+        }
+        .green-an {
+            color: #2ecc71;
+            font-weight: 600;
+            text-shadow: 0 0 2px rgba(46,204,113,0.3);
+        }
+        .flex-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 0.6rem;
+        }
+        .control-panel {
+            flex: 1.2;
+            min-width: 260px;
+            background: rgba(2, 12, 24, 0.75);
+            border-radius: 1.6rem;
+            padding: 1.2rem;
+            border: 1px solid rgba(0, 210, 200, 0.35);
+        }
+        .graph-panel {
+            flex: 2.8;
+            min-width: 280px;
+        }
+        .slider-group {
+            margin-bottom: 1.5rem;
+        }
+        .slider-group label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 500;
+            color: #d2ecff;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+        input[type="range"] {
+            width: 100%;
+            height: 5px;
+            -webkit-appearance: none;
+            background: linear-gradient(90deg, #0af, #f6a);
+            border-radius: 10px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            border: 2px solid cyan;
+            box-shadow: 0 0 10px #0ff;
+            cursor: pointer;
+        }
+        .value-badge {
+            background: #021e2c;
+            padding: 0.2rem 0.7rem;
+            border-radius: 28px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #0ff;
+        }
+        .model-box {
+            background: #061d2ccc;
+            border-radius: 1.2rem;
+            padding: 0.7rem;
+            text-align: center;
+            margin: 1rem 0;
+            border: 1px solid #2ee0c070;
+        }
+        .info-hint {
+            font-size: 0.75rem;
+            color: #b0d0f0;
+            margin-top: 6px;
+            line-height: 1.3;
+        }
+        .status-area {
+            background: #02121e;
+            padding: 12px 12px;
+            border-radius: 32px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 12px;
+            border-left: 4px solid cyan;
+            transition: all 0.1s;
+        }
+        button {
+            background: rgba(0, 180, 220, 0.2);
+            border: 1px solid #2cc;
+            color: #caf0ff;
+            padding: 7px 16px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+        }
+        button:active {
+            background: cyan;
+            color: #011a2a;
+            transform: scale(0.97);
+        }
+        .plot-container {
+            border-radius: 1.2rem;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            background: #020b14;
+        }
+        /* 图例说明区域 - 修正完善版 */
+        .legend-section {
+            margin-top: 12px;
+            background: rgba(0, 15, 30, 0.65);
+            border-radius: 1rem;
+            padding: 8px 12px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(0, 200, 255, 0.25);
+        }
+        .legend-title {
+            font-size: 0.7rem;
+            color: #8bcbff;
+            margin-bottom: 6px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .legend-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 0.7rem;
+            color: #c5e2ff;
+        }
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .legend-color {
+            width: 16px;
+            height: 3px;
+            border-radius: 2px;
+        }
+        .legend-color.circle {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .legend-color.dash {
+            width: 20px;
+            height: 3px;
+            background: repeating-linear-gradient(90deg, #ffaa66, #ffaa66 4px, transparent 4px, transparent 8px);
+        }
+        .explanation-text {
+            margin-top: 8px;
+            font-size: 0.7rem;
+            color: #aaccee;
+            border-top: 1px dashed #2a6080;
+            padding-top: 6px;
+            line-height: 1.4;
+        }
+        .math-display-container {
+            background: rgba(0,20,40,0.7);
+            border-radius: 40px;
+            padding: 8px 16px;
+            text-align: center;
+            margin-bottom: 8px;
+            backdrop-filter: blur(4px);
+        }
+        .math-display {
+            font-size: 1rem;
+            color: #e0f0ff;
+        }
+        @media (max-width: 700px) {
+            .master-container { padding: 1rem; }
+            .title-section h1 { font-size: 1.4rem; }
+            .abel-statement { font-size: 0.85rem; }
+            .math-display { font-size: 0.75rem; }
+            .legend-row { flex-direction: column; gap: 4px; }
+        }
+        .footnote {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #6f9bc0;
+            margin-top: 1rem;
+            border-top: 1px dashed #2a6080;
+            padding-top: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+<div class="master-container">
+    <div class="title-section">
+        <h1>📐 阿贝尔定理 · 幂级数收敛半径与收敛域 (中心 x₀ = 0)</h1>
+        <div class="subhead">Abel 定理严格几何直观 | 动态探究收敛区间、端点与和函数连续性 | 系数 <span class="green-an">aₙ</span> 绿色高亮</div>
+    </div>
+
+    <!-- 阿贝尔定理完整表述 -->
+    <div class="abel-card">
+        <div class="abel-title">
+            <span>📖 阿贝尔定理 (Abel Theorem) —— 幂级数收敛性的基石</span>
+        </div>
+        <div class="abel-statement math">
+            <strong>定理1 (阿贝尔第一定理)</strong> 设幂级数 \(\displaystyle \sum_{n=0}^{\infty} \color{#2ecc71}{a_n} x^n\)，若存在点 \(x_1 \neq 0\) 使得级数收敛，则对于一切满足 \(|x| < |x_1|\) 的 \(x\)，级数<span class="highlight-gold">绝对收敛</span>；若在点 \(x_2\) 发散，则对于一切 \(|x| > |x_2|\) 的 \(x\)，级数<span class="highlight-gold">发散</span>。<br>
+            <strong>推论 (收敛半径)</strong> 存在唯一的 \(R\) ( \(0 \le R \le +\infty\) )，使得当 \(|x| < R\) 时级数绝对收敛，当 \(|x| > R\) 时级数发散。<br>
+            <strong>定理2 (阿贝尔第二定理, 连续性)</strong> 若幂级数 \(\sum \color{#2ecc71}{a_n} x^n\) 的收敛半径为 \(R>0\)，且级数在端点 \(x = R\) (或 \(x = -R\)) 处收敛，则其和函数 \(S(x)\) 在 \(x = R\) (或 \(x = -R\)) 处连续，即：
+            \[
+            \lim_{x \to R^{-}} S(x) = S(R), \quad \lim_{x \to (-R)^{+}} S(x) = S(-R).
+            \]
+        </div>
+        <div class="abel-explain">
+            💡 <strong>数学内涵与动态演示对应 (中心 \(x_0=0\)，系数 <span class="green-an">aₙ</span> 绿色标记)</strong><br>
+            ✦ <strong>收敛半径 \(R\)</strong>：级数在开区间 \((-R, R)\) 内部处处绝对收敛，可逐项求导与积分；外部发散。<br>
+            ✦ <strong>边界奇异性</strong>：在 \(x = \pm R\) 处，级数可能条件收敛、绝对收敛或发散，取决于系数衰减。本演示中 <span class="green-an">\(a_n = \dfrac{1}{(n+1)^{\alpha}}\)</span>，通过调节 \(\alpha\) 观测端点收敛性 (\(\alpha>1\) 绝对收敛， \(\alpha \le 1\) 条件收敛/发散)。<br>
+            ✦ <strong>阿贝尔定理直观</strong>：如果级数在某非零点收敛，则从原点到该点的整个区间内部都绝对收敛。拖动探针 \(x\)，观察 \(|x| < R\) 时部分和稳定，\(|x| > R\) 时部分和剧烈震荡/发散，边界处若收敛则和函数连续。
+        </div>
+    </div>
+
+    <div class="flex-grid">
+        <!-- 左侧交互控件 -->
+        <div class="control-panel">
+            <div class="slider-group">
+                <label>🎛️ 收敛半径 \(R\) <span id="R_display" class="value-badge">1.50</span></label>
+                <input type="range" id="R_slider" min="0.3" max="3.8" step="0.01" value="1.5">
+                <div class="info-hint">\( R = \lim\limits_{n\to\infty} \left| \frac{a_n}{a_{n+1}} \right| \) 控制收敛区间长度 \((-R,R)\)</div>
+            </div>
+            <div class="slider-group">
+                <label>📉 系数衰减指数 \(\alpha\) <span id="alpha_display" class="value-badge">1.00</span></label>
+                <input type="range" id="alpha_slider" min="0.4" max="2.8" step="0.01" value="1.0">
+                <div class="info-hint"><span class="green-an">\( a_n = \dfrac{1}{(n+1)^{\alpha}} \)</span> &nbsp; ⇒ 端点收敛性：\(\alpha > 1\) 绝对收敛，\(\alpha \le 1\) 端点条件收敛或发散</div>
+            </div>
+            <div class="slider-group">
+                <label>📍 观察点 \(x\) (探针) <span id="x_display" class="value-badge">0.00</span></label>
+                <input type="range" id="x_slider" min="-4.2" max="4.2" step="0.02" value="0.0">
+                <div class="info-hint">验证阿贝尔定理：\(|x| < R\) 收敛，\(|x| > R\) 发散；边界处验证第二定理连续性</div>
+            </div>
+            <div class="slider-group">
+                <label>🧮 部分和阶数 \(N\) <span id="N_display" class="value-badge">22</span></label>
+                <input type="range" id="N_slider" min="2" max="75" step="1" value="22">
+                <div class="info-hint">增加 \(N\) 观察级数逼近和函数 (内闭一致收敛)</div>
+            </div>
+
+            <div class="model-box math">
+                <div style="color:#0ff; font-weight: 500;">📐 当前幂级数模型 (中心 x₀=0)</div>
+                <div style="font-size:1.05rem; margin: 8px 0;">
+                    \(\displaystyle f(x)=\sum_{n=0}^{\infty} \color{#2ecc71}{\frac{1}{(n+1)^{\alpha}}} \left( \frac{x}{R} \right)^{\!n}\)
+                </div>
+                <div>收敛半径 \(R = <span id="R_math_span">1.50</span> \), 中心 \(x_0=0\)</div>
+                <div style="font-size:0.7rem; margin-top:5px;">🔍 绝对收敛区间 \( |x| &lt; R \)；端点的敛散性依赖 \(\alpha\)，符合阿贝尔第二定理</div>
+            </div>
+            <button id="resetBtn">⟳ 重置参数 (R=1.5, α=1.0, x=0, N=22)</button>
+            <div class="status-area" id="statusMsg">
+                📍 当前点 x = 0.00 → 位于收敛圆内部 ✅ 级数绝对收敛
+            </div>
+        </div>
+
+        <!-- 右侧动态图形区 -->
+        <div class="graph-panel">
+            <div class="math-display-container">
+                <div class="math-display" id="mathFormulaDisplay">
+                    正在加载数学公式...
+                </div>
+            </div>
+            <div id="interactivePlot" class="plot-container" style="height: 400px; width: 100%;"></div>
+            
+            <!-- 修正完善后的图例与说明文本 -->
+            <div class="legend-section">
+                <div class="legend-title">📊 图形符号说明</div>
+                <div class="legend-row">
+                    <span class="legend-item"><span class="legend-color" style="background: #3ec1ff; width:20px;"></span> 蓝色曲线：部分和 \(S_N(x)\)</span>
+                    <span class="legend-item"><span class="legend-color dash"></span> 橙色虚线：收敛边界 \(x = \pm R\)</span>
+                    <span class="legend-item"><span class="legend-color circle" style="background: #ff66f0;"></span> 紫色圆点：当前探针位置 \((x, S_N(x))\)</span>
+                    <span class="legend-item"><span class="legend-color" style="background: rgba(0,210,255,0.3); width:20px;"></span> 浅蓝阴影：绝对收敛区间 \(|x| < R\)</span>
+                    <span class="legend-item"><span class="green-an">aₙ</span> 绿色标记：幂级数系数</span>
+                </div>
+                <div class="explanation-text">
+                    🔬 <strong>阿贝尔定理动态验证指南</strong><br>
+                    • <strong>收敛半径 \(R\)</strong>：拖动滑块改变 \(R\)，观察阴影区域（绝对收敛区间）和边界虚线的变化。<br>
+                    • <strong>系数衰减指数 \(\alpha\)</strong>：改变 \(\alpha\) 影响端点 \(x = \pm R\) 处的收敛性。当 \(\alpha > 1\) 时，端点绝对收敛；当 \(0 < \alpha \le 1\) 时，\(x = -R\) 处条件收敛，\(x = +R\) 处发散。<br>
+                    • <strong>探针 \(x\)</strong>：拖动紫色圆点对应的滑块，观察曲线上的点位置。当 \(|x| < R\) 时，部分和曲线稳定，级数收敛；当 \(|x| > R\) 时，部分和发散（数值剧烈波动）。<br>
+                    • <strong>部分和阶数 \(N\)</strong>：增加 \(N\) 可观察级数更精确地逼近和函数，体现内闭一致收敛性。<br>
+                    • <strong>阿贝尔第二定理验证</strong>：若级数在端点收敛（如 \(\alpha > 1\) 时），则和函数在该端点连续；若端点发散，则图形在边界处不趋于有限值。
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footnote">
+        <strong>阿贝尔定理精确验证 (中心 x₀=0)</strong>：调整 R 改变收敛区间；调整 α 观察端点收敛条件。当 |x| &lt; R 部分和快速收敛，当 |x| &gt; R 部分和发散。若级数在边界收敛，则和函数在端点连续 —— 图形中边界点附近级数稳定。符合《高等数学(同济第八版)》阿贝尔定理全部内涵。
+    </div>
+</div>
+
+<script>
+    // 全局动态参数
+    let R = 1.5;
+    let alpha = 1.0;
+    let x0 = 0.0;
+    let N = 22;
+
+    const R_slider = document.getElementById('R_slider');
+    const R_display = document.getElementById('R_display');
+    const R_math_span = document.getElementById('R_math_span');
+    const alpha_slider = document.getElementById('alpha_slider');
+    const alpha_display = document.getElementById('alpha_display');
+    const x_slider = document.getElementById('x_slider');
+    const x_display = document.getElementById('x_display');
+    const N_slider = document.getElementById('N_slider');
+    const N_display = document.getElementById('N_display');
+    const resetBtn = document.getElementById('resetBtn');
+    const statusMsgDiv = document.getElementById('statusMsg');
+    const mathFormulaDisplay = document.getElementById('mathFormulaDisplay');
+
+    function getCoeff(n, alphaVal) {
+        return 1 / Math.pow(n + 1, alphaVal);
+    }
+
+    function partialSum(xVal, radius, alphaVal, maxN) {
+        let sum = 0.0;
+        const scaled = xVal / radius;
+        for (let n = 0; n <= maxN; n++) {
+            const coeff = getCoeff(n, alphaVal);
+            const term = coeff * Math.pow(scaled, n);
+            sum += term;
+            if (!isFinite(term) && n > 6) break;
+        }
+        if (Math.abs(sum) > 200) sum = (sum > 0 ? 200 : -200);
+        return sum;
+    }
+
+    function getPlotData() {
+        let xMin = Math.max(-4.8, -R - 1.3);
+        let xMax = Math.min(4.8, R + 1.3);
+        if (R < 0.9) { xMin = -3.6; xMax = 3.6; }
+        const points = 420;
+        const step = (xMax - xMin) / points;
+        let xVals = [], yVals = [];
+        for (let i = 0; i <= points; i++) {
+            let xCurr = xMin + i * step;
+            let yCurr = partialSum(xCurr, R, alpha, N);
+            if (Math.abs(yCurr) > 150) yCurr = (yCurr > 0 ? 150 : -150);
+            xVals.push(xCurr);
+            yVals.push(yCurr);
+        }
+        return { xVals, yVals, xMin, xMax };
+    }
+
+    function updateStatusText(xVal, radius, alphaVal) {
+        const absX = Math.abs(xVal);
+        const eps = 1e-6;
+        if (absX < radius - eps) {
+            statusMsgDiv.innerHTML = `✅ 阿贝尔第一定理（绝对收敛） |x| = ${xVal.toFixed(3)} < R = ${radius.toFixed(3)}<br>级数绝对收敛，内闭一致收敛，和函数光滑。符合收敛圆内部性质。`;
+            statusMsgDiv.style.background = "#022a30";
+        } else if (absX > radius + eps) {
+            statusMsgDiv.innerHTML = `⚠️ 发散区域（阿贝尔定理推论） |x| = ${xVal.toFixed(3)} > R = ${radius.toFixed(3)}<br>级数发散，通项不趋于零，满足"半径外发散"。`;
+            statusMsgDiv.style.background = "#2e1a1f";
+        } else {
+            let endpointDetail = "";
+            const isPositiveEnd = xVal > 0;
+            if (alphaVal > 1.0 + 1e-6) {
+                endpointDetail = `端点绝对收敛 (α = ${alphaVal.toFixed(2)} > 1)，和函数在 x = ${isPositiveEnd ? '+R' : '-R'} 连续，符合阿贝尔第二定理。`;
+            } else if (alphaVal > 0.0 && alphaVal <= 1.0) {
+                if (isPositiveEnd) endpointDetail = `x = +R 处级数发散 (α ≤ 1)；x = -R 处条件收敛。`;
+                else endpointDetail = `x = -R 处交错级数条件收敛 (α = ${alphaVal.toFixed(2)})，和函数左连续。`;
+            } else {
+                endpointDetail = `端点发散 (α ≤ 0)`;
+            }
+            statusMsgDiv.innerHTML = `🔍 收敛边界 |x| = R，当前 x = ${xVal.toFixed(3)}<br>📖 ${endpointDetail}`;
+            statusMsgDiv.style.background = "#2a2a1c";
+        }
+    }
+
+    function updateMathFormulaDisplay() {
+        const alphaFixed = alpha.toFixed(2);
+        const RFixed = R.toFixed(2);
+        const formulaTex = `\\[ S_{${N}}(x) = \\sum_{n=0}^{${N}} \\color{#2ecc71}{\\frac{1}{(n+1)^{${alphaFixed}}}} \\left(\\frac{x}{${RFixed}}\\right)^{\\!n} \\]`;
+        mathFormulaDisplay.innerHTML = formulaTex;
+        if (window.MathJax) MathJax.typesetPromise?.([mathFormulaDisplay]);
+    }
+
+    function updateGraph() {
+        const { xVals, yVals, xMin, xMax } = getPlotData();
+        const currentSum = partialSum(x0, R, alpha, N);
+        const clampedCurr = Math.abs(currentSum) > 150 ? (currentSum > 0 ? 150 : -150) : currentSum;
+        
+        let shapes = [];
+        if (R > 0 && R < 20) {
+            shapes.push({
+                type: 'rect', xref: 'x', yref: 'paper',
+                x0: -R, y0: 0, x1: R, y1: 1,
+                fillcolor: 'rgba(0, 210, 255, 0.12)', line: { width: 0 }, layer: 'below'
+            });
+        }
+        
+        const boundaryLines = [];
+        if (R > 0 && R < 12) {
+            boundaryLines.push({ x: [-R, -R], y: [-200, 200], mode: 'lines', type: 'scatter',
+                line: { color: '#ffaa66', width: 2.5, dash: 'dash' }, name: 'x = -R (边界)' });
+            boundaryLines.push({ x: [R, R], y: [-200, 200], mode: 'lines', type: 'scatter',
+                line: { color: '#ffaa66', width: 2.5, dash: 'dash' }, name: 'x = +R (边界)' });
+        }
+        
+        const mainTrace = { x: xVals, y: yVals, mode: 'lines', type: 'scatter',
+            name: `部分和 S_${N}(x)`, line: { color: '#3ec1ff', width: 2.5, shape: 'spline' },
+            fill: 'tozeroy', fillcolor: 'rgba(62, 193, 255, 0.05)' };
+        const pointTrace = { x: [x0], y: [clampedCurr], mode: 'markers', type: 'scatter',
+            marker: { color: '#ff66f0', size: 13, symbol: 'circle', line: { color: 'white', width: 1.8 } },
+            name: `探针 x = ${x0.toFixed(3)}, S_${N} ≈ ${clampedCurr.toFixed(5)}` };
+        
+        const layout = { title: { text: "" }, xaxis: { title: { text: "自变量 x" }, gridcolor: 'rgba(80,190,250,0.2)', zerolinecolor: '#0ff', color: '#d4ecff', range: [xMin, xMax] },
+            yaxis: { title: { text: "部分和值 S_N(x)" }, gridcolor: 'rgba(80,190,250,0.2)', zerolinecolor: '#ffaa77', color: '#d4ecff' },
+            plot_bgcolor: 'rgba(2,12,28,0.85)', paper_bgcolor: 'rgba(0,0,0,0)', font: { color: '#cee7ff' }, hovermode: 'closest',
+            shapes: shapes, legend: { orientation: 'h', yanchor: 'bottom', y: 1.02, xanchor: 'center', x: 0.5, bgcolor: 'rgba(0,0,0,0.6)' }, margin: { t: 20, l: 45, r: 30, b: 40 } };
+        
+        Plotly.react('interactivePlot', [mainTrace, ...boundaryLines, pointTrace], layout, { responsive: true, displayModeBar: false });
+        updateStatusText(x0, R, alpha);
+        updateMathFormulaDisplay();
+    }
+    
+    function syncAll() {
+        R = parseFloat(R_slider.value); alpha = parseFloat(alpha_slider.value);
+        x0 = parseFloat(x_slider.value); N = parseInt(N_slider.value);
+        R_display.innerText = R.toFixed(3); R_math_span.innerText = R.toFixed(3);
+        alpha_display.innerText = alpha.toFixed(2); x_display.innerText = x0.toFixed(3); N_display.innerText = N;
+        updateGraph();
+    }
+    
+    R_slider.addEventListener('input', syncAll);
+    alpha_slider.addEventListener('input', syncAll);
+    x_slider.addEventListener('input', syncAll);
+    N_slider.addEventListener('input', syncAll);
+    resetBtn.addEventListener('click', () => {
+        R_slider.value = "1.5"; alpha_slider.value = "1.0"; x_slider.value = "0.0"; N_slider.value = "22";
+        syncAll();
+    });
+    
+    window.addEventListener('resize', () => updateGraph());
+    syncAll();
+    setInterval(() => { if(window.MathJax) MathJax.typesetPromise?.(); }, 600);
+</script>
+</body>
+</html>
