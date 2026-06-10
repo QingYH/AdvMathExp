@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>高数下期末模拟 | 同济八版下册（不含微分方程）MathJax渲染</title>
+    <!-- MathJax 核心库，用于渲染LaTeX数学公式为标准教材样式 -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef5f2;
+            font-family: system-ui, 'Segoe UI', 'Noto Sans', 'Helvetica Neue', 'Times New Roman', '宋体', SimSun, serif;
+            padding: 20px 16px 50px;
+            color: #1e2a32;
+        }
+
+        .exam-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 32px;
+            box-shadow: 0 8px 28px rgba(0, 20, 10, 0.08);
+            overflow: hidden;
+            padding: 22px 20px 36px;
+        }
+
+        .exam-header {
+            text-align: center;
+            margin-bottom: 28px;
+            border-bottom: 2px solid #cfe9df;
+            padding-bottom: 16px;
+        }
+        .exam-header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #1e6f5c;
+        }
+        .exam-header .sub {
+            color: #4f7e6b;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            background: #e2f0ea;
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 40px;
+        }
+        .score-summary {
+            background: #f8fefb;
+            border-radius: 28px;
+            padding: 12px 16px;
+            margin: 20px 0 12px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid #cae3da;
+            color: #2c5a4b;
+        }
+        .score-item {
+            background: white;
+            padding: 4px 12px;
+            border-radius: 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .section {
+            margin-bottom: 2rem;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 0.2rem 0 0.6rem;
+        }
+        .section-title {
+            font-size: 1.38rem;
+            font-weight: 600;
+            background: #dff3ed;
+            display: inline-block;
+            padding: 5px 24px;
+            border-radius: 40px;
+            margin-bottom: 1.2rem;
+            color: #1b5e4f;
+        }
+        .question-card {
+            background: #fefefe;
+            border-left: 5px solid #55b89c;
+            padding: 16px 20px;
+            margin-bottom: 26px;
+            border-radius: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            transition: all 0.1s;
+        }
+        .q-title {
+            font-weight: 650;
+            font-size: 1rem;
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            color: #1c4e42;
+        }
+        .q-points {
+            font-size: 0.7rem;
+            background: #e3f1ec;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-weight: normal;
+        }
+        .q-content {
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 16px;
+            color: #1f2f38;
+        }
+        /* 数学公式内部段落微调 */
+        .q-content mjx-container {
+            margin: 0 2px;
+        }
+        .options {
+            margin: 12px 0 6px 24px;
+            list-style: none;
+        }
+        .options li {
+            margin: 6px 0;
+            font-size: 0.96rem;
+        }
+        .toggle-solution {
+            background: #ecf7f2;
+            border: none;
+            font-size: 0.75rem;
+            padding: 6px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #2b7b64;
+            transition: 0.2s;
+            margin-top: 8px;
+        }
+        .toggle-solution:hover {
+            background: #cfe9df;
+        }
+        .solution {
+            display: none;
+            background: #f7fef9;
+            margin-top: 18px;
+            padding: 16px 20px;
+            border-radius: 22px;
+            border-left: 3px solid #2e9b7e;
+            font-size: 0.92rem;
+            line-height: 1.55;
+            color: #2a4b41;
+        }
+        .solution.visible {
+            display: block;
+        }
+        .solution strong {
+            color: #1b6b58;
+        }
+        footer {
+            text-align: center;
+            margin-top: 32px;
+            font-size: 0.7rem;
+            color: #81aa9b;
+        }
+        @media (max-width: 550px) {
+            .exam-container {
+                padding: 16px;
+            }
+            .q-content {
+                font-size: 0.94rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="exam-container">
+    <div class="exam-header">
+        <h1>📐 高等数学（下）期末模拟</h1>
+        <div class="sub">同济大学第八版下册 · 必修内容（无星号，不含微分方程）</div>
+        <div class="score-summary">
+            <span class="score-item">✅ 判断题 5×2'=10'</span>
+            <span class="score-item">🔘 选择题 10×3'=30'</span>
+            <span class="score-item">📝 填空题 5×3'=15'</span>
+            <span class="score-item">⚙️ 计算题 5×7'=35'</span>
+            <span class="score-item">📊 应用题 1×5'=5'</span>
+            <span class="score-item">📐 证明题 1×5'=5'</span>
+            <span class="score-item">⭐ 总分: 100分</span>
+        </div>
+        <div class="sub">✨ 所有公式已启用 MathJax 渲染，显示为标准数学教材格式 ✨<br>点击每道题下方按钮可查看详细解答+知识点</div>
+    </div>
+
+    <div class="section"><div class="section-title">一、判断题 (每题2分)</div><div id="judge-list"></div></div>
+    <div class="section"><div class="section-title">二、选择题 (每题3分)</div><div id="choice-list"></div></div>
+    <div class="section"><div class="section-title">三、填空题 (每题3分)</div><div id="fill-list"></div></div>
+    <div class="section"><div class="section-title">四、计算题 (每题7分)</div><div id="calc-list"></div></div>
+    <div class="section"><div class="section-title">五、应用题 (条件极值/最值 5分)</div><div id="appl-list"></div></div>
+    <div class="section"><div class="section-title">六、证明题 (5分)</div><div id="proof-list"></div></div>
+    <footer>© 向量代数 · 多元函数微分 · 重积分 · 曲线曲面积分 · 无穷级数（不含星号）<br>所有数学公式均以 LaTeX 标准格式渲染，符合教材规范</footer>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // 1. 定义题目数据 (所有数学符号均使用标准 LaTeX，会被 MathJax 完美渲染)
+    // --------------------------------------------------------------
+    
+    // 判断题 (5道)
+    const judgeQuestions = [
+        { text: "设向量 \\(\\vec{a} = (1,2,3), \\vec{b} = (2,4,6)\\)，则 \\(\\vec{a} \\times \\vec{b} = \\vec{0}\\)。", answer: true, explanation: "因为 \\(\\vec{b}=2\\vec{a}\\)，两向量共线，叉积为零向量。<br><strong>📖 知识点：</strong>向量叉积的几何意义，共线向量叉积为零。" },
+        { text: "二元函数 \\(f(x,y) = \\sqrt{x^2+y^2}\\) 在点 \\((0,0)\\) 处可微。", answer: false, explanation: "该函数即距离函数，在 \\((0,0)\\) 处偏导数不存在（圆锥顶点），故不可微。<br><strong>📖 知识点：</strong>可微的必要条件——偏导存在且连续。" },
+        { text: "若级数 \\(\\sum_{n=1}^{\\infty} u_n\\) 收敛，则 \\(\\lim_{n\\to\\infty} u_n = 0\\)。", answer: true, explanation: "级数收敛的必要条件是一般项趋于零。<br><strong>📖 知识点：</strong>收敛级数的通项极限必为零。" },
+        { text: "设 \\(L\\) 是圆周 \\(x^2+y^2=a^2\\)，则对弧长的曲线积分 \\(\\oint_L (x^2+y^2) \\, ds = 2\\pi a^3\\)。", answer: true, explanation: "在 \\(L\\) 上 \\(x^2+y^2=a^2\\)，所以积分 = \\(a^2 \\times\\) 周长 \\(= a^2 \\cdot 2\\pi a = 2\\pi a^3\\)。<br><strong>📖 知识点：</strong>第一类曲线积分代入路径方程。" },
+        { text: "函数 \\(f(x,y)=x^3 - y^3 + 3xy\\) 在点 \\((0,0)\\) 处取得极值。", answer: false, explanation: "求偏导 \\(f_x=3x^2+3y,\\; f_y=-3y^2+3x\\)，在 \\((0,0)\\) 处驻点，二阶偏导 \\(A=0,B=3,C=0\\)，\\(AC-B^2=-9<0\\)，故不是极值点，是鞍点。<br><strong>📖 知识点：</strong>二元函数极值判别法。" }
+    ];
+
+    // 选择题 (10道)
+    const choiceQuestions = [
+        { text: "向量 \\(\\vec{a}=(1,2,2)\\) 与 \\(\\vec{b}=(2,1,-2)\\) 的夹角余弦为？", options: ["A. 0", "B. \\(\\frac{1}{2}\\)", "C. \\(-\\frac{1}{2}\\)", "D. 1"], correct: "A", explanation: "点积 \\(\\vec{a}\\cdot\\vec{b}=1\\cdot2+2\\cdot1+2\\cdot(-2)=2+2-4=0\\)，夹角 \\(90^\\circ\\)，余弦 0。<br><strong>📖 知识点：</strong>向量点积与夹角。" },
+        { text: "函数 \\(f(x,y)=xy\\) 在约束条件 \\(x+y=2\\) 下的条件极大值为？", options: ["A. 2", "B. 1", "C. 0", "D. -1"], correct: "B", explanation: "拉格朗日函数 \\(L=xy+\\lambda(2-x-y)\\)，求偏导得 \\(y-\\lambda=0,\\; x-\\lambda=0\\)，结合 \\(x+y=2\\) 解得 \\(x=y=1\\)，极大值 \\(1\\)。<br><strong>📖 知识点：</strong>条件极值拉格朗日乘数法。" },
+        { text: "曲面 \\(z = x^2 + y^2\\) 在点 \\((1,1,2)\\) 处的切平面方程为？", options: ["A. \\(2x+2y-z=2\\)", "B. \\(2x+2y-z=0\\)", "C. \\(x+y-z=0\\)", "D. \\(2x+2y+z=2\\)"], correct: "A", explanation: "\\(z_x=2x,\\; z_y=2y\\)，在 \\((1,1)\\) 处法向量 \\((2,2,-1)\\)，切平面 \\(2(x-1)+2(y-1)-(z-2)=0\\) → \\(2x+2y-z=2\\)。<br><strong>📖 知识点：</strong>曲面切平面方程。" },
+        { text: "二重积分 \\(\\iint_D e^{x^2+y^2} dxdy\\)，其中 \\(D: x^2+y^2 \\le 1\\)，化为极坐标后的表达式为？", options: ["A. \\(\\int_0^{2\\pi} d\\theta \\int_0^1 e^{r^2} r\\, dr\\)", "B. \\(\\int_0^{2\\pi} d\\theta \\int_0^1 e^{r^2} dr\\)", "C. \\(\\int_0^{2\\pi} d\\theta \\int_0^1 e^{r} r\\, dr\\)", "D. \\(\\int_0^{2\\pi} d\\theta \\int_0^1 e^{r^2} r^2 dr\\)"], correct: "A", explanation: "极坐标变换 \\(x=r\\cos\\theta,\\; y=r\\sin\\theta\\)，面积元 \\(r\\,drd\\theta\\)，被积函数 \\(e^{r^2}\\)，积分限 \\(r:0\\to1\\)。<br><strong>📖 知识点：</strong>二重积分的极坐标变换。" },
+        { text: "设级数 \\(\\sum_{n=1}^{\\infty} \\frac{(-1)^n}{\\sqrt{n}}\\)，则该级数", options: ["A. 绝对收敛", "B. 条件收敛", "C. 发散", "D. 无法判断"], correct: "B", explanation: "绝对值级数 \\(\\sum 1/\\sqrt{n}\\) 发散 (\\(p=1/2\\))，但交错级数满足莱布尼茨准则，条件收敛。<br><strong>📖 知识点：</strong>交错级数判别法。" },
+        { text: "设 \\(L\\) 为从点 \\((0,0)\\) 到点 \\((1,1)\\) 的直线段，则 \\(\\int_L (x+y) dx + (x-y) dy\\) 的值为？", options: ["A. 1", "B. 0", "C. 2", "D. -1"], correct: "A", explanation: "参数化 \\(x=t,\\; y=t,\\; t:0\\to1\\)，原式=\\(\\int_0^1 (t+t)dt+(t-t)dt = \\int_0^1 2t\\,dt =1\\)。<br><strong>📖 知识点：</strong>第二类曲线积分。" },
+        { text: "球面 \\(x^2+y^2+z^2=9\\) 的外侧，则曲面积分 \\(\\iint_{\\Sigma} z\\, dxdy\\) 等于？", options: ["A. \\(36\\pi\\)", "B. \\(0\\)", "C. \\(18\\pi\\)", "D. \\(9\\pi\\)"], correct: "A", explanation: "由高斯公式：\\(\\iint_{\\Sigma} z\\,dxdy = \\iiint_V 1\\,dV = \\) 球体积 \\(= \\frac{4}{3}\\pi \\cdot 3^3 = 36\\pi\\)。<br><strong>📖 知识点：</strong>高斯公式及应用。" },
+        { text: "函数 \\(f(x,y) = \\ln(1+x^2+y^2)\\) 在 \\((0,0)\\) 处的全微分为？", options: ["A. \\(dx+dy\\)", "B. \\(0\\)", "C. \\(2xdx+2ydy\\)", "D. \\(xdx+ydy\\)"], correct: "B", explanation: "\\(f_x=\\frac{2x}{1+x^2+y^2},\\; f_y=\\frac{2y}{1+x^2+y^2}\\)，在 \\((0,0)\\) 处偏导均为0，所以全微分 \\(df=0\\)。<br><strong>📖 知识点：</strong>全微分定义。" },
+        { text: "幂级数 \\(\\sum_{n=1}^{\\infty} \\frac{x^n}{n\\cdot 2^n}\\) 的收敛半径是？", options: ["A. 1", "B. 2", "C. \\(\\frac{1}{2}\\)", "D. \\(+\\infty\\)"], correct: "B", explanation: "系数 \\(a_n=1/(n2^n)\\)，收敛半径 \\(R=\\lim_{n\\to\\infty}\\left|\\frac{a_n}{a_{n+1}}\\right| = \\lim_{n\\to\\infty} \\frac{(n+1)2^{n+1}}{n2^n}=2\\)。<br><strong>📖 知识点：</strong>幂级数收敛半径。" },
+        { text: "设空间曲线 \\(x=t,\\; y=t^2,\\; z=t^3\\) 在点 \\((1,1,1)\\) 处的切向量为？", options: ["A. (1,2,3)", "B. (1,1,1)", "C. (0,2,3)", "D. (1,0,0)"], correct: "A", explanation: "当 \\(t=1\\) 对应点，切向量 \\((x'(t),y'(t),z'(t)) = (1,2t,3t^2)\\)，代入 \\(t=1\\) 得 \\((1,2,3)\\)。<br><strong>📖 知识点：</strong>空间曲线的切向量。" }
+    ];
+
+    // 填空题 (5道)
+    const fillQuestions = [
+        { text: "设 \\(z = e^{x}\\sin y\\)，则 \\(\\frac{\\partial^2 z}{\\partial x \\partial y} =\\) ______。", answer: "\\(e^{x}\\cos y\\)", explanation: "先对 \\(x\\) 求偏导得 \\(e^x\\sin y\\)，再对 \\(y\\) 求偏导得 \\(e^x\\cos y\\)。<br><strong>📖 知识点：</strong>混合偏导次序无关性。" },
+        { text: "交换积分次序：\\(\\int_0^1 dx \\int_{x^2}^x f(x,y) dy =\\) ______。", answer: "\\(\\int_0^1 dy \\int_{y}^{\\sqrt{y}} f(x,y) dx\\)", explanation: "积分区域由 \\(y=x^2\\) 到 \\(y=x\\)，\\(x\\in[0,1]\\)，转化为 \\(y\\in[0,1]\\)，\\(x\\) 从 \\(y\\) 到 \\(\\sqrt{y}\\)。<br><strong>📖 知识点：</strong>二重积分交换次序。" },
+        { text: "曲面 \\(z = 4 - x^2 - y^2\\) 在 \\(z \\ge 0\\) 部分的面积为 ______。", answer: "\\(\\frac{\\pi}{6}(17\\sqrt{17}-1)\\)", explanation: "面积公式 \\(\\iint_{D} \\sqrt{1+z_x^2+z_y^2} dA\\)，\\(z_x=-2x,\\; z_y=-2y\\)，根号 \\(\\sqrt{1+4r^2}\\)，极坐标 \\(\\int_0^{2\\pi}d\\theta\\int_0^2 \\sqrt{1+4r^2}\\, rdr\\)，换元得 \\(\\frac{\\pi}{6}(17\\sqrt{17}-1)\\)。<br><strong>📖 知识点：</strong>曲面面积计算。" },
+        { text: "级数 \\(\\sum_{n=1}^{\\infty} \\frac{2^n+3^n}{6^n}\\) 的和为 ______。", answer: "\\(\\frac{3}{2}\\)", explanation: "拆分为 \\(\\sum (1/3)^n + \\sum (1/2)^n\\)，公比 \\(1/3\\) 和 \\(1/2\\)，和 = \\(\\frac{1/3}{1-1/3}+\\frac{1/2}{1-1/2}= \\frac{1}{2}+1 = \\frac{3}{2}\\)。<br><strong>📖 知识点：</strong>几何级数求和。" },
+        { text: "函数 \\(u = x^2 + y^2 + z^2\\) 在点 \\(M(1,1,1)\\) 处沿方向 \\(\\vec{l}=(1,2,2)\\) 的方向导数为 ______。", answer: "\\(\\frac{10}{3}\\)", explanation: "梯度 \\(\\nabla u = (2x,2y,2z) = (2,2,2)\\)，方向单位向量 \\(\\left(\\frac{1}{3},\\frac{2}{3},\\frac{2}{3}\\right)\\)，方向导数 \\(=2\\cdot\\frac13+2\\cdot\\frac23+2\\cdot\\frac23 = \\frac{10}{3}\\)。<br><strong>📖 知识点：</strong>方向导数与梯度。" }
+    ];
+
+    // 计算题 (5道)
+    const calcQuestions = [
+        { text: "计算二重积分 \\(\\iint_D (x^2+y) dxdy\\)，其中 \\(D\\) 由 \\(y=x^2\\) 与 \\(y=2x\\) 所围成的区域。", answer: "\\(\\frac{56}{15}\\)", solution: "联立 \\(x^2=2x\\) 得交点 \\((0,0),\\(2,4)\\)。先 \\(y\\) 后 \\(x\\)：\\(\\int_0^2 dx \\int_{x^2}^{2x} (x^2+y) dy = \\int_0^2 \\left[x^2(2x-x^2)+\\frac12((2x)^2-(x^2)^2)\\right]dx = \\int_0^2 (2x^3-x^4+2x^2-\\frac12 x^4)dx = \\int_0^2(2x^3+2x^2-\\frac32 x^4)dx = \\left[\\frac12 x^4 + \\frac23 x^3 - \\frac{3}{10}x^5\\right]_0^2 = 8 + \\frac{16}{3} - \\frac{96}{10} = \\frac{56}{15}\\)。<br><strong>📖 知识点：</strong>直角坐标系下二重积分。" },
+        { text: "计算曲线积分 \\(\\int_L (2xy^3 - y^2\\cos x)dx + (1-2y\\sin x+3x^2y^2)dy\\)，其中 \\(L\\) 为从 \\((0,0)\\) 到 \\((\\pi,1)\\) 的任意路径。", answer: "\\(1+\\pi^2\\)", solution: "验证 \\(P_y=6xy^2-2y\\cos x,\\; Q_x= -2y\\cos x+6xy^2\\)，相等，与路径无关。取折线 \\((0,0)\\to(\\pi,0)\\to(\\pi,1)\\)，积分 = \\(\\int_0^{\\pi}(-0)dx + \\int_0^1(1-2y\\sin\\pi+3\\pi^2y^2)dy = \\int_0^1(1+3\\pi^2 y^2)dy = [y+\\pi^2 y^3]_0^1 = 1+\\pi^2\\)。<br><strong>📖 知识点：</strong>曲线积分与路径无关。" },
+        { text: "求幂级数 \\(\\sum_{n=1}^{\\infty} \\frac{x^{n}}{n\\cdot 3^{n}}\\) 的和函数，并求收敛域。", answer: "\\(-\\ln\\left(1-\\frac{x}{3}\\right)\\)，收敛域 \\([-3,3)\\)", solution: "已知 \\(-\\ln(1-t)=\\sum_{n=1}^\\infty \\frac{t^n}{n}\\)，令 \\(t=x/3\\) 得 \\(\\sum_{n=1}^\\infty \\frac{x^n}{n3^n}=-\\ln\\left(1-\\frac{x}{3}\\right)\\)，收敛半径 \\(3\\)，\\(x=3\\) 发散，\\(x=-3\\) 条件收敛，故收敛域 \\([-3,3)\\)。<br><strong>📖 知识点：</strong>幂级数求和。" },
+        { text: "利用高斯公式计算曲面积分 \\(\\iint_{\\Sigma} x^3 dy dz + y^3 dz dx + z^3 dx dy\\)，其中 \\(\\Sigma\\) 为球面 \\(x^2+y^2+z^2=a^2\\) 的外侧。", answer: "\\(\\frac{12}{5}\\pi a^5\\)", solution: "由高斯公式，原式 = \\(\\iiint_V (3x^2+3y^2+3z^2)dV = 3\\iiint_V r^2 dV\\)，球坐标下 \\(\\iiint_V r^2 dV = \\int_0^{2\\pi}d\\theta\\int_0^\\pi \\sin\\phi d\\phi\\int_0^a r^4 dr = 2\\pi \\cdot 2 \\cdot \\frac{a^5}{5} = \\frac{4\\pi a^5}{5}\\)，再乘以 3 得 \\(\\frac{12\\pi a^5}{5}\\)。<br><strong>📖 知识点：</strong>高斯公式与三重积分。" },
+        { text: "求函数 \\(f(x,y)=x^2+xy+y^2-2x-y\\) 的极值点与极值。", answer: "极小值点 \\((1,0)\\)，极小值 \\(-1\\)", solution: "解 \\(f_x=2x+y-2=0,\\; f_y=x+2y-1=0\\) 得驻点 \\((1,0)\\)。\\(A=f_{xx}=2,\\; B=f_{xy}=1,\\; C=f_{yy}=2\\)，\\(AC-B^2=3>0\\) 且 \\(A>0\\)，故取得极小值 \\(f(1,0)=1+0+0-2-0=-1\\)。<br><strong>📖 知识点：</strong>多元函数极值。" }
+    ];
+
+    // 应用题
+    const appQuestion = {
+        text: "用铁皮制作一个容积为 \\(8\\,\\text{m}^3\\) 的长方体无盖水箱，问长、宽、高各为多少时，所用材料最省？(即表面积最小)",
+        answer: "长=宽=2 m，高=2 m，最小表面积 \\(20\\,\\text{m}^2\\)",
+        solution: "设长 \\(x\\)，宽 \\(y\\)，高 \\(z\\)，\\(xyz=8\\)，表面积 \\(S=xy+2xz+2yz\\)。构造拉格朗日函数 \\(L=xy+2xz+2yz+\\lambda(8-xyz)\\)。求偏导：\\(\\frac{\\partial L}{\\partial x}=y+2z-\\lambda yz=0\\)，\\(\\frac{\\partial L}{\\partial y}=x+2z-\\lambda xz=0\\)，\\(\\frac{\\partial L}{\\partial z}=2x+2y-\\lambda xy=0\\)，结合 \\(xyz=8\\) 解得 \\(x=y=2,\\; z=2\\)。此时 \\(S=4+8+8=20\\)。<br><strong>📖 知识点：</strong>条件极值拉格朗日乘数法。" 
+    };
+
+    // 证明题
+    const proofQuestion = {
+        text: "证明曲线积分 \\(\\int_{(1,2)}^{(3,4)} (6xy^2 - y^3)dx + (6x^2y - 3xy^2)dy\\) 与路径无关，并计算其值。",
+        answer: "与路径无关，积分值 \\(236\\)",
+        solution: "设 \\(P=6xy^2-y^3,\\; Q=6x^2y-3xy^2\\)，则 \\(\\frac{\\partial P}{\\partial y}=12xy-3y^2\\)，\\(\\frac{\\partial Q}{\\partial x}=12xy-3y^2\\)，二者相等，故积分与路径无关。取折线 \\((1,2)\\to(3,2)\\to(3,4)\\)，原式 = \\(\\int_1^3 (6x\\cdot4 -8)dx + \\int_2^4 (6\\cdot9y-3\\cdot3y^2)dy = \\int_1^3(24x-8)dx + \\int_2^4(54y-9y^2)dy = [12x^2-8x]_1^3 + [27y^2-3y^3]_2^4 = (108-24)-(12-8)=80 + (432-192)-(108-24)=156\\)，合计 \\(236\\)。<br><strong>📖 知识点：</strong>曲线积分与路径无关性。" 
+    };
+
+    // ---------- 动态渲染 (保留原始 LaTeX 文本，MathJax 会自动渲染) ----------
+    function buildCard(question, idx, type) {
+        let points = "";
+        if(type === 'judge') points = "2分";
+        else if(type === 'choice') points = "3分";
+        else if(type === 'fill') points = "3分";
+        else if(type === 'calc') points = "7分";
+        else if(type === 'app') points = "5分";
+        else if(type === 'proof') points = "5分";
+        
+        let titlePrefix = "";
+        if(type === 'judge') titlePrefix = "判断题";
+        else if(type === 'choice') titlePrefix = "选择题";
+        else if(type === 'fill') titlePrefix = "填空题";
+        else if(type === 'calc') titlePrefix = "计算题";
+        else if(type === 'app') titlePrefix = "应用题";
+        else if(type === 'proof') titlePrefix = "证明题";
+        
+        let qHtml = `<div class="question-card" id="card-${type}-${idx}">
+                        <div class="q-title">${idx+1}. ${titlePrefix} <span class="q-points">${points}</span></div>
+                        <div class="q-content">${question.text}</div>`;
+        
+        if(type === 'choice' && question.options) {
+            qHtml += `<ul class="options">${question.options.map(opt => `<li>${opt}</li>`).join('')}</ul>`;
+        }
+        
+        let correctInfo = "";
+        if(type === 'judge') correctInfo = `✅ 正确答案: ${question.answer ? '√ (正确)' : '× (错误)'}`;
+        if(type === 'choice') correctInfo = `🔘 正确答案: ${question.correct}`;
+        if(type === 'fill') correctInfo = `📝 正确答案: \\(${question.answer}\\)`;
+        if(type === 'calc') correctInfo = `📌 参考答案: \\(${question.answer}\\)`;
+        if(type === 'app') correctInfo = `📌 最优结果: ${question.answer}`;
+        if(type === 'proof') correctInfo = `📌 结论: 与路径无关，积分值 \\(236\\)`;
+        
+        let explanationText = "";
+        if(type === 'judge') explanationText = question.explanation;
+        if(type === 'choice') explanationText = question.explanation;
+        if(type === 'fill') explanationText = question.explanation;
+        if(type === 'calc') explanationText = question.solution;
+        if(type === 'app') explanationText = question.solution;
+        if(type === 'proof') explanationText = proofQuestion.solution;
+        
+        qHtml += `<button class="toggle-solution" data-target="sol-${type}-${idx}">📖 显示/隐藏 详细解答与知识点</button>
+                  <div id="sol-${type}-${idx}" class="solution"><strong>🔍 解答与知识点：</strong><br>${correctInfo}<br><br>${explanationText}</div>
+                </div>`;
+        return qHtml;
+    }
+    
+    // 渲染所有区块
+    function renderAll() {
+        const judgeDiv = document.getElementById('judge-list');
+        judgeQuestions.forEach((q,i) => judgeDiv.innerHTML += buildCard(q,i,'judge'));
+        const choiceDiv = document.getElementById('choice-list');
+        choiceQuestions.forEach((q,i) => choiceDiv.innerHTML += buildCard(q,i,'choice'));
+        const fillDiv = document.getElementById('fill-list');
+        fillQuestions.forEach((q,i) => fillDiv.innerHTML += buildCard(q,i,'fill'));
+        const calcDiv = document.getElementById('calc-list');
+        calcQuestions.forEach((q,i) => calcDiv.innerHTML += buildCard(q,i,'calc'));
+        const appDiv = document.getElementById('appl-list');
+        appDiv.innerHTML += buildCard(appQuestion,0,'app');
+        const proofDiv = document.getElementById('proof-list');
+        proofDiv.innerHTML += buildCard(proofQuestion,0,'proof');
+        
+        // 绑定解答按钮事件
+        document.querySelectorAll('.toggle-solution').forEach(btn => {
+            btn.addEventListener('click', function() {
+                let targetId = this.getAttribute('data-target');
+                let solPanel = document.getElementById(targetId);
+                if(solPanel) solPanel.classList.toggle('visible');
+            });
+        });
+        
+        // 触发 MathJax 重新渲染新添加的公式
+        if (window.MathJax) {
+            MathJax.typesetPromise();
+        }
+    }
+    
+    renderAll();
+</script>
+</body>
+</html>
