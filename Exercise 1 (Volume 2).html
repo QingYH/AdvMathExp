@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>高数试题精解 · 手机端优化</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Noto Sans', '微软雅黑', '宋体', 'Times New Roman', serif;
+            background-color: #eef2f5;
+            color: #1e2a32;
+            padding: 16px 12px 40px 12px;
+            line-height: 1.5;
+        }
+
+        /* 主容器 - 手机舒适边距 */
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            padding: 20px 18px 28px 18px;
+        }
+
+        /* 头部 */
+        .title-wrap {
+            text-align: center;
+            margin-bottom: 28px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #cbdde6;
+        }
+        h1 {
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: #155f7c;
+            letter-spacing: -0.3px;
+            line-height: 1.25;
+        }
+        .sub {
+            font-size: 0.8rem;
+            color: #4a6f7f;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        /* 卡片样式 - 触摸友好 */
+        .question-card {
+            background: #ffffff;
+            border-radius: 24px;
+            margin-bottom: 28px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04), 0 0 0 1px #e9f0f3;
+            transition: 0.2s;
+            overflow: hidden;
+        }
+
+        .question-header {
+            background: #f3f9fe;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #e2edf2;
+        }
+
+        .q-num {
+            background-color: #2c7da0;
+            color: white;
+            width: 34px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 700;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .q-title {
+            font-weight: 600;
+            font-size: 1.08rem;
+            color: #0b4f6c;
+            flex: 1;
+            line-height: 1.35;
+        }
+
+        .question-body {
+            padding: 16px 18px 22px 18px;
+        }
+
+        .question-text {
+            background: #fafdff;
+            padding: 12px 14px;
+            border-radius: 20px;
+            border: 1px solid #deeaf0;
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: #1f3b45;
+            line-height: 1.45;
+        }
+
+        /* 解答区域 - 背景柔和 */
+        .solution {
+            background: #fefaf0;
+            border-left: 4px solid #61a5c2;
+            padding: 14px 16px;
+            border-radius: 20px;
+            font-size: 0.94rem;
+            line-height: 1.55;
+            margin-top: 6px;
+            color: #2c3f47;
+        }
+
+        .solution-title {
+            font-weight: 700;
+            color: #1f6392;
+            margin-bottom: 12px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 3px solid #61a5c2;
+            padding-left: 12px;
+        }
+
+        .math {
+            font-family: 'Times New Roman', 'Cambria Math', 'STIXGeneral', 'SF Mono', monospace;
+            font-size: 0.95rem;
+            overflow-x: auto;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .math p, .math ul {
+            margin-bottom: 12px;
+        }
+
+        .math ul {
+            padding-left: 1.4rem;
+        }
+
+        .math li {
+            margin-bottom: 6px;
+        }
+
+        .formula-inline {
+            background: #eef3f7;
+            padding: 0.1rem 0.3rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        hr {
+            margin: 16px 0;
+            border: none;
+            height: 1px;
+            background: #d4e2ea;
+        }
+
+        .formula-block {
+            text-align: center;
+            margin: 12px 0;
+            background: #f3f7f9;
+            padding: 10px 8px;
+            border-radius: 16px;
+            overflow-x: auto;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #678c9c;
+            margin-top: 30px;
+            border-top: 1px solid #e2edf2;
+            padding-top: 18px;
+        }
+
+        /* 数学公式在小屏上自动换行 */
+        .katex {
+            font-size: 1em !important;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        /* 触屏优化 */
+        button, .solution, .question-text {
+            cursor: default;
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 14px 14px 20px 14px;
+            }
+            .question-body {
+                padding: 12px 14px 18px 14px;
+            }
+            .q-title {
+                font-size: 0.98rem;
+            }
+            .solution {
+                padding: 12px 14px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+</head>
+<body>
+<div class="container">
+    <div class="title-wrap">
+        <h1>📐 高数·试题精解</h1>
+        <div class="sub">多元微积分 · 空间几何 · 优化决策</div>
+    </div>
+
+    <!-- 1. 连续 偏导 可微关系 -->
+    <div class="question-card">
+        <div class="question-header">
+            <span class="q-num">1</span>
+            <span class="q-title">连续、偏导、可微之间关系（含实例）</span>
+        </div>
+        <div class="question-body">
+            <div class="question-text">📌 结合实例简述二元函数的连续、偏导存在、偏导连续、可微（全微分存在）之间的关系。</div>
+            <div class="solution">
+                <div class="solution-title">🔗 逻辑框架 + 反例</div>
+                <div class="math">
+                    <p><strong>核心结论：</strong><br>
+                    ✔ 偏导连续 \( \Rightarrow \) 可微 \( \Rightarrow \) 连续，且可微 \( \Rightarrow \) 偏导存在。<br>
+                    ✘ 偏导存在 \(\nRightarrow\) 连续（例: \(f(x,y)=\begin{cases}1&xy=0\\0&其他\end{cases}\) 在(0,0)偏导0但不连续）。<br>
+                    ✘ 连续 \(\nRightarrow\) 偏导存在（例: \(f(x,y)=|x|+|y|\) 在(0,0)连续但偏导不存在）。<br>
+                    ✘ 偏导存在 \(\nRightarrow\) 可微（例: \(f(x,y)=\frac{xy}{x^2+y^2}\) 补充定义0，偏导存在为0，但极限不存在，不可微）。<br>
+                    ✘ 可微 \(\nRightarrow\) 偏导连续（例: \(f(x,y)=(x^2+y^2)\sin\frac1{x^2+y^2}\) 在(0,0)可微，但偏导不连续）。<br>
+                    <strong>实例综合：</strong> 偏导连续是最强条件，可微是桥梁，连续和偏导存在互不蕴含。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 空间图形 -->
+    <div class="question-card">
+        <div class="question-header">
+            <span class="q-num">2</span>
+            <span class="q-title">空间解析几何 · 曲面识别</span>
+        </div>
+        <div class="question-body">
+            <div class="question-text">指出方程在空间解析几何中的图形及特征:<br> \((1)x^2+y^2=1\quad (2)x^2+y^2=z^2\quad (3)x^2+y^2=z\)</div>
+            <div class="solution">
+                <div class="solution-title">📐 图形与几何描述</div>
+                <div class="math">
+                    <p>✅ <strong>(1) \(x^2+y^2=1\)</strong> —— <strong>圆柱面</strong>，母线平行于z轴，准线为xOy平面单位圆，半径\(R=1\)，无限延伸。</p>
+                    <p>✅ <strong>(2) \(x^2+y^2=z^2\)</strong> —— <strong>圆锥面</strong>，顶点在原点，轴线为z轴，半顶角45°，上下对称。任意水平截面\(z=c\)为半径\(|c|\)的圆。</p>
+                    <p>✅ <strong>(3) \(x^2+y^2=z\)</strong> —— <strong>旋转抛物面</strong>，开口向上，顶点在原点，水平截面\(z=h\ge0\)为半径\(\sqrt{h}\)的圆，形如碗状。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 向量 点积叉积 平面与直线 -->
+    <div class="question-card">
+        <div class="question-header">
+            <span class="q-num">3</span>
+            <span class="q-title">向量运算 & 平面/直线方程</span>
+        </div>
+        <div class="question-body">
+            <div class="question-text">\(\vec{a}=(-1,0,1),\ \vec{b}=(0,1,0)\)，求(1) \(\vec{a}\cdot\vec{b}\)，\(\vec{c}=\vec{a}\times\vec{b}\)；(2)过\(M_0(1,0,1)\)以\(\vec{c}\)为法向量的平面方程；(3)过\(M_1(1,-1,1)\)以\(\vec{c}\)为方向向量的直线方程。</div>
+            <div class="solution">
+                <div class="solution-title">✍️ 详细步骤</div>
+                <div class="math">
+                    <p><strong>(1) 点积与叉积</strong><br>
+                    \(\vec{a}\cdot\vec{b}=(-1)\times0+0\times1+1\times0=0\)。<br>
+                    \(\vec{c}=\vec{a}\times\vec{b}=\begin{vmatrix}\mathbf{i}&\mathbf{j}&\mathbf{k}\\-1&0&1\\0&1&0\end{vmatrix}=(-1,0,-1)\)。</p>
+                    <p><strong>(2) 平面方程</strong> 法向量\(\vec{n}=(-1,0,-1)\)，过\(M_0(1,0,1)\):<br>
+                    \(-1(x-1)+0(y-0)-1(z-1)=0 \Rightarrow -x+1 -z+1=0 \Rightarrow x+z=2\)。</p>
+                    <p><strong>(3) 直线方程</strong> 方向向量\(\vec{c}=(-1,0,-1)\)，过\(M_1(1,-1,1)\)，对称式: \(\frac{x-1}{-1}=\frac{y+1}{0}=\frac{z-1}{-1}\)；参数式: \(x=1-t,\ y=-1,\ z=1-t\)。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 隐函数求偏导 -->
+    <div class="question-card">
+        <div class="question-header">
+            <span class="q-num">4</span>
+            <span class="q-title">隐函数求偏导</span>
+        </div>
+        <div class="question-body">
+            <div class="question-text">设 \(z = x^{3} + 2y + e^{z}\)，求 \(\frac{\partial z}{\partial x},\frac{\partial z}{\partial y}\)。</div>
+            <div class="solution">
+                <div class="solution-title">📌 隐函数微分法</div>
+                <div class="math">
+                    <p>令 \(F(x,y,z)=x^3+2y+e^z-z=0\)。<br>
+                    \(F_x=3x^2,\ F_y=2,\ F_z=e^z-1\)。<br>
+                    \[
+                    \frac{\partial z}{\partial x}=-\frac{F_x}{F_z}=-\frac{3x^2}{e^z-1},\qquad 
+                    \frac{\partial z}{\partial y}=-\frac{F_y}{F_z}=-\frac{2}{e^z-1}.
+                    \]
+                    注意表达式保留\(z\)，满足隐函数定理条件 (\(e^z\neq1\))。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. 全微分与梯度 -->
+    <div class="question-card">
+        <div class="question-header">
+            <span class="q-num">5</span>
+            <span class="q-title">全微分 & 梯度 (幂指函数)</span>
+        </div>
+        <div class="question-body">
+            <div class="question-text">设 \(z = x^{y}\ (x>0)\)，求全微分 \(dz\) 和梯度 \(\operatorname{grad} z\)。</div>
+            <div class="solution">
+                <div class="solution-title">✨ 计算推导</div>
+                <div class="math">
+                    <p>\(z = e^{y\ln x}\)，偏导数：<br>
+                    \(\frac{\partial z}{\partial x}=e^{y\ln x}\cdot\frac{y}{x}=y x^{y-1}\)，\(\frac{\partial z}{\partial y}=e^{y\ln x}\cdot\ln x = x^y\ln x\)。<br>
+                    全微分：\(dz = yx^{y-1}dx + x^y\ln x\,dy\)。<br>
+                    梯度：\(\nabla z = \bigl( yx^{y-1},\ x^y\ln x \bigr)\)。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. 二重积分 圆环区域 -->
+    <div class="question-card">
+        <div class="question-header">
+            <span class="q-num">6</span>
+            <span class="q-title">二重积分 · 圆盘挖小圆</span>
+        </div>
+        <div class="question-body">
+            <div class="question-text">求 \(I = \iint_{D} y \, dx dy\)，其中 \(D\): 圆面 \(x^{2}+(y-2)^{2}\le 4\) 挖去 \(x^{2}+(y-1)^{2}<1\) 剩余部分。</div>
+            <div class="solution">
+                <div class="solution-title">🎯 对称性+平移法</div>
+                <div class="math">
+                    <p><strong>区域分析：</strong> 大圆圆心\((0,2)\)半径\(2\)，小圆圆心\((0,1)\)半径\(1\)，小圆完全在大圆内部。<br>
+                    积分 \(I = \iint_{D_{大}} y\,dxdy - \iint_{D_{小}} y\,dxdy\)。<br>
+                    大圆平移: 令\(Y=y-2\)，则 \(\iint_{X^2+Y^2\le4}(Y+2)dXdY = \iint Y dXdY + 2\cdot\text{面积}=0+2\cdot4\pi=8\pi\)。<br>
+                    小圆平移: 令\(v=y-1\)，\(\iint_{u^2+v^2\le1}(v+1)dudv = 0 + 1\cdot\pi = \pi\)。<br>
+                    故 \(I = 8\pi - \pi = 7\pi\)。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. 三重积分 锥体 -->
+    <div class="question-card">
+        <div class="question-header">
+            <span class="q-num">7</span>
+            <span class="q-title">三重积分 · 锥面与平面</span>
+        </div>
+        <div class="question-body">
+            <div class="question-text">求 \(I = \iiint_{\Omega} 2 \, dx dy dz\)，其中 \(\Omega\) 为曲面 \(z=\sqrt{x^{2}+y^{2}}\) 与平面 \(z=3\) 所围立体。</div>
+            <div class="solution">
+                <div class="solution-title">⛰️ 柱坐标 / 体积法</div>
+                <div class="math">
+                    <p>被积函数为常数2，\(I=2\cdot V(\Omega)\)。立体是圆锥体，底面半径\(R=3\)，高\(h=3\)。<br>
+                    体积 \(V=\frac{1}{3}\pi R^2 h = \frac{1}{3}\pi\cdot9\cdot3=9\pi\)。<br>
+                    或者柱坐标：\(V=\int_0^{2\pi}\!d\theta\int_0^3 r dr\int_r^3 dz = 2\pi\int_0^3 r(3-r)dr = 9\pi\)。<br>
+                    因此 \(I=2\times9\pi = 18\pi\)。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 8. 最大利润定价 -->
+    <div class="question-card">
+        <div class="question-header">
+            <span class="q-num">8</span>
+            <span class="q-title">双渠道定价 · 利润最大化</span>
+        </div>
+        <div class="question-body">
+            <div class="question-text">线上售价\(x_1\)，线下\(x_2\)，需求\(n_1=24-0.2x_1,\ n_2=10-0.05x_2\)，成本\(c=35+40(n_1+n_2)\)，求最优售价及最大利润。</div>
+            <div class="solution">
+                <div class="solution-title">💡 最优化求解</div>
+                <div class="math">
+                    <p><strong>收入：</strong> \(R = x_1(24-0.2x_1)+x_2(10-0.05x_2)=24x_1-0.2x_1^2+10x_2-0.05x_2^2\)。<br>
+                    <strong>成本：</strong> \(C=35+40[(24-0.2x_1)+(10-0.05x_2)] = 1395 -8x_1-2x_2\)。<br>
+                    <strong>利润：</strong> \(\pi = R-C = (32x_1-0.2x_1^2)+(12x_2-0.05x_2^2)-1395\)。<br>
+                    求偏导：\(\frac{\partial\pi}{\partial x_1}=32-0.4x_1=0 \Rightarrow x_1=80\)； \(\frac{\partial\pi}{\partial x_2}=12-0.1x_2=0 \Rightarrow x_2=120\)。<br>
+                    二阶导验证\(-0.4<0,\ -0.1<0\)，为极大值。<br>
+                    最优售价：线上 \(80\)，线下 \(120\)。<br>
+                    需求：\(n_1=24-16=8,\ n_2=10-6=4\)。<br>
+                    最大利润：\(\pi=80\times8+120\times4 -[35+40\times12]=640+480-(35+480)=1120-515=605\)。<br>
+                    ✅ 最大利润为 \(605\) (货币单位)。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>📱 手机端完美适配 · 解答包含所有关键步骤与几何直观<br> 温故知新，夯实多元微积分基础。</footer>
+</div>
+</body>
+</html>
