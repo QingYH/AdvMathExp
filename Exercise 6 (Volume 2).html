@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>高数下期末模拟·第六套 | 多元微分关系 | 格林·高斯公式</title>
+    <!-- MathJax 核心库，标准数学教材渲染 -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #eef5f0;
+            font-family: system-ui, 'Segoe UI', 'Noto Sans', 'Helvetica Neue', 'Times New Roman', '宋体', SimSun, serif;
+            padding: 20px 16px 50px;
+            color: #1a3a31;
+        }
+        .exam-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 36px;
+            box-shadow: 0 12px 28px rgba(0, 40, 20, 0.06);
+            padding: 24px 22px 38px;
+        }
+        .exam-header {
+            text-align: center;
+            margin-bottom: 28px;
+            border-bottom: 2px solid #cde6dd;
+            padding-bottom: 18px;
+        }
+        .exam-header h1 {
+            font-size: 1.85rem;
+            font-weight: 650;
+            color: #1c7863;
+        }
+        .exam-header .sub {
+            color: #3c7868;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            background: #e2f1eb;
+            display: inline-block;
+            padding: 5px 16px;
+            border-radius: 40px;
+        }
+        .score-summary {
+            background: #f6fdfa;
+            border-radius: 28px;
+            padding: 12px 16px;
+            margin: 20px 0 12px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid #cbe5db;
+            color: #1b6b58;
+        }
+        .score-item {
+            background: white;
+            padding: 4px 14px;
+            border-radius: 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .section { margin-bottom: 2rem; }
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            background: #def0e8;
+            display: inline-block;
+            padding: 5px 24px;
+            border-radius: 40px;
+            margin-bottom: 1.2rem;
+            color: #146c58;
+        }
+        .question-card {
+            background: #fefefe;
+            border-left: 5px solid #47b393;
+            padding: 16px 20px;
+            margin-bottom: 26px;
+            border-radius: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        }
+        .q-title {
+            font-weight: 660;
+            font-size: 1rem;
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            color: #166b58;
+        }
+        .q-points {
+            font-size: 0.7rem;
+            background: #e2f0ea;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-weight: normal;
+        }
+        .q-content { font-size: 1rem; line-height: 1.5; margin-bottom: 16px; color: #1e4239; }
+        .options { margin: 12px 0 6px 24px; list-style: none; }
+        .options li { margin: 6px 0; font-size: 0.95rem; }
+        .toggle-solution {
+            background: #eaf5f0;
+            border: none;
+            font-size: 0.75rem;
+            padding: 6px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #1b7c64;
+            transition: 0.2s;
+            margin-top: 8px;
+        }
+        .toggle-solution:hover { background: #cde6de; }
+        .solution {
+            display: none;
+            background: #f6fef9;
+            margin-top: 18px;
+            padding: 16px 20px;
+            border-radius: 22px;
+            border-left: 3px solid #47b393;
+            font-size: 0.92rem;
+            line-height: 1.55;
+            color: #235f4e;
+        }
+        .solution.visible { display: block; }
+        .solution strong { color: #136453; }
+        footer { text-align: center; margin-top: 30px; font-size: 0.7rem; color: #87b9a8; }
+        @media (max-width: 550px) {
+            .exam-container { padding: 16px; }
+            .q-content { font-size: 0.93rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="exam-container">
+    <div class="exam-header">
+        <h1>📐 高等数学（下）模拟卷·第六套</h1>
+        <div class="sub">同济第八版下册 | 必修内容 | 多元函数微分关系专题 + 格林·高斯公式应用</div>
+        <div class="score-summary">
+            <span class="score-item">✅ 判断题 5×2'=10'</span>
+            <span class="score-item">🔘 选择题 10×3'=30'</span>
+            <span class="score-item">📝 填空题 5×3'=15'</span>
+            <span class="score-item">⚙️ 计算题 5×7'=35'</span>
+            <span class="score-item">📊 应用题 1×5'=5'</span>
+            <span class="score-item">📐 证明题 1×5'=5'</span>
+            <span class="score-item">⭐ 总分: 100分</span>
+        </div>
+        <div class="sub">✨ 重点：连续、偏导存在、可微、偏导连续的关系 | 格林·高斯公式在计算题中自然呈现 ✨</div>
+    </div>
+
+    <div class="section"><div class="section-title">一、判断题 (每题2分)</div><div id="judge-list"></div></div>
+    <div class="section"><div class="section-title">二、选择题 (每题3分)</div><div id="choice-list"></div></div>
+    <div class="section"><div class="section-title">三、填空题 (每题3分)</div><div id="fill-list"></div></div>
+    <div class="section"><div class="section-title">四、计算题 (每题7分)</div><div id="calc-list"></div></div>
+    <div class="section"><div class="section-title">五、应用题 (条件极值/最值 5分)</div><div id="appl-list"></div></div>
+    <div class="section"><div class="section-title">六、证明题 (5分)</div><div id="proof-list"></div></div>
+    <footer>© 多元微分学核心关系 · 曲线曲面积分 · 格林公式 · 高斯公式 | 题目全新</footer>
+</div>
+
+<script>
+    // =============================================================
+    // 第六套模拟题：
+    // 1. 判断题保留1道考查“可微与连续”的关系，其余为其他章节内容
+    // 2. 选择题、填空题中各1道考查多元函数微分关系
+    // 3. 计算题中涉及格林公式、高斯公式（题面不显式提及，解法可用公式或直接计算）
+    // 4. 其余题目覆盖多元微分、重积分、级数等，与前五套无重复
+    // =============================================================
+
+    // ---------- 判断题 (5道，第1题考查微分关系：可微则连续) ----------
+    const judgeQuestions = [
+        { text: "若二元函数 \\(f(x,y)\\) 在点 \\((x_0,y_0)\\) 处可微，则 \\(f(x,y)\\) 在该点处一定连续。", answer: true, explanation: "可微是连续的充分条件，可微必连续。<br><strong>📖 知识点：</strong>可微与连续的关系。" },
+        { text: "设向量 \\(\\vec{a}=(1,2,-1)\\)，\\(\\vec{b}=(2,-1,3)\\)，则 \\(\\vec{a}\\cdot\\vec{b}=2-2-3=-3\\)。", answer: true, explanation: "点积计算：\\(1\\times2+2\\times(-1)+(-1)\\times3=2-2-3=-3\\)，正确。<br><strong>📖 知识点：</strong>向量点积。" },
+        { text: "正项级数 \\(\\sum_{n=1}^{\\infty} \\frac{1}{n^2+1}\\) 收敛。", answer: true, explanation: "比较判别法：\\(\\frac{1}{n^2+1} < \\frac{1}{n^2}\\)，而\\(\\sum 1/n^2\\)收敛，故原级数收敛。<br><strong>📖 知识点：</strong>正项级数比较判别法。" },
+        { text: "函数 \\(z = \\ln(x^2+y^2)\\) 在点 \\((1,0)\\) 处对 \\(x\\) 的偏导数为2。", answer: true, explanation: "\\(z_x = \\frac{2x}{x^2+y^2}\\)，代入 \\((1,0)\\) 得 \\(2\\)。<br><strong>📖 知识点：</strong>偏导数计算。" },
+        { text: "向量场 \\(\\mathbf{F} = (x^2, y^2, z^2)\\) 的散度是 \\(2x+2y+2z\\)。", answer: true, explanation: "散度 \\(\\nabla\\cdot\\mathbf{F} = \\frac{\\partial}{\\partial x}(x^2)+\\frac{\\partial}{\\partial y}(y^2)+\\frac{\\partial}{\\partial z}(z^2)=2x+2y+2z\\)。<br><strong>📖 知识点：</strong>散度计算。" }
+    ];
+
+    // ---------- 选择题 (10道，第1题考查微分关系：偏导连续⇒可微) ----------
+    const choiceQuestions = [
+        { text: "关于二元函数 \\(f(x,y)\\) 在点 \\((x_0,y_0)\\) 处的以下命题中，正确的是？", options: ["A. 偏导存在 ⇒ 连续", "B. 连续 ⇒ 可微", "C. 可微 ⇒ 偏导连续", "D. 偏导连续 ⇒ 可微"], correct: "D", explanation: "偏导连续是可微的充分条件；可微必连续且偏导存在，但反之不成立。<br><strong>📖 知识点：</strong>多元函数微分学逻辑关系。" },
+        { text: "设 \\(z = \\sin(xy)\\)，则 \\(\\frac{\\partial z}{\\partial y} = \\)", options: ["A. \\(x\\cos(xy)\\)", "B. \\(y\\cos(xy)\\)", "C. \\(\\cos(xy)\\)", "D. \\(xy\\cos(xy)\\)"], correct: "A", explanation: "\\(\\frac{\\partial}{\\partial y}\\sin(xy) = x\\cos(xy)\\)。<br><strong>📖 知识点：</strong>偏导数计算。" },
+        { text: "极限 \\(\\lim_{(x,y)\\to(0,0)} \\frac{x^2 y}{x^4+y^2}\\) 的值为？", options: ["A. 0", "B. 1", "C. 不存在", "D. ∞"], correct: "C", explanation: "沿 \\(y=x^2\\) 得 \\(\\frac12\\)，沿 \\(y=0\\) 得0，故极限不存在。<br><strong>📖 知识点：</strong>多元函数极限。" },
+        { text: "设 \\(D: x^2+y^2 \\le 4\\)，则 \\(\\iint_D dxdy = \\)", options: ["A. \\(2\\pi\\)", "B. \\(4\\pi\\)", "C. \\(6\\pi\\)", "D. \\(8\\pi\\)"], correct: "B", explanation: "积分即圆面积 \\(\\pi\\cdot 2^2 = 4\\pi\\)。<br><strong>📖 知识点：</strong>二重积分几何意义。" },
+        { text: "幂级数 \\(\\sum_{n=1}^{\\infty} \\frac{x^n}{n\\cdot 2^n}\\) 的收敛半径是？", options: ["A. 1", "B. 2", "C. 1/2", "D. ∞"], correct: "B", explanation: "系数 \\(a_n=1/(n2^n)\\)，收敛半径 \\(R=\\lim_{n\\to\\infty}|a_n/a_{n+1}| = \\lim \\frac{(n+1)2^{n+1}}{n2^n}=2\\)。<br><strong>📖 知识点：</strong>幂级数收敛半径。" },
+        { text: "设 \\(L\\) 为从 \\((0,0)\\) 到 \\((1,1)\\) 的直线段，则 \\(\\int_L x dy = \\)", options: ["A. \\(\\frac12\\)", "B. \\(1\\)", "C. \\(0\\)", "D. \\(2\\)"], correct: "A", explanation: "参数化 \\(x=t, y=t, t:0\\to1\\)，\\(dy=dt\\)，\\(\\int_0^1 t dt = \\frac12\\)。<br><strong>📖 知识点：</strong>第二类曲线积分。" },
+        { text: "曲面 \\(z = x^2 + y^2\\) 在点 \\((1,2,5)\\) 处的切平面方程为？", options: ["A. \\(2x+4y-z=5\\)", "B. \\(2x+4y-z=4\\)", "C. \\(2x+4y-z=3\\)", "D. \\(2x+4y-z=6\\)"], correct: "A", explanation: "\\(z_x=2x=2, z_y=2y=4\\)，切平面 \\(2(x-1)+4(y-2)-(z-5)=0\\) ⇒ \\(2x+4y-z=5\\)。<br><strong>📖 知识点：</strong>切平面方程。" },
+        { text: "函数 \\(f(x,y)=x^2-2xy+2y^2\\) 在点 \\((1,1)\\) 处的梯度为？", options: ["A. \\((0,2)\\)", "B. \\((2,0)\\)", "C. \\((0,0)\\)", "D. \\((2,2)\\)"], correct: "A", explanation: "\\(f_x=2x-2y=0, f_y=-2x+4y=2\\)，梯度 \\((0,2)\\)。<br><strong>📖 知识点：</strong>梯度计算。" },
+        { text: "下列级数中条件收敛的是？", options: ["A. \\(\\sum (-1)^n \\frac{1}{n}\\)", "B. \\(\\sum (-1)^n \\frac{1}{n^2}\\)", "C. \\(\\sum \\frac{1}{n}\\)", "D. \\(\\sum \\frac{1}{n^2}\\)"], correct: "A", explanation: "A为交错调和级数，条件收敛；B绝对收敛；C发散；D绝对收敛。<br><strong>📖 知识点：</strong>条件收敛判别。" },
+        { text: "设 \\(\\Sigma\\) 是平面 \\(x+y+z=1\\) 在第一卦限的部分，则 \\(\\iint_\\Sigma dS = \\)", options: ["A. \\(\\frac{\\sqrt{3}}{2}\\)", "B. \\(\\sqrt{3}\\)", "C. \\(\\frac{\\sqrt{3}}{4}\\)", "D. \\(\\frac{\\sqrt{3}}{6}\\)"], correct: "A", explanation: "三角形面积：边长\\(\\sqrt{2}\\)，高\\(\\sqrt{3}/2\\)？标准面积公式：\\(S=\\frac{\\sqrt{3}}{2}\\)。<br><strong>📖 知识点：</strong>第一类曲面积分面积。" }
+    ];
+
+    // ---------- 填空题 (5道，第1题考查微分关系：可微则偏导存在) ----------
+    const fillQuestions = [
+        { text: "若函数 \\(f(x,y)\\) 在点 \\((x_0,y_0)\\) 处可微，则 \\(f(x,y)\\) 在该点处的偏导数 ______ 存在（填“一定”或“不一定”）。", answer: "一定", explanation: "可微是可推出偏导存在的充分条件。<br><strong>📖 知识点：</strong>可微与偏导存在的关系。" },
+        { text: "设 \\(z = e^{x^2+y^2}\\)，则 \\(\\frac{\\partial^2 z}{\\partial x \\partial y} = \\) ______。", answer: "\\(4xy e^{x^2+y^2}\\)", explanation: "\\(z_x=2x e^{x^2+y^2}\\)，再对y求偏导得 \\(4xy e^{x^2+y^2}\\)。<br><strong>📖 知识点：</strong>混合偏导。" },
+        { text: "交换积分次序 \\(\\int_0^2 dx \\int_{0}^{x^2} f(x,y) dy = \\) ______。", answer: "\\(\\int_0^4 dy \\int_{\\sqrt{y}}^{2} f(x,y) dx\\)", explanation: "区域 \\(0\\le x\\le2, 0\\le y\\le x^2\\)，即 \\(0\\le y\\le4, \\sqrt{y}\\le x\\le2\\)。<br><strong>📖 知识点：</strong>二重积分换序。" },
+        { text: "曲线 \\(x=t, y=t^2, z=t^3\\) 在点 \\((1,1,1)\\) 处的切向量为 ______。", answer: "\\((1,2,3)\\)", explanation: "求导 \\((1,2t,3t^2)\\) 代入 \\(t=1\\) 得 \\((1,2,3)\\)。<br><strong>📖 知识点：</strong>空间曲线切向量。" },
+        { text: "幂级数 \\(\\sum_{n=0}^{\\infty} \\frac{(x-1)^n}{n+1}\\) 的收敛域为 ______。", answer: "\\([0,2)\\)", explanation: "收敛半径1，中心1，区间 \\((0,2)\\)，端点 \\(x=0\\) 条件收敛，\\(x=2\\) 发散，故收敛域 \\([0,2)\\)。<br><strong>📖 知识点：</strong>幂级数收敛域。" }
+    ];
+
+    // ---------- 计算题 (5道，第2题涉及格林公式，第4题涉及高斯公式，题面不显式提及，解法可用公式或直接计算) ----------
+    const calcQuestions = [
+        { text: "计算二重积分 \\(\\iint_D (x+y) dxdy\\)，其中 \\(D\\) 是由 \\(x=0, y=0, x+y=1\\) 所围成的三角形区域。", answer: "\\(\\frac13\\)", solution: "直接计算：\\(\\int_0^1 dx \\int_0^{1-x} (x+y) dy = \\int_0^1 [x(1-x)+\\frac12(1-x)^2] dx = \\int_0^1 (x - x^2 + \\frac12 - x + \\frac12 x^2) dx = \\int_0^1 (\\frac12 - \\frac12 x^2) dx = [\\frac12 x - \\frac16 x^3]_0^1 = \\frac12 - \\frac16 = \\frac13\\)。<br><strong>📖 知识点：</strong>二重积分。" },
+        { text: "计算曲线积分 \\(\\oint_L (x^2+y) dx + (x-y^2) dy\\)，其中 \\(L\\) 是正向圆周 \\(x^2+y^2=1\\)。", answer: "\\(0\\)", solution: "利用格林公式：\\(P=x^2+y, Q=x-y^2\\)，\\(P_y=1, Q_x=1\\)，\\(Q_x-P_y=0\\)，故积分值为0。也可直接参数化验证。<br><strong>📖 知识点：</strong>格林公式（或直接计算）。" },
+        { text: "求函数 \\(f(x,y)=x^2+2y^2-4x+4y\\) 的极值。", answer: "极小值 \\(-6\\) 在 \\((2,-1)\\)", solution: "\\(f_x=2x-4=0, f_y=4y+4=0\\) 得 \\((2,-1)\\)，\\(A=2,B=0,C=4\\)，\\(AC-B^2=8>0, A>0\\)，极小值 \\(f(2,-1)=4+2-8-4=-6\\)。<br><strong>📖 知识点：</strong>多元函数极值。" },
+        { text: "计算曲面积分 \\(\\iint_\\Sigma x dy dz + y dz dx + z dx dy\\)，其中 \\(\\Sigma\\) 是球面 \\(x^2+y^2+z^2=1\\) 的外侧。", answer: "\\(4\\pi\\)", solution: "由高斯公式，散度 \\(\\frac{\\partial}{\\partial x}x+\\frac{\\partial}{\\partial y}y+\\frac{\\partial}{\\partial z}z=3\\)，积分 \\(=3\\times \\text{球体积}=3\\times\\frac{4\\pi}{3}=4\\pi\\)。<br><strong>📖 知识点：</strong>高斯公式（或直接计算）。" },
+        { text: "求幂级数 \\(\\sum_{n=1}^{\\infty} \\frac{x^{n}}{n\\cdot 3^{n}}\\) 的和函数。", answer: "\\(-\\ln\\left(1-\\frac{x}{3}\\right)\\)，收敛域 \\([-3,3)\\)", solution: "令 \\(t=x/3\\)，\\(\\sum t^n/n = -\\ln(1-t)\\)，收敛半径3，端点 \\(x=3\\) 发散，\\(x=-3\\) 条件收敛。<br><strong>📖 知识点：</strong>幂级数求和。" }
+    ];
+
+    // 应用题（条件极值问题）
+    const appQuestion = {
+        text: "在椭圆 \\(\\frac{x^2}{4}+\\frac{y^2}{9}=1\\) 上求一点，使得该点到直线 \\(3x+4y=12\\) 的距离最大，并求最大距离。",
+        answer: "\\(\\left(\\frac{8}{5}, \\frac{9}{5}\\right)\\)，最大距离 \\(\\frac{12}{5}\\)",
+        solution: "设点 \\((2\\cos\\theta, 3\\sin\\theta)\\)，距离 \\(d=\\frac{|6\\cos\\theta+12\\sin\\theta-12|}{5}\\)，求最值可得最大距离 \\(\\frac{12}{5}\\)，对应点 \\((8/5, 9/5)\\)。<br><strong>📖 知识点：</strong>参数方程与距离最值。" 
+    };
+
+    // 证明题（考查多元函数可微性）
+    const proofQuestion = {
+        text: "证明函数 \\(f(x,y)=\\begin{cases} \\dfrac{xy}{x^2+y^2}, & (x,y)\\neq(0,0) \\\\ 0, & (x,y)=(0,0) \\end{cases}\\) 在点 \\((0,0)\\) 处不连续，但偏导数存在。",
+        answer: "不连续；偏导存在均为0",
+        solution: "不连续：沿 \\(y=x\\) 方向，\\(f(x,x)=\\dfrac{x^2}{2x^2}=\\dfrac12 \\neq 0\\)，故极限不存在，不连续。偏导数：\\(f_x(0,0)=\\lim_{h\\to0}\\dfrac{f(h,0)-0}{h}=0\\)，同理 \\(f_y(0,0)=0\\)，偏导存在。<br><strong>📖 知识点：</strong>偏导存在与连续的关系。" 
+    };
+
+    // ---------- 渲染函数 ----------
+    function buildCard(question, idx, type) {
+        let points = "";
+        if(type === 'judge') points = "2分";
+        else if(type === 'choice') points = "3分";
+        else if(type === 'fill') points = "3分";
+        else if(type === 'calc') points = "7分";
+        else if(type === 'app') points = "5分";
+        else if(type === 'proof') points = "5分";
+        let prefix = "";
+        if(type === 'judge') prefix = "判断题";
+        else if(type === 'choice') prefix = "选择题";
+        else if(type === 'fill') prefix = "填空题";
+        else if(type === 'calc') prefix = "计算题";
+        else if(type === 'app') prefix = "应用题";
+        else if(type === 'proof') prefix = "证明题";
+        
+        let html = `<div class="question-card"><div class="q-title">${idx+1}. ${prefix} <span class="q-points">${points}</span></div><div class="q-content">${question.text}</div>`;
+        if(type === 'choice' && question.options) {
+            html += `<ul class="options">${question.options.map(opt => `<li>${opt}</li>`).join('')}</ul>`;
+        }
+        let correctInfo = "";
+        if(type === 'judge') correctInfo = `✅ 正确答案: ${question.answer ? '√' : '×'}`;
+        if(type === 'choice') correctInfo = `🔘 正确答案: ${question.correct}`;
+        if(type === 'fill') correctInfo = `📝 正确答案: \\(${question.answer}\\)`;
+        if(type === 'calc') correctInfo = `📌 参考答案: ${question.answer}`;
+        if(type === 'app') correctInfo = `📌 最优结果: ${question.answer}`;
+        if(type === 'proof') correctInfo = `📌 结论: 不连续，偏导存在`;
+        let expl = question.explanation || question.solution || "";
+        html += `<button class="toggle-solution" data-target="sol-${type}-${idx}">📖 显示/隐藏 详细解答与知识点</button>
+                 <div id="sol-${type}-${idx}" class="solution"><strong>🔍 解答与知识点：</strong><br>${correctInfo}<br><br>${expl}</div></div>`;
+        return html;
+    }
+
+    function renderAll() {
+        const jDiv = document.getElementById('judge-list');
+        judgeQuestions.forEach((q,i)=> jDiv.innerHTML += buildCard(q,i,'judge'));
+        const cDiv = document.getElementById('choice-list');
+        choiceQuestions.forEach((q,i)=> cDiv.innerHTML += buildCard(q,i,'choice'));
+        const fDiv = document.getElementById('fill-list');
+        fillQuestions.forEach((q,i)=> fDiv.innerHTML += buildCard(q,i,'fill'));
+        const calcDiv = document.getElementById('calc-list');
+        calcQuestions.forEach((q,i)=> calcDiv.innerHTML += buildCard(q,i,'calc'));
+        const appDiv = document.getElementById('appl-list');
+        appDiv.innerHTML += buildCard(appQuestion,0,'app');
+        const proofDiv = document.getElementById('proof-list');
+        proofDiv.innerHTML += buildCard(proofQuestion,0,'proof');
+        
+        document.querySelectorAll('.toggle-solution').forEach(btn => {
+            btn.addEventListener('click', function() {
+                let target = this.getAttribute('data-target');
+                let solPanel = document.getElementById(target);
+                if(solPanel) solPanel.classList.toggle('visible');
+            });
+        });
+        if(window.MathJax) MathJax.typesetPromise();
+    }
+    renderAll();
+</script>
+</body>
+</html>
