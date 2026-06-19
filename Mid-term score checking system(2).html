@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>高数期中查分 · B3班</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #d4e9ff;
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            margin: 0;
+        }
+
+        .card {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(255, 248, 235, 0.85);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border-radius: 56px 56px 48px 48px;
+            box-shadow: 0 20px 40px rgba(60, 100, 140, 0.25), 0 6px 12px rgba(0, 0, 0, 0.10);
+            padding: 28px 22px 34px;
+            transition: all 0.2s ease;
+            border: 2px solid rgba(180, 210, 240, 0.6);
+        }
+
+        .title-block {
+            text-align: center;
+            margin-bottom: 28px;
+            background: linear-gradient(135deg, #1d3b5c, #2f5a7a);
+            padding: 22px 12px 18px;
+            border-radius: 60px 60px 40px 40px;
+            box-shadow: inset 0 -4px 0 #7fa5c9, 0 12px 18px -8px rgba(0, 20, 40, 0.3);
+        }
+
+        .title-main {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #f5e7b0;
+            text-shadow: 0 3px 0 #2a4b6a, 0 6px 12px rgba(0,0,0,0.4);
+            word-break: break-word;
+        }
+
+        .title-sub {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #ddf0ff;
+            background: rgba(30, 60, 90, 0.6);
+            display: inline-block;
+            padding: 4px 22px;
+            margin-top: 8px;
+            border-radius: 40px;
+            backdrop-filter: blur(2px);
+            letter-spacing: 1px;
+            border: 1px solid #8bb9e6;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .search-area {
+            background: #eef6fd;
+            padding: 24px 18px 28px;
+            border-radius: 48px;
+            box-shadow: inset 0 2px 10px rgba(60, 110, 160, 0.15), 0 10px 16px rgba(0, 0, 0, 0.06);
+            margin-bottom: 28px;
+            border: 1px solid #b8d2ed;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .input-group {
+            margin-bottom: 22px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1f405a;
+            margin-bottom: 8px;
+            padding-left: 6px;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 2px rgba(200, 225, 250, 0.6);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 1.4rem;
+            border-radius: 60px;
+            border: 2px solid #8bb3d4;
+            background: #fafdff;
+            transition: 0.2s;
+            font-weight: 500;
+            color: #1a3144;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #3f7ea8;
+            background: #ffffff;
+            box-shadow: 0 0 0 5px rgba(70, 140, 200, 0.25);
+        }
+
+        .input-group input::placeholder {
+            color: #8aadcc;
+            font-weight: 400;
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .btn-query {
+            width: 100%;
+            padding: 18px 10px;
+            font-size: 1.9rem;
+            font-weight: 800;
+            background: linear-gradient(145deg, #5b9bd5, #3a7bb5);
+            border: none;
+            border-radius: 80px;
+            color: #f0f9ff;
+            text-shadow: 0 2px 4px rgba(0, 40, 70, 0.4);
+            box-shadow: 0 10px 0 #1f4d72, 0 6px 16px rgba(30, 80, 130, 0.4);
+            transition: 0.08s linear;
+            cursor: pointer;
+            letter-spacing: 3px;
+            margin-top: 8px;
+        }
+
+        .btn-query:active {
+            transform: translateY(6px);
+            box-shadow: 0 4px 0 #143a55, 0 8px 14px rgba(20, 70, 120, 0.3);
+        }
+
+        /* 密码规则提示 - 标准数学形式 */
+        .password-hint {
+            background: #f0f6fe;
+            border-radius: 32px;
+            padding: 16px 18px;
+            margin-top: 6px;
+            margin-bottom: 12px;
+            border: 1px solid #b8d2ed;
+            font-size: 0.95rem;
+            color: #1f405a;
+            line-height: 1.7;
+            transition: all 0.4s ease;
+            overflow: hidden;
+            max-height: 300px;
+            opacity: 1;
+        }
+
+        .password-hint.hidden {
+            max-height: 0;
+            padding: 0 18px;
+            margin-top: 0;
+            margin-bottom: 0;
+            opacity: 0;
+            border: 0;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .password-hint .hint-label {
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 1.0rem;
+        }
+
+        /* 标准数学公式样式 */
+        .math-display {
+            font-family: 'Times New Roman', 'CMU Serif', 'STIX', serif;
+            font-style: italic;
+            font-size: 1.2rem;
+            background: #e3effa;
+            padding: 12px 14px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 4px 0;
+        }
+
+        .math-display .sum-symbol {
+            font-size: 1.8rem;
+            font-weight: 400;
+        }
+
+        .math-display .limit-sub {
+            font-size: 0.85rem;
+            vertical-align: sub;
+            font-style: normal;
+        }
+
+        .math-display .limit-sup {
+            font-size: 0.85rem;
+            vertical-align: super;
+            font-style: normal;
+        }
+
+        .math-display .base {
+            font-size: 1.3rem;
+        }
+
+        .math-display .exponent {
+            font-size: 0.85rem;
+            vertical-align: super;
+        }
+
+        .math-display .fraction {
+            display: inline-block;
+            vertical-align: middle;
+            text-align: center;
+            margin: 0 4px;
+            font-style: normal;
+        }
+
+        .math-display .fraction .numerator {
+            display: block;
+            border-bottom: 2px solid #1f405a;
+            padding: 0 8px 2px;
+            font-size: 1.0rem;
+        }
+
+        .math-display .fraction .denominator {
+            display: block;
+            padding: 2px 8px 0;
+            font-size: 1.0rem;
+        }
+
+        .math-display .paren {
+            font-size: 1.3rem;
+        }
+
+        .math-display .condition {
+            font-style: normal;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.95rem;
+            margin-left: 8px;
+        }
+
+        .math-display .result-label {
+            font-style: normal;
+            font-weight: 700;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 1.0rem;
+            margin-top: 6px;
+            display: block;
+            color: #1a3a5a;
+        }
+
+        .result-panel {
+            background: #f5faff;
+            border-radius: 48px;
+            padding: 20px 16px 22px;
+            border: 2px solid #b6d2ec;
+            box-shadow: inset 0 2px 12px #d4e6f5, 0 8px 16px rgba(0, 0, 0, 0.08);
+            margin-top: 10px;
+            transition: all 0.25s;
+            min-height: 100px;
+        }
+
+        .result-placeholder {
+            color: #5c7f9c;
+            font-size: 1.4rem;
+            font-weight: 500;
+            text-align: center;
+            padding: 20px 6px;
+            background: #e3effa;
+            border-radius: 40px;
+            letter-spacing: 1px;
+            border: 1px dashed #8bb3d4;
+        }
+
+        .result-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px 8px 18px;
+            background: rgba(220, 240, 255, 0.7);
+            border-radius: 60px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            flex-wrap: wrap;
+        }
+
+        .result-name-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .avatar-icon {
+            font-size: 2.0rem;
+            line-height: 1;
+            display: inline-block;
+        }
+
+        .result-label {
+            color: #1f405a;
+            letter-spacing: 1px;
+        }
+
+        .result-score-wrapper {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            background: #1a344b;
+            padding: 4px 16px 4px 20px;
+            border-radius: 60px;
+            box-shadow: inset 0 -2px 0 #6f9ac2;
+        }
+
+        .result-score-label {
+            color: #b6d4f0;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .result-score {
+            color: #e6f0fa;
+            font-size: 2.2rem;
+            font-weight: 800;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .result-message {
+            font-size: 1.0rem;
+            font-weight: 600;
+            padding: 16px 18px;
+            border-radius: 40px;
+            text-align: left;
+            line-height: 1.6;
+            word-break: break-word;
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.05);
+            border-left: 8px solid #5f8db0;
+            background: #f0f8ff;
+            color: #1a2f44;
+        }
+
+        /* 分数段字体颜色 */
+        .msg-0 { color: #4a4a6a; background: #e0e8f0; border-left-color: #5a5a8a; }
+        .msg-1 { color: #8a2a2a; background: #fde8e8; border-left-color: #b33a3a; }
+        .msg-2 { color: #a04020; background: #fdecd8; border-left-color: #c06030; }
+        .msg-3 { color: #9a6a20; background: #fdf4d8; border-left-color: #c09030; }
+        .msg-4 { color: #3a7a3a; background: #e8f4e8; border-left-color: #4a9a4a; }
+        .msg-5 { color: #1a6a8a; background: #ddf0f8; border-left-color: #2a8aaa; }
+        .msg-6 { color: #1a5a7a; background: #d0eaf5; border-left-color: #2a7aaa; }
+        .msg-7 { color: #1a4a7a; background: #cce4f5; border-left-color: #2a6aaa; }
+        .msg-8 { color: #1a3a6a; background: #c8def5; border-left-color: #2a5a9a; }
+
+        .error-msg {
+            background: #e0d6c8;
+            color: #4f2a1a;
+            font-size: 1.6rem;
+            font-weight: 600;
+            padding: 22px 12px;
+            border-radius: 60px;
+            text-align: center;
+            border-left: 8px solid #a55a3a;
+        }
+
+        @media (max-width: 480px) {
+            .card { padding: 20px 14px 26px; }
+            .title-main { font-size: 1.9rem; }
+            .title-sub { font-size: 1.0rem; }
+            .input-group input { font-size: 1.2rem; padding: 14px 18px; }
+            .btn-query { font-size: 1.6rem; padding: 16px 10px; }
+            .result-row { font-size: 1.3rem; }
+            .result-score { font-size: 1.8rem; min-width: 40px; }
+            .result-message { font-size: 0.9rem; padding: 14px 14px; }
+            .result-score-label { font-size: 0.9rem; }
+            .avatar-icon { font-size: 1.6rem; }
+            .math-display { font-size: 1.0rem; padding: 10px 8px; }
+            .math-display .sum-symbol { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="title-block">
+        <div class="title-main">📐 高等数学（2）</div>
+        <div class="title-sub">期中测试查分系统</div>
+        <div class="title-sub" style="background: #3d6b8f; color: #f0f8ff; margin-top: 6px; font-weight: 700;">2025级 高数B3班 · 专用</div>
+    </div>
+
+    <div class="search-area" id="searchArea">
+        <div class="input-group">
+            <label for="studentName">👤 姓名</label>
+            <input type="text" id="studentName" placeholder="请输入姓名" />
+        </div>
+        <div class="input-group">
+            <label for="studentPwd">🔐 密码</label>
+            <input type="password" id="studentPwd" placeholder="请输入密码" />
+        </div>
+
+        <!-- 密码规则提示 - 标准数学形式 -->
+        <div class="password-hint" id="passwordHint">
+            <div class="hint-label">📌 登录密码是：</div>
+            <div class="math-display">
+                <span class="sum-symbol">Σ</span>
+                <span class="limit-sub">n=0</span>
+                <span class="limit-sup">∞</span>
+                &nbsp;
+                <span class="fraction">
+                    <span class="numerator">x<sup>n</sup></span>
+                    <span class="denominator">(3a)<sup>n</sup></span>
+                </span>
+                <span class="condition">，其中 a = 学号后5位</span>
+                <span class="result-label">的收敛半径</span>
+            </div>
+        </div>
+
+        <button class="btn-query" id="queryBtn">📊 查 分</button>
+    </div>
+
+    <div class="result-panel" id="resultPanel">
+        <div class="result-placeholder" id="placeholderMsg">✨ 输入姓名和密码，点击查分</div>
+        <div id="resultContent" style="display: none;"></div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ----- 原始数据 -----
+        const students = [
+            {序号:1,学号:"061025022",姓名:"徐若伽",期中成绩:67},
+            {序号:2,学号:"061025026",姓名:"程子昂",期中成绩:64},
+            {序号:3,学号:"170425048",姓名:"李心然",期中成绩:61},
+            {序号:4,学号:"061025041",姓名:"朱静蕾",期中成绩:47},
+            {序号:5,学号:"170425057",姓名:"段诗雅",期中成绩:82},
+            {序号:6,学号:"061025063",姓名:"王硕",期中成绩:71},
+            {序号:7,学号:"061025078",姓名:"邹健乐",期中成绩:76},
+            {序号:8,学号:"061025100",姓名:"吴子涵",期中成绩:30},
+            {序号:9,学号:"061025103",姓名:"张怡",期中成绩:50},
+            {序号:10,学号:"061025110",姓名:"胡恒远",期中成绩:68},
+            {序号:11,学号:"061025111",姓名:"夏天香",期中成绩:99},
+            {序号:12,学号:"061025117",姓名:"谢涵",期中成绩:89},
+            {序号:13,学号:"080325015",姓名:"朱芮",期中成绩:71},
+            {序号:14,学号:"080325019",姓名:"李欣怡",期中成绩:68},
+            {序号:15,学号:"080325036",姓名:"俞光燕",期中成绩:78},
+            {序号:16,学号:"080325042",姓名:"郭英姿",期中成绩:58},
+            {序号:17,学号:"120525027",姓名:"袁欣怡",期中成绩:76},
+            {序号:18,学号:"080325066",姓名:"张天乐",期中成绩:85},
+            {序号:19,学号:"080325069",姓名:"李乐乐",期中成绩:48},
+            {序号:20,学号:"080325071",姓名:"李志豪",期中成绩:76},
+            {序号:21,学号:"080325073",姓名:"杨硕",期中成绩:0},
+            {序号:22,学号:"080325074",姓名:"杨鋆妍",期中成绩:43},
+            {序号:23,学号:"080325086",姓名:"金宇",期中成绩:87},
+            {序号:24,学号:"080325088",姓名:"胡文远",期中成绩:70},
+            {序号:25,学号:"080325089",姓名:"胡雨欣",期中成绩:51},
+            {序号:26,学号:"080325094",姓名:"常俊",期中成绩:89},
+            {序号:27,学号:"080825002",姓名:"韦书成",期中成绩:83},
+            {序号:28,学号:"080825013",姓名:"汤子扬",期中成绩:61},
+            {序号:29,学号:"080825014",姓名:"阮家豪",期中成绩:31},
+            {序号:30,学号:"080825015",姓名:"何俊杰",期中成绩:59},
+            {序号:31,学号:"080825028",姓名:"单宇阳",期中成绩:62},
+            {序号:32,学号:"080825030",姓名:"姚勇棋",期中成绩:48},
+            {序号:33,学号:"080825032",姓名:"段海冰",期中成绩:80},
+            {序号:34,学号:"080825033",姓名:"唐亚",期中成绩:83},
+            {序号:35,学号:"080825039",姓名:"鲍瑞锋",期中成绩:71},
+            {序号:36,学号:"080825040",姓名:"蔡贤运",期中成绩:67},
+            {序号:37,学号:"080825042",姓名:"方海涛",期中成绩:49},
+            {序号:38,学号:"080825043",姓名:"韦宇恒",期中成绩:83},
+            {序号:39,学号:"080825044",姓名:"韦嘉乐",期中成绩:53},
+            {序号:40,学号:"080825046",姓名:"王昊宇",期中成绩:75},
+            {序号:41,学号:"080825047",姓名:"王瑞琦",期中成绩:61},
+            {序号:42,学号:"080825048",姓名:"叶啟军",期中成绩:37},
+            {序号:43,学号:"080825049",姓名:"年博一",期中成绩:87},
+            {序号:44,学号:"080825050",姓名:"刘子龙",期中成绩:51},
+            {序号:45,学号:"080825051",姓名:"刘瑞",期中成绩:66},
+            {序号:46,学号:"080825052",姓名:"朱勋振",期中成绩:53},
+            {序号:47,学号:"080825057",姓名:"张宇洋",期中成绩:70},
+            {序号:48,学号:"080825059",姓名:"张浩宇",期中成绩:50},
+            {序号:49,学号:"080825060",姓名:"李俊杰",期中成绩:51},
+            {序号:50,学号:"080825061",姓名:"杨文宇",期中成绩:66},
+            {序号:51,学号:"080825062",姓名:"杨树园",期中成绩:50},
+            {序号:52,学号:"080825063",姓名:"杨恩凡",期中成绩:59},
+            {序号:53,学号:"080825065",姓名:"杨盛浩",期中成绩:74},
+            {序号:54,学号:"080825075",姓名:"唐志远",期中成绩:39},
+            {序号:55,学号:"080825076",姓名:"夏云勇",期中成绩:38},
+            {序号:56,学号:"080825080",姓名:"谢超",期中成绩:36},
+            {序号:57,学号:"081325001",姓名:"毛运朝",期中成绩:87},
+            {序号:58,学号:"081325002",姓名:"韦玉",期中成绩:54},
+            {序号:59,学号:"081325007",姓名:"孙耀坤",期中成绩:89},
+            {序号:60,学号:"081325009",姓名:"朱行跃",期中成绩:36},
+            {序号:61,学号:"081325019",姓名:"陈启睿",期中成绩:36},
+            {序号:62,学号:"081325023",姓名:"姚智鹏",期中成绩:58},
+            {序号:63,学号:"081325030",姓名:"韩紫嫣",期中成绩:37},
+            {序号:64,学号:"081525088",姓名:"王童",期中成绩:83},
+            {序号:65,学号:"081525091",姓名:"叶婷婷",期中成绩:68},
+            {序号:66,学号:"081525120",姓名:"童欣怡",期中成绩:64},
+            {序号:67,学号:"081525122",姓名:"舒智文",期中成绩:41},
+            {序号:68,学号:"081525124",姓名:"韩玉洁",期中成绩:48},
+            {序号:69,学号:"151025088",姓名:"鲍晨",期中成绩:0},
+            {序号:70,学号:"081525161",姓名:"梁晖",期中成绩:59},
+            {序号:71,学号:"081525167",姓名:"谭慧慧",期中成绩:32},
+            {序号:72,学号:"120725084",姓名:"孙岩",期中成绩:86},
+            {序号:73,学号:"120725106",姓名:"舒新",期中成绩:84},
+            {序号:74,学号:"081525169",姓名:"马鑫宇",期中成绩:17},
+            {序号:75,学号:"081525170",姓名:"孔艺涵",期中成绩:62},
+            {序号:76,学号:"081525171",姓名:"方玉达",期中成绩:68},
+            {序号:77,学号:"81525174",姓名:"王梦云",期中成绩:84},
+            {序号:78,学号:"081525188",姓名:"张梦婷",期中成绩:67},
+            {序号:79,学号:"081525200",姓名:"房银霏",期中成绩:88},
+            {序号:80,学号:"081525206",姓名:"梁心怡",期中成绩:78},
+            {序号:81,学号:"081525207",姓名:"梁宇琨",期中成绩:61},
+            {序号:82,学号:"081525209",姓名:"霍浩然",期中成绩:59},
+            {序号:83,学号:"081525210",姓名:"丁宇轩",期中成绩:70},
+            {序号:84,学号:"081525211",姓名:"马自红",期中成绩:54},
+            {序号:85,学号:"081525213",姓名:"牛好",期中成绩:16},
+            {序号:86,学号:"081525222",姓名:"江海涛",期中成绩:56},
+            {序号:87,学号:"081525225",姓名:"张家福",期中成绩:55},
+            {序号:88,学号:"081525235",姓名:"罗时武",期中成绩:38},
+            {序号:89,学号:"081525240",姓名:"胡耀",期中成绩:57},
+            {序号:90,学号:"081525242",姓名:"赵紫涵",期中成绩:73},
+            {序号:91,学号:"081525243",姓名:"高庆鹏",期中成绩:60},
+            {序号:92,学号:"081525244",姓名:"盛文涛",期中成绩:63},
+            {序号:93,学号:"081825001",姓名:"卞勇乐",期中成绩:43},
+            {序号:94,学号:"081825010",姓名:"朱贤涛",期中成绩:61},
+            {序号:95,学号:"081825014",姓名:"张玉洁",期中成绩:81},
+            {序号:96,学号:"081825015",姓名:"张鸣威",期中成绩:89},
+            {序号:97,学号:"081825016",姓名:"张恒",期中成绩:67},
+            {序号:98,学号:"081825023",姓名:"杨佳怡",期中成绩:85},
+            {序号:99,学号:"081825027",姓名:"陈家乐",期中成绩:44},
+            {序号:100,学号:"081825030",姓名:"明华东",期中成绩:50},
+            {序号:101,学号:"081825032",姓名:"姚猛",期中成绩:27},
+            {序号:102,学号:"081825035",姓名:"项可益",期中成绩:31},
+            {序号:103,学号:"081825039",姓名:"湛益阳",期中成绩:93}
+        ];
+
+        const nameMap = new Map();
+        students.forEach(s => {
+            if (!nameMap.has(s.姓名)) {
+                nameMap.set(s.姓名, s);
+            }
+        });
+
+        // 密码规则：收敛半径 R = 3a，a = 学号后5位
+        function calcPassword(学号) {
+            if (!学号) return '';
+            const str = String(学号);
+            const last5 = str.slice(-5);
+            const a = parseInt(last5, 10);
+            if (isNaN(a) || a === 0) return '0';
+            return String(3 * a);
+        }
+
+        // 彩色人像
+        function getColoredAvatar(name) {
+            if (!name) return '👤';
+            const firstChar = name.charAt(0);
+            const avatarMap = {
+                '徐': '👩', '程': '👨', '李': '👩', '朱': '👨', '段': '👩',
+                '王': '👨', '邹': '👩', '吴': '👨', '张': '👩', '胡': '👨',
+                '夏': '👩', '谢': '👨', '俞': '👩', '郭': '👨', '袁': '👩',
+                '金': '👨', '韦': '👩', '汤': '👨', '阮': '👩', '何': '👨',
+                '单': '👩', '姚': '👨', '唐': '👩', '鲍': '👨', '蔡': '👩',
+                '方': '👨', '叶': '👩', '年': '👨', '刘': '👩', '杨': '👨',
+                '马': '👩', '毛': '👨', '孙': '👩', '陈': '👨', '韩': '👩',
+                '童': '👨', '舒': '👩', '梁': '👨', '谭': '👩', '孔': '👨',
+                '丁': '👩', '牛': '👨', '江': '👩', '罗': '👨', '赵': '👩',
+                '高': '👨', '盛': '👩', '卞': '👨', '明': '👩', '项': '👨',
+                '湛': '👩'
+            };
+            return avatarMap[firstChar] || '👤';
+        }
+
+        // ----- 评语池 -----
+        const messagePool = {
+            '0': [
+                '❌ 缺考！你成功避开了期中，但一周后的期末考试可不会“心慈手软”。\n\n现在不是躺平的时候，高数的每一章都环环相扣。建议你立刻制定一个“抢救计划”：每天至少花2小时认真看书、整理笔记，把前几章的基础概念重新过一遍。一周的时间足够你“起死回生”，但必须争分夺秒。记住：补考费很贵，重修更痛苦，现在开始，一切都还来得及！',
+                '⚠️ 期中考试你缺席了，但一周后的期末考就在眼前，躲不掉的。\n\n别让“缺考”成为习惯，高数不会因为你没来就变简单。赶紧把课本翻出来，从第一章开始，每天攻克一个单元，配合习题练习。一周虽然短，但集中火力也能创造奇迹。加油，别让期末再留遗憾！'
+            ],
+            '1': [
+                '😱 这分数……高数在向你招手说“再爱我一次”。\n\n虽然现在看起来有点惨烈，但别灰心，逆袭的故事往往从低谷开始。建议你马上调整状态，每天保证充足的复习时间，把课本例题和课后习题扎扎实实做一遍。一周后就要期末考试了，这是你翻身的最好机会，如果进步到80分以上，那就是最漂亮的“逆袭剧本”！',
+                '📉 分数不太乐观，但别慌！一周后的期末考试才是真正的“战场”。\n\n现在开始，每天给自己定个小目标，比如弄懂一个章节的例题，做对10道练习题。别想太多，先行动起来。一周的时间，足够你从“青铜”冲到“黄金”，只要你不放弃，期末就能迎来转机！'
+            ],
+            '2': [
+                '🧐 分数有点“凉凉”，但别慌！一周后的期末考试，就是你“逆风翻盘”的舞台。\n\n你离及格其实并不遥远，缺的只是系统性的梳理和适量的练习。建议你整理一份错题本，把之前做错的题目重新做一遍，找出薄弱环节。同时，多向老师或同学请教，别把问题留到考前。一周时间，足够你“脱胎换骨”，期末冲上80分，证明你的实力！',
+                '📊 现在的分数或许让你有些不安，但一周后的期末考，一切皆有可能。\n\n别把时间浪费在焦虑上，立刻开始行动。把课本的重点章节画出来，每天集中攻克一个，配合真题练习。一周虽然短，但高效利用，足以让你“咸鱼翻身”。记住，每一次努力，都会在分数上体现！'
+            ],
+            '3': [
+                '📉 距离及格还差一口气！一周后的期末考试，就是你“补气”的关键时刻。\n\n别小看这10分的差距，它可能就是你与“安全线”之间的距离。现在开始，每节课坐到前排，课后作业独立完成，不懂就问。周末再抽半天做一套模拟卷，你会发现那口气很快就补上了。期末把目标定在80+，你一定行！',
+                '🎯 差一点就及格了，但一周后的期末考，才是决定你“命运”的战役。\n\n现在开始，把那些模糊的概念和公式重新梳理一遍，多做几道综合题。一周的时间，足够你跨越及格线，甚至冲上80分。别犹豫，拿起笔，开始刷题吧！'
+            ],
+            '4': [
+                '🎯 差一点就及格啦！一周后的期末考试，就是你“摆脱危险”的最佳时机。\n\n你已经很接近目标了，但千万不要在最后关头松懈。建议你重点突破中档题，把基础分稳稳拿到手。把近三年的期末真题刷一遍，你会发现很多套路。保持这个势头，期末冲上80分，甚至更高，彻底告别“危险分子”的称号！',
+                '📈 离及格只差一步之遥，一周后的期末考，就是你“跨越鸿沟”的桥梁。\n\n别因为期中成绩而自满或气馁，最后一周的复习效率至关重要。建议你制定一个“冲刺计划”，每天集中精力解决一个题型，把错题本上的题目再做一遍。只要稳住心态，期末80分以上不是梦！'
+            ],
+            '5': [
+                '✅ 及格保底，但别飘～一周后的期末考试，才是你“更上一层楼”的机会。\n\n现在的成绩只是个开始，高数的海洋还很广阔。建议你趁热打铁，把之前模糊的概念彻底搞懂，多做一些综合题，提升熟练度。一周后如果能把分数提到80分以上，不仅更安全，还能为后续课程打下坚实基础。继续冲，别停！',
+                '🌟 及格了，但这不是终点，一周后的期末考，才是你“展现实力”的舞台。\n\n别满足于现状，高数需要的是不断突破。建议你利用这一周时间，把薄弱环节重点攻克，多练几套模拟卷。期末如果能冲上80分，那才是真正的“稳了”。加油，你值得更好！'
+            ],
+            '6': [
+                '🌟 不错哦！但离“大佬”还有距离。一周后的期末考试，就是你“升级”的关键战。\n\n你的底子已经不错，但高数讲究的是融会贯通。建议你挑战一些难题，锻炼自己的数学思维。同时，注意计算细节，避免因小失大。一周后如果冲上85分，那就是质的飞跃，奖学金也在向你招手！',
+                '📈 70多分已经不错，但一周后的期末考，是你“冲击优秀”的绝佳机会。\n\n别停下脚步，最后一周的复习要更有针对性。建议你把近几年的期末大题梳理一遍，总结解题套路。只要保持状态，期末85分以上指日可待，甚至能冲击90分！'
+            ],
+            '7': [
+                '🎉 优秀！继续保持，一周后的期末考试，就是你“封神”的最后一战。\n\n这个分数已经证明你的实力，但强者从不满足。建议你把目光放在满分上，查漏补缺，特别是那些容易扣分的步骤和定义。多和同学讨论，教学相长。一周后如果稳定在90+，你将成为班级的标杆，未来可期！',
+                '🏅 80多分，你已经站在了前列，但一周后的期末考，才是“王者加冕”的时刻。\n\n别因为期中成绩而放松警惕，最后一周的复习要精益求精。建议你回顾所有错题，确保每一个知识点都万无一失。期末冲刺90分以上，你就是当之无愧的“高数大神”！'
+            ],
+            '8': [
+                '🏆 大神级别！但一周后的期末考试，才是你“稳固王座”的考验。\n\n你已经站在了金字塔顶端，但高数之巅没有尽头。建议你保持谦逊，巩固每一个细节，同时可以尝试用更高阶的视角看待问题。一周后只要正常发挥，你就是当之无愧的王者。但切记，大意是最大的敌人，稳住！',
+                '👑 接近满分，你已经是传奇，但一周后的期末考，才是“传说续写”的时刻。\n\n别因为期中成绩而骄傲，高数需要的是持之以恒的专注。建议你把所有公式和定理重新推导一遍，确保毫无死角。一周后，用满分证明你的实力，成为所有人的榜样！'
+            ]
+        };
+
+        function getScoreMessage(score) {
+            let key;
+            if (score === 0) key = '0';
+            else if (score < 20) key = '1';
+            else if (score >= 20 && score < 40) key = '2';
+            else if (score >= 40 && score < 50) key = '3';
+            else if (score >= 50 && score < 60) key = '4';
+            else if (score >= 60 && score < 70) key = '5';
+            else if (score >= 70 && score < 80) key = '6';
+            else if (score >= 80 && score < 90) key = '7';
+            else if (score >= 90 && score <= 100) key = '8';
+            else key = '5';
+
+            const pool = messagePool[key] || messagePool['5'];
+            const idx = Math.floor(Math.random() * pool.length);
+            return { msg: pool[idx], cls: 'msg-' + key };
+        }
+
+        // DOM
+        const nameInput = document.getElementById('studentName');
+        const pwdInput = document.getElementById('studentPwd');
+        const queryBtn = document.getElementById('queryBtn');
+        const placeholderMsg = document.getElementById('placeholderMsg');
+        const resultContent = document.getElementById('resultContent');
+        const passwordHint = document.getElementById('passwordHint');
+
+        function renderResult(student) {
+            passwordHint.classList.add('hidden');
+
+            placeholderMsg.style.display = 'none';
+            resultContent.style.display = 'block';
+
+            const score = student.期中成绩;
+            const avatar = getColoredAvatar(student.姓名);
+            const { msg, cls } = getScoreMessage(score);
+            const formattedMsg = msg.replace(/\n/g, '<br>');
+
+            resultContent.innerHTML = `
+                <div class="result-item">
+                    <div class="result-row">
+                        <div class="result-name-area">
+                            <span class="avatar-icon">${avatar}</span>
+                            <span class="result-label">${student.姓名}</span>
+                        </div>
+                        <span class="result-score-wrapper">
+                            <span class="result-score-label">期中分数</span>
+                            <span class="result-score">${score}</span>
+                        </span>
+                    </div>
+                    <div class="result-message ${cls}">${formattedMsg}</div>
+                    <div style="font-size: 0.9rem; color: #2a4f6a; margin-top: 6px; text-align:center; background: #dcebf7; border-radius: 40px; padding: 6px; font-weight: 500;">学号: ${student.学号}</div>
+                </div>
+            `;
+        }
+
+        function showError(text) {
+            passwordHint.classList.remove('hidden');
+            placeholderMsg.style.display = 'none';
+            resultContent.style.display = 'block';
+            resultContent.innerHTML = `<div class="error-msg">❌ ${text}</div>`;
+        }
+
+        function resetPlaceholder() {
+            passwordHint.classList.remove('hidden');
+            placeholderMsg.style.display = 'block';
+            resultContent.style.display = 'none';
+            resultContent.innerHTML = '';
+        }
+
+        function handleQuery() {
+            const name = nameInput.value.trim();
+            const pwd = pwdInput.value.trim();
+
+            if (!name) {
+                showError('请输入姓名');
+                return;
+            }
+            if (!pwd) {
+                showError('请输入密码');
+                return;
+            }
+
+            const student = nameMap.get(name);
+            if (!student) {
+                showError('未找到该姓名的学生，请确认');
+                return;
+            }
+
+            const correctPwd = calcPassword(student.学号);
+            if (pwd !== correctPwd) {
+                showError('密码错误，请重试');
+                return;
+            }
+
+            renderResult(student);
+        }
+
+        queryBtn.addEventListener('click', handleQuery);
+        pwdInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                queryBtn.click();
+            }
+        });
+        nameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                pwdInput.focus();
+            }
+        });
+
+        resetPlaceholder();
+    })();
+</script>
+
+</body>
+</html>
