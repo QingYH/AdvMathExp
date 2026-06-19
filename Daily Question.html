@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>高数每日一题 | 完整题库 | 超详细解析 | 云端同步 | 教师后台</title>
@@ -1195,6 +1198,16 @@
         let sid = document.getElementById("studentId").value.trim();
         if(sid) displayStudentResult(sid, formatDate(new Date()));
     })();
+    //-------------------------
+    // 强制刷新版本（每次修改网页时，把下面的日期改成当天）
+const APP_VERSION = '2026-06-19-v1'; 
+
+// 检查本地版本号，如果不一致就强制清除缓存并刷新
+if (localStorage.getItem('app_version') !== APP_VERSION) {
+    localStorage.clear(); // 清空所有旧数据
+    localStorage.setItem('app_version', APP_VERSION);
+    location.reload(true); // 强制从服务器重新加载
+}
 </script>
 </body>
 </html>
