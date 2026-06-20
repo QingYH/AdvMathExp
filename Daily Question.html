@@ -14,271 +14,61 @@
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] });"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <style>
+        /* 样式代码保持不变（因长度限制此处省略，请使用您原来的样式） */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-            background: #f0ede8;
-            padding: 24px 20px 48px;
-            min-height: 100vh;
-            color: #2c2824;
-        }
+        body { font-family: 'Segoe UI', Roboto, system-ui, sans-serif; background: #f0ede8; padding: 24px 20px 48px; min-height: 100vh; color: #2c2824; }
         .main-wrapper { max-width: 1400px; margin: 0 auto; }
-        .countdown-banner {
-            background: linear-gradient(105deg, #fff3e0 0%, #ffe6d0 100%);
-            border-radius: 28px;
-            padding: 14px 24px;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            border-left: 8px solid #c9774b;
-        }
+        .countdown-banner { background: linear-gradient(105deg, #fff3e0 0%, #ffe6d0 100%); border-radius: 28px; padding: 14px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; border-left: 8px solid #c9774b; }
         .banner-text { font-weight: 700; color: #a55127; }
-        .countdown-timer {
-            background: #ffffffcc;
-            backdrop-filter: blur(4px);
-            padding: 6px 18px;
-            border-radius: 50px;
-            font-weight: 800;
-            font-size: 1rem;
-            color: #bc5f31;
-        }
-        .card {
-            background: #ffffff;
-            border-radius: 32px;
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.05);
-            padding: 28px;
-            border: 1px solid #e8e0d6;
-        }
-        .header-section {
-            background: #ffffff;
-            border-radius: 32px;
-            padding: 20px 28px;
-            margin-bottom: 28px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .countdown-timer { background: #ffffffcc; backdrop-filter: blur(4px); padding: 6px 18px; border-radius: 50px; font-weight: 800; font-size: 1rem; color: #bc5f31; }
+        .card { background: #ffffff; border-radius: 32px; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.05); padding: 28px; border: 1px solid #e8e0d6; }
+        .header-section { background: #ffffff; border-radius: 32px; padding: 20px 28px; margin-bottom: 28px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; }
         .title-area h1 { font-size: 1.75rem; font-weight: 700; color: #2c4b3e; }
         .title-area p { color: #6f5e4e; margin-top: 6px; font-size: 0.85rem; }
-        .date-panel {
-            background: #eef2ed;
-            padding: 8px 24px;
-            border-radius: 60px;
-            font-weight: 600;
-            color: #3b5a4b;
-        }
-        .teacher-button {
-            background: #4e6b5c;
-            border: none;
-            color: white;
-            padding: 8px 22px;
-            border-radius: 40px;
-            font-weight: 600;
-            margin-left: 16px;
-            cursor: pointer;
-        }
+        .date-panel { background: #eef2ed; padding: 8px 24px; border-radius: 60px; font-weight: 600; color: #3b5a4b; }
+        .teacher-button { background: #4e6b5c; border: none; color: white; padding: 8px 22px; border-radius: 40px; font-weight: 600; margin-left: 16px; cursor: pointer; }
         .two-columns { display: flex; flex-wrap: wrap; gap: 28px; }
         .submit-area, .result-area { flex: 1; min-width: 320px; }
         .form-field { margin-bottom: 22px; }
         .form-field label { font-weight: 600; color: #4f5e54; display: block; margin-bottom: 8px; }
-        .form-field input {
-            width: 100%;
-            padding: 14px 20px;
-            border-radius: 48px;
-            border: 1px solid #dbd1c4;
-            background: #fefefe;
-            font-size: 1rem;
-            outline: none;
-        }
-        .question-container {
-            background: #faf7f2;
-            border-radius: 28px;
-            padding: 20px 24px;
-            margin: 20px 0;
-            border-left: 6px solid #7f9a88;
-        }
-        .chapter-badge {
-            display: inline-block;
-            background: #e2d8cd;
-            padding: 5px 16px;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
+        .form-field input { width: 100%; padding: 14px 20px; border-radius: 48px; border: 1px solid #dbd1c4; background: #fefefe; font-size: 1rem; outline: none; }
+        .question-container { background: #faf7f2; border-radius: 28px; padding: 20px 24px; margin: 20px 0; border-left: 6px solid #7f9a88; }
+        .chapter-badge { display: inline-block; background: #e2d8cd; padding: 5px 16px; border-radius: 30px; font-size: 0.7rem; font-weight: 700; margin-bottom: 12px; }
         .options-container { margin: 16px 0 8px; }
-        .option-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 14px;
-            padding: 12px 14px;
-            margin: 6px 0;
-            background: #fefcf9;
-            border-radius: 20px;
-            border: 1px solid #ede3d7;
-            transition: 0.2s;
-        }
+        .option-item { display: flex; align-items: flex-start; gap: 14px; padding: 12px 14px; margin: 6px 0; background: #fefcf9; border-radius: 20px; border: 1px solid #ede3d7; transition: 0.2s; }
         .option-item:hover { background: #f8f3ec; }
-        .option-item input {
-            width: 20px;
-            height: 20px;
-            margin-top: 2px;
-            flex-shrink: 0;
-            cursor: pointer;
-            accent-color: #6b8a78;
-        }
-        .option-item label {
-            flex: 1;
-            font-size: 0.9rem;
-            line-height: 1.45;
-            color: #3b3a36;
-            cursor: pointer;
-            font-weight: normal;
-        }
-        .question-type-badge {
-            display: inline-block;
-            background: #c9d9cf;
-            padding: 4px 12px;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            margin-left: 10px;
-            color: #3b5a4b;
-        }
-        .btn-primary {
-            background: #6b8a78;
-            width: 100%;
-            border: none;
-            padding: 14px 0;
-            border-radius: 60px;
-            font-weight: 700;
-            font-size: 1rem;
-            color: white;
-            cursor: pointer;
-        }
+        .option-item input { width: 20px; height: 20px; margin-top: 2px; flex-shrink: 0; cursor: pointer; accent-color: #6b8a78; }
+        .option-item label { flex: 1; font-size: 0.9rem; line-height: 1.45; color: #3b3a36; cursor: pointer; font-weight: normal; }
+        .question-type-badge { display: inline-block; background: #c9d9cf; padding: 4px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; margin-left: 10px; color: #3b5a4b; }
+        .btn-primary { background: #6b8a78; width: 100%; border: none; padding: 14px 0; border-radius: 60px; font-weight: 700; font-size: 1rem; color: white; cursor: pointer; }
         .btn-primary:disabled { background: #b7cdbf; cursor: not-allowed; }
-        .score-card {
-            background: linear-gradient(135deg, #2c6e2f15 0%, #4a9e4e25 100%);
-            border-radius: 28px;
-            padding: 16px;
-            text-align: center;
-            margin: 12px 0;
-            border: 1px solid #9bc4a0;
-        }
+        .score-card { background: linear-gradient(135deg, #2c6e2f15 0%, #4a9e4e25 100%); border-radius: 28px; padding: 16px; text-align: center; margin: 12px 0; border: 1px solid #9bc4a0; }
         .score-value { font-size: 2.5rem; font-weight: 800; color: #2c6e2f; }
         .total-score-value { font-size: 1.8rem; font-weight: 800; color: #3b6b54; }
-        .eval-content {
-            background: #fefaf5;
-            border-radius: 28px;
-            padding: 18px 20px;
-            margin: 14px 0;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-        .option-analysis {
-            background: #f8f0e8;
-            border-radius: 20px;
-            padding: 14px 18px;
-            margin: 12px 0;
-            font-size: 0.85rem;
-            line-height: 1.5;
-        }
-        .info-note {
-            font-size: 0.7rem;
-            background: #f1ede8;
-            border-radius: 28px;
-            padding: 10px 14px;
-            text-align: center;
-            margin-top: 18px;
-        }
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(45, 45, 40, 0.75);
-            backdrop-filter: blur(6px);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 16px;
-        }
-        .modal-window {
-            background: white;
-            width: 100%;
-            max-width: 98%;
-            border-radius: 44px;
-            padding: 24px 20px;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-        .matrix-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.75rem;
-            min-width: 1000px;
-        }
-        .matrix-table th, .matrix-table td {
-            border: 1px solid #e2d9cf;
-            padding: 8px 6px;
-            text-align: center;
-            vertical-align: middle;
-        }
-        .matrix-table th {
-            background: #f2ede6;
-            position: sticky;
-            top: 0;
-            font-weight: 700;
-        }
+        .eval-content { background: #fefaf5; border-radius: 28px; padding: 18px 20px; margin: 14px 0; font-size: 0.9rem; line-height: 1.5; }
+        .option-analysis { background: #f8f0e8; border-radius: 20px; padding: 14px 18px; margin: 12px 0; font-size: 0.85rem; line-height: 1.5; }
+        .info-note { font-size: 0.7rem; background: #f1ede8; border-radius: 28px; padding: 10px 14px; text-align: center; margin-top: 18px; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(45, 45, 40, 0.75); backdrop-filter: blur(6px); justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
+        .modal-window { background: white; width: 100%; max-width: 98%; border-radius: 44px; padding: 24px 20px; max-height: 85vh; overflow-y: auto; }
+        .matrix-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; min-width: 1000px; }
+        .matrix-table th, .matrix-table td { border: 1px solid #e2d9cf; padding: 8px 6px; text-align: center; vertical-align: middle; }
+        .matrix-table th { background: #f2ede6; position: sticky; top: 0; font-weight: 700; }
         .matrix-table tr:hover { background: #faf5ef; }
         .btn-export { background: #718b79; margin-top: 20px; padding: 8px 28px; border-radius: 50px; color: white; border: none; cursor: pointer; }
         .close-modal-btn { background: #9d7f66; padding: 6px 22px; border-radius: 40px; color: white; border: none; }
         i { margin-right: 6px; }
         .footer-text { text-align: center; margin-top: 32px; font-size: 0.7rem; color: #9b8c7a; }
-        .encouragement-box {
-            background: linear-gradient(105deg, #fff7e8 0%, #feefd6 100%);
-            border-radius: 28px;
-            padding: 16px 20px;
-            margin: 14px 0;
-            text-align: center;
-            border-left: 8px solid #f0a34b;
-        }
-        .theorem-box, .conclusion-box, .method-box, .solution-box, .warning-box, .example-box {
-            border-radius: 20px;
-            padding: 14px 18px;
-            margin: 12px 0;
-        }
+        .encouragement-box { background: linear-gradient(105deg, #fff7e8 0%, #feefd6 100%); border-radius: 28px; padding: 16px 20px; margin: 14px 0; text-align: center; border-left: 8px solid #f0a34b; }
+        .theorem-box, .conclusion-box, .method-box, .solution-box, .warning-box, .example-box { border-radius: 20px; padding: 14px 18px; margin: 12px 0; }
         .theorem-box { background: #eaf4ea; border-left: 4px solid #2c6e2f; }
         .conclusion-box { background: #e0f0e0; border-left: 4px solid #3a7c3a; }
         .method-box { background: #eef2fa; border-left: 4px solid #718b79; }
         .solution-box { background: #fefaf5; border-left: 4px solid #5a7c6b; }
         .warning-box { background: #fff0e0; border-left: 4px solid #e0a878; }
         .example-box { background: #f0e6ff; border-left: 4px solid #8b72b0; }
-        .toggle-btn {
-            background: #6b8a78;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 0.75rem;
-            padding: 4px 12px;
-            border-radius: 20px;
-            margin-top: 8px;
-        }
-        .example-answer {
-            display: none;
-            margin-top: 10px;
-            padding: 10px;
-            background: #e8e0d6;
-            border-radius: 16px;
-            font-size: 0.85rem;
-        }
-        .example-answer.show {
-            display: block;
-        }
+        .toggle-btn { background: #6b8a78; border: none; color: white; cursor: pointer; font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; margin-top: 8px; }
+        .example-answer { display: none; margin-top: 10px; padding: 10px; background: #e8e0d6; border-radius: 16px; font-size: 0.85rem; }
+        .example-answer.show { display: block; }
         .detail-text { color: #4a5b52; font-size: 0.8rem; margin-top: 4px; }
         .refresh-btn { background: #718b79; color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; cursor: pointer; margin-left: 10px; }
         @media (max-width: 700px) { body { padding: 16px 12px; } .header-section { flex-direction: column; align-items: flex-start; gap: 12px; } .option-item label { font-size: 0.8rem; } .matrix-table { font-size: 0.7rem; } }
@@ -286,24 +76,12 @@
         .option-wrong { color: #b1624b; }
         .not-submitted { color: #d97706; font-style: italic; background-color: #fef3c7; }
         .future-date { color: #9ca3af; background-color: #f3f4f6; }
-        .success-toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #2c6e2f;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 50px;
-            z-index: 1000;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            animation: fadeOut 3s ease;
-            white-space: nowrap;
-        }
+        .success-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #2c6e2f; color: white; padding: 12px 24px; border-radius: 50px; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.2); animation: fadeOut 3s ease; white-space: nowrap; }
         @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
     </style>
 </head>
 <body>
+<!-- ==================== HTML 结构 ==================== -->
 <div class="main-wrapper">
     <div class="countdown-banner">
         <div class="banner-text"><i class="fas fa-hourglass-half"></i> 期末考试倒计时，请珍惜复习时间！未雨绸缪！期末不挂在高数上！</div>
@@ -347,6 +125,7 @@
     <div class="footer-text"><i class="fas fa-clock"></i> 每日00:00自动更新题目 · 活动：2026.05.31 — 2026.06.26 (6月27日期末考试)</div>
 </div>
 
+<!-- 教师后台弹窗 -->
 <div id="adminModal" class="modal-overlay">
     <div class="modal-window">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
@@ -370,13 +149,13 @@
 </div>
 
 <script>
-    // ======================= 版本管理（必须放在最前面） =======================
-    const APP_VERSION = '2026-06-20-v2';
+    // ======================= 版本管理 =======================
+    const APP_VERSION = '2026-06-20-v3';
     if (localStorage.getItem('app_version') !== APP_VERSION) {
         console.log('🔄 版本更新，清除旧缓存...');
         localStorage.clear();
         localStorage.setItem('app_version', APP_VERSION);
-        // 注意：不要在这里 location.reload，避免死循环
+        location.reload(true);
     }
 
     // ======================= Supabase 配置 =======================
@@ -384,7 +163,8 @@
     const SUPABASE_ANON_KEY = "sb_publishable_IJ_gC4997bVOHXad83g5vg_ATcWKUCJ";
     
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    
+    console.log('✅ Supabase 客户端初始化完成');
+
     // ======================= 完整学生名单 =======================
     const validStudents = new Map([
         ["061025022","徐若伽"],["061025026","程子昂"],["170425048","李心然"],["061025041","朱静蕾"],["170425057","段诗雅"],
@@ -410,8 +190,9 @@
         ["081825032","姚猛"],["081825035","项可益"],["081825039","湛益阳"]
     ]);
 
-    // ======================= 完整题库 =======================
+    // ======================= 完整题库（全部保留） =======================
     const fullQuestionSet = [
+        // 第1题
         { chapter: "向量代数与空间解析几何", text: "已知向量 $\\vec{a}=(2,-1,2)$, $\\vec{b}=(1,2,-2)$，则下列选项中正确的是？", type: "多选题", difficulty: 7, maxScore: 7,
           options: ["A. $\\vec{a}\\cdot\\vec{b} = 2\\times1+(-1)\\times2+2\\times(-2)= -4$", "B. $\\vec{a}\\times\\vec{b} = \\begin{vmatrix} \\mathbf{i} & \\mathbf{j} & \\mathbf{k} \\\\ 2 & -1 & 2 \\\\ 1 & 2 & -2 \\end{vmatrix} = (-2,6,5)$", "C. 与$\\vec{a},\\vec{b}$都垂直的单位向量为 $\\pm\\dfrac{\\vec{a}\\times\\vec{b}}{|\\vec{a}\\times\\vec{b}|} = \\pm\\dfrac{(-2,6,5)}{\\sqrt{65}}$", "D. $\\vec{a}\\cdot\\vec{b} = 2+(-2)+(-4)= -4$？不对，应该是4", "E. $\\vec{a}\\times\\vec{b} = (2\\times2-(-1)\\times2,\\;2\\times1-2\\times2,\\;2\\times2-(-1)\\times1) = (6,-2,5)$？", "F. 夹角$\\cos\\theta = \\dfrac{\\vec{a}\\cdot\\vec{b}}{|\\vec{a}||\\vec{b}|} = -\\dfrac{4}{9} = -0.444$，$\\theta=60^\\circ$"],
           correct: ["A","B","C"],
@@ -423,6 +204,7 @@
           optionDetails: { A:"✓ 点积计算正确", B:"✓ 叉积行列式计算正确", C:"✓ 单位向量计算正确", D:"✗ 点积应为-4", E:"✗ 叉积计算公式错误", F:"✗ $\\cos\\theta=-4/9\\neq1/2$，$\\theta\\approx116^\\circ$" },
           exampleQuestion: "已知 $\\vec{a}=(1,0,-1)$, $\\vec{b}=(0,1,1)$，求 $\\vec{a}\\cdot\\vec{b}$、$\\vec{a}\\times\\vec{b}$ 及单位向量",
           exampleAnswer: "$\\vec{a}\\cdot\\vec{b}=-1$；$\\vec{a}\\times\\vec{b}=(1,-1,1)$；单位向量 $= \\pm\\left(\\dfrac{1}{\\sqrt{3}},-\\dfrac{1}{\\sqrt{3}},\\dfrac{1}{\\sqrt{3}}\\right)$" },
+        // 第2题
         { chapter: "多元函数微分学", text: "函数 $z = x^3 + y^3 - 3xy$ 的极值情况，正确的是？", type: "多选题", difficulty: 8, maxScore: 8,
           options: ["A. 驻点：解 $\\dfrac{\\partial z}{\\partial x}=3x^2-3y=0$，$\\dfrac{\\partial z}{\\partial y}=3y^2-3x=0$，得 $(0,0)$ 和 $(1,1)$", "B. $(0,0)$ 处 $A=0,\\Delta=AC-B^2=-9<0$，是极小值点", "C. $(1,1)$ 处 $A=6>0,\\Delta=27>0$，是极小值点，极小值 $-1$", "D. 函数没有极值点", "E. $(0,0)$ 是极大值点", "F. 函数无极大值，但有极小值"],
           correct: ["A","C"],
@@ -434,7 +216,7 @@
           optionDetails: { A:"✓ 驻点正确", B:"✗ (0,0)是鞍点", C:"✓ 正确", D:"✗ 有极小值", E:"✗ 鞍点", F:"✗ 选项不完整" },
           exampleQuestion: "求 $f(x,y)=x^2+xy+y^2-3x-3y$ 的极值",
           exampleAnswer: "驻点 $(1,1)$，极小值 $-3$" },
-            
+        // 第3题
         { chapter: "空间解析几何", text: "平面 $2x - y + 2z = 6$ 与直线 $\\dfrac{x-1}{2} = \\dfrac{y+1}{-1} = \\dfrac{z}{2}$ 的位置关系是？", type: "多选题", difficulty: 7, maxScore: 7,
           options: ["A. 直线的方向向量为 $(2,-1,2)$", "B. 平面的法向量为 $(2,-1,2)$", "C. 直线与平面垂直", "D. 直线与平面平行", "E. 直线在平面上", "F. 直线与平面相交但不垂直"],
           correct: ["A","B","C"],
@@ -446,7 +228,7 @@
           optionDetails: { A:"✓ 方向向量正确", B:"✓ 法向量正确", C:"✓ 垂直正确", D:"✗ 不平行", E:"✗ 不在平面上", F:"✗ 垂直非相交" },
           exampleQuestion: "判断直线$\\frac{x}{1}=\\frac{y}{2}=\\frac{z}{-1}$与平面$x+2y-z=3$的关系",
           exampleAnswer: "方向向量(1,2,-1)与法向量(1,2,-1)平行，垂直" },
-    
+        // 第4题
         { chapter: "多元函数微分学", text: "函数 $f(x,y)=x^2+2y^2$ 在点 $P(1,1)$ 处沿方向 $\\vec{l}=(1,1)$ 的方向导数为？", type: "多选题", difficulty: 7, maxScore: 7,
           options: ["A. 梯度 $\\nabla f(1,1)=(2,4)$", "B. 方向余弦 $\\cos\\alpha=\\frac{\\sqrt{2}}{2},\\cos\\beta=\\frac{\\sqrt{2}}{2}$", "C. 方向导数 $\\frac{\\partial f}{\\partial l}=2\\cdot\\frac{\\sqrt{2}}{2}+4\\cdot\\frac{\\sqrt{2}}{2}=3\\sqrt{2}$", "D. 方向导数等于 $3\\sqrt{2}$", "E. 梯度模长 $|\\nabla f|=\\sqrt{20}=2\\sqrt{5}$", "F. 沿该方向函数增加最快"],
           correct: ["A","B","C","D","E"],
@@ -458,7 +240,7 @@
           optionDetails: { A:"✓", B:"✓", C:"✓", D:"✓", E:"✓", F:"✗ 梯度方向才是最快" },
           exampleQuestion: "求 $f(x,y)=xy$ 在点(2,1)沿$\\vec{i}+\\vec{j}$的方向导数",
           exampleAnswer: "$\\nabla f=(1,2)$，单位方向$(\\frac{\\sqrt{2}}{2},\\frac{\\sqrt{2}}{2})$，方向导数$\\frac{3\\sqrt{2}}{2}$" },
-    
+        // 第5题
         { chapter: "多元函数微分学", text: "设 $z = f(x,y)$ 由方程 $e^z + xyz = 0$ 所确定，则 $\\dfrac{\\partial z}{\\partial x}$ 为？", type: "多选题", difficulty: 8, maxScore: 8,
           options: ["A. 对两边求x偏导得 $e^z \\frac{\\partial z}{\\partial x} + yz + xy\\frac{\\partial z}{\\partial x}=0$", "B. 整理得 $(e^z+xy)\\frac{\\partial z}{\\partial x} = -yz$", "C. $\\frac{\\partial z}{\\partial x} = -\\frac{yz}{e^z+xy}$", "D. $\\frac{\\partial z}{\\partial x} = -\\frac{yz}{xyz+xy}$", "E. 结果为 $\\frac{yz}{e^z+xy}$", "F. 隐函数求导公式直接可得"],
           correct: ["A","B","C"],
@@ -469,10 +251,202 @@
           warnings: "注意$z$是$x,y$的函数，求导时$z$要视为中间变量",
           optionDetails: { A:"✓ 求导正确", B:"✓ 整理正确", C:"✓ 结果正确", D:"✗ 表达式不对", E:"✗ 符号错误", F:"✓ 也正确" },
           exampleQuestion: "设$\\sin(xy)+e^z=z$，求$\\frac{\\partial z}{\\partial x}$",
-          exampleAnswer: "$\\frac{\\partial z}{\\partial x}=\\frac{y\\cos(xy)}{1-e^z}$" }
+          exampleAnswer: "$\\frac{\\partial z}{\\partial x}=\\frac{y\\cos(xy)}{1-e^z}$" },
+        // 第6题
+        { chapter: "重积分", text: "计算 $\\iint_D (x+y) d\\sigma$，其中 $D$ 由 $x=0, y=0, x+y=1$ 所围，则下列正确的是？", type: "多选题", difficulty: 7, maxScore: 7,
+          options: ["A. $\\int_0^1 dx \\int_0^{1-x} (x+y) dy$", "B. $\\int_0^1 dy \\int_0^{1-y} (x+y) dx$", "C. 结果为 $\\frac{1}{2}$", "D. 结果为 $\\frac{1}{3}$", "E. 先对y积分得 $\\int_0^1 [x(1-x)+\\frac{1}{2}(1-x)^2]dx$", "F. 最终值为 $\\frac{1}{3}$"],
+          correct: ["A","B","D","E","F"],
+          theorems: "二重积分化为累次积分",
+          conclusions: "结果为$\\frac{1}{3}$",
+          method: "先对y积分再对x积分",
+          solution: "$\\int_0^1 dx \\int_0^{1-x} (x+y)dy = \\int_0^1 [x(1-x)+\\frac12(1-x)^2]dx = \\int_0^1 (\\frac12 - \\frac12 x^2)dx = \\frac12 - \\frac16 = \\frac13$",
+          warnings: "注意积分区域的边界",
+          optionDetails: { A:"✓", B:"✓", C:"✗", D:"✓", E:"✓", F:"✓" },
+          exampleQuestion: "计算 $\\iint_D xy d\\sigma$, $D:0\\le x\\le1,0\\le y\\le1-x$",
+          exampleAnswer: "$\\frac{1}{24}$" },
+        // 第7题
+        { chapter: "三重积分", text: "计算 $\\iiint_{\\Omega} z dv$，$\\Omega$ 为 $z=0$ 与 $z=1-x-y$ 及坐标面所围四面体，正确的为？", type: "多选题", difficulty: 8, maxScore: 8,
+          options: ["A. $\\int_0^1 dx \\int_0^{1-x} dy \\int_0^{1-x-y} z dz$", "B. $\\int_0^1 dz \\iint_{D_z} z dxdy$，$D_z: x\\ge0,y\\ge0,x+y\\le1-z$", "C. 结果为 $\\frac{1}{24}$", "D. 结果为 $\\frac{1}{12}$", "E. 先对z积分得 $\\frac12\\iint_D (1-x-y)^2 d\\sigma$", "F. 最终值$\\frac{1}{24}$"],
+          correct: ["A","B","C","E","F"],
+          theorems: "三重积分先一后二或先二后一",
+          conclusions: "值为$\\frac{1}{24}$",
+          method: "先对z积分再二重积分",
+          solution: "$\\int_0^1 dx\\int_0^{1-x}dy\\frac12(1-x-y)^2 = \\frac12\\int_0^1 \\frac{(1-x)^3}{3}dx = \\frac{1}{24}$",
+          warnings: "注意积分限和被积函数",
+          optionDetails: { A:"✓", B:"✓", C:"✓", D:"✗", E:"✓", F:"✓" },
+          exampleQuestion: "求 $\\iiint_{\\Omega} x dv$，$\\Omega$ 同原题",
+          exampleAnswer: "$\\frac{1}{120}$" },
+        // 第8题
+        { chapter: "重积分", text: "用极坐标计算二重积分 $\\iint_D e^{-x^2-y^2} d\\sigma$，其中 $D: x^2+y^2 \\le R^2$，则正确的是？", type: "多选题", difficulty: 7, maxScore: 7,
+          options: ["A. 极坐标变换 $x=r\\cos\\theta, y=r\\sin\\theta$", "B. 积分限 $0\\le r\\le R, 0\\le\\theta\\le 2\\pi$", "C. 被积函数变为 $e^{-r^2}$", "D. 面积元 $d\\sigma = r dr d\\theta$", "E. 积分值为 $\\pi(1-e^{-R^2})$", "F. 积分值为 $2\\pi(1-e^{-R^2})$"],
+          correct: ["A","B","C","D","E"],
+          theorems: "极坐标变换：$x=r\\cos\\theta, y=r\\sin\\theta$，$d\\sigma = r dr d\\theta$",
+          conclusions: "$\\iint_D e^{-x^2-y^2} d\\sigma = \\pi(1-e^{-R^2})$",
+          method: "极坐标变换后先对r积分",
+          solution: "$\\int_0^{2\\pi}d\\theta\\int_0^R e^{-r^2} r dr = 2\\pi \\cdot [-\\frac{1}{2}e^{-r^2}]_0^R = \\pi(1-e^{-R^2})$",
+          warnings: "注意$d\\sigma$要多一个$r$",
+          optionDetails: { A:"✓", B:"✓", C:"✓", D:"✓", E:"✓", F:"✗" },
+          exampleQuestion: "计算 $\\iint_D \\sqrt{x^2+y^2} d\\sigma$，$D: x^2+y^2\\le1$",
+          exampleAnswer: "$\\frac{2\\pi}{3}$" },
+        // 第9题
+        { chapter: "曲线积分", text: "设 $L$ 为从 $A(0,0)$ 到 $B(1,1)$ 的直线段，则 $\\int_L (x+y) ds$ 的值为？", type: "多选题", difficulty: 6, maxScore: 6,
+          options: ["A. 参数化 $x=t, y=t, t\\in[0,1]$, $ds=\\sqrt{2}dt$", "B. $\\int_0^1 (t+t)\\sqrt{2}dt = \\sqrt{2}$", "C. 值为 $\\sqrt{2}$", "D. 值为 $2\\sqrt{2}$", "E. 值为 $\\sqrt{2}/2$", "F. 弧微分$ds=\\sqrt{1+(y')^2}dx$"],
+          correct: ["A","B","C","F"],
+          theorems: "第一类曲线积分$\\int_L f ds = \\int_a^b f(\\gamma(t))|\\gamma'(t)|dt$",
+          conclusions: "值为$\\sqrt{2}$",
+          method: "参数化计算弧微分",
+          solution: "$ds=\\sqrt{1^2+1^2}dt=\\sqrt{2}dt$，积分得$\\sqrt{2}\\int_0^1 2t dt = \\sqrt{2}$",
+          warnings: "弧微分公式不要遗漏",
+          optionDetails: { A:"✓", B:"✓", C:"✓", D:"✗", E:"✗", F:"✓" },
+          exampleQuestion: "$\\int_L x^2 ds$, $L$ 为 $y=x$ 从0到1",
+          exampleAnswer: "$\\frac{\\sqrt{2}}{3}$" },
+        // 第10题
+        { chapter: "曲面积分", text: "设 $\\Sigma$ 为球面 $x^2+y^2+z^2=R^2$ 的外侧，则 $\\iint_\\Sigma z dS$ 的值为？", type: "多选题", difficulty: 8, maxScore: 8,
+          options: ["A. 由对称性 $\\iint_\\Sigma z dS = 0$", "B. 利用 $z$ 为奇函数，积分区域对称，结果为0", "C. 极坐标投影法得非零", "D. 结果为 $\\frac{4}{3}\\pi R^3$", "E. 结果为 $4\\pi R^3$", "F. 结果为 0"],
+          correct: ["A","B","F"],
+          theorems: "对称性：若曲面关于$z=0$对称，被积函数$z$为奇函数，则积分为0",
+          conclusions: "值为0",
+          method: "利用奇偶对称性",
+          solution: "球面关于xy平面对称，z为奇函数，故积分为0",
+          warnings: "第一类曲面积分奇偶性成立",
+          optionDetails: { A:"✓", B:"✓", F:"✓", C:"✗", D:"✗", E:"✗" },
+          exampleQuestion: "$\\iint_\\Sigma x^2 dS$ 球面",
+          exampleAnswer: "$\\frac{4}{3}\\pi R^4$" },
+        // 第11题
+        { chapter: "高斯公式", text: "设空间闭区域 $\\Omega$ 由 $z=x^2+y^2$ 与 $z=1$ 所围，$\\vec{F}=(x,y,z)$，则 $\\iint_{\\partial\\Omega}\\vec{F}\\cdot d\\vec{S}$ 等于？", type: "多选题", difficulty: 9, maxScore: 9,
+          options: ["A. 高斯公式 $=\\iiint_\\Omega 3 dv$", "B. 体积 $V=\\int_0^{2\\pi}d\\theta\\int_0^1 r dr \\int_{r^2}^1 dz = \\frac{\\pi}{2}$", "C. 通量 $= \\frac{3\\pi}{2}$", "D. 结果为 $\\pi$", "E. 结果为 $\\frac{3\\pi}{2}$", "F. 散度为3"],
+          correct: ["A","B","C","E","F"],
+          theorems: "高斯公式：$\\iint_{\\partial\\Omega}\\vec{F}\\cdot d\\vec{S}=\\iiint_\\Omega \\nabla\\cdot\\vec{F} dv$",
+          conclusions: "体积$\\pi/2$，通量$3\\pi/2$",
+          method: "高斯公式化为三重积分，用柱坐标",
+          solution: "$\\nabla\\cdot\\vec{F}=3$，$V=\\int_0^{2\\pi}d\\theta\\int_0^1 r dr \\int_{r^2}^1 dz = 2\\pi\\int_0^1 r(1-r^2)dr = \\frac{\\pi}{2}$，通量$3\\times\\frac{\\pi}{2}=\\frac{3\\pi}{2}$",
+          warnings: "高斯公式要求曲面外侧",
+          optionDetails: { A:"✓", B:"✓", C:"✓", D:"✗", E:"✓", F:"✓" },
+          exampleQuestion: "求 $\\iint_\\Sigma x dy dz + y dz dx + z dx dy$，$\\Sigma$为球面外侧",
+          exampleAnswer: "$4\\pi R^3$" },
+        // 第12题
+        { chapter: "斯托克斯公式", text: "设 $\\Gamma$ 为平面 $x+y+z=1$ 被坐标面所截的三角形，方向逆时针，则 $\\oint_\\Gamma y dx + z dy + x dz$ 的值为？", type: "多选题", difficulty: 9, maxScore: 9,
+          options: ["A. 旋度 $\\nabla\\times\\vec{F}=(-1,-1,-1)$", "B. 三角形面积 $\\frac{\\sqrt{3}}{2}$", "C. 值为 $-\\frac{3}{2}$", "D. 值为 $\\sqrt{3}$", "E. 值为 $-\\sqrt{3}$", "F. 可用斯托克斯公式化为曲面积分"],
+          correct: ["A","B","C","F"],
+          theorems: "$\\oint_\\Gamma \\vec{F}\\cdot d\\vec{r} = \\iint_\\Sigma (\\nabla\\times\\vec{F})\\cdot \\vec{n} dS$",
+          conclusions: "旋度$(-1,-1,-1)$，单位法向量$(\\frac{1}{\\sqrt{3}},\\frac{1}{\\sqrt{3}},\\frac{1}{\\sqrt{3}})$，点积$-\\sqrt{3}$，面积$\\frac{\\sqrt{3}}{2}$，积分$-\\frac{3}{2}$",
+          method: "斯托克斯公式",
+          solution: "旋度$(-1,-1,-1)$，单位法向量$(\\frac{1}{\\sqrt{3}},\\frac{1}{\\sqrt{3}},\\frac{1}{\\sqrt{3}})$，点积$-\\sqrt{3}$，三角形面积$\\frac{\\sqrt{3}}{2}$，积分$-\\frac{3}{2}$",
+          warnings: "注意法向量方向与曲线方向符合右手法则",
+          optionDetails: { A:"✓", B:"✓", C:"✓", D:"✗", E:"✗", F:"✓" },
+          exampleQuestion: "计算 $\\oint_\\Gamma y^2 dx + z^2 dy + x^2 dz$，$\\Gamma$为单位圆$x^2+y^2+z^2=1, x+y+z=0$",
+          exampleAnswer: "由对称性得0" },
+        // 第13题
+        { chapter: "曲线积分与路径无关", text: "下列积分与路径无关的是？", type: "多选题", difficulty: 7, maxScore: 7,
+          options: ["A. $\\int (2xy dx + x^2 dy)$", "B. $\\int (y dx + x dy)$", "C. $\\int (x dx + y dy)$", "D. $\\int (y^2 dx + 2xy dy)$", "E. $\\int (\\cos y dx - x\\sin y dy)$", "F. 全微分条件 $\\frac{\\partial P}{\\partial y}=\\frac{\\partial Q}{\\partial x}$"],
+          correct: ["A","B","C","D","E","F"],
+          theorems: "格林公式及全微分条件",
+          conclusions: "所有选项都满足$\\partial P/\\partial y = \\partial Q/\\partial x$",
+          method: "检验偏导数相等",
+          solution: "各选项均满足条件，故与路径无关",
+          warnings: "注意定义域单连通",
+          optionDetails: { A:"✓", B:"✓", C:"✓", D:"✓", E:"✓", F:"✓" },
+          exampleQuestion: "验证$(e^x\\cos y + yz)dx + (xz - e^x\\sin y)dy + (xy+z)dz$是否为全微分",
+          exampleAnswer: "是，势函数为$e^x\\cos y + xyz + \\frac12 z^2$" },
+        // 第14题
+        { chapter: "常数项级数", text: "级数 $\\sum_{n=1}^{\\infty} \\frac{(-1)^{n-1}}{n}$ 的敛散性？", type: "多选题", difficulty: 8, maxScore: 8,
+          options: ["A. 条件收敛", "B. 绝对收敛", "C. 收敛于 $\\ln 2$", "D. 发散", "E. 交错级数莱布尼茨判别", "F. 收敛于1"],
+          correct: ["A","C","E"],
+          theorems: "莱布尼茨判别法，调和级数发散",
+          conclusions: "条件收敛，和为$\\ln2$",
+          method: "莱布尼茨，且绝对值级数发散",
+          solution: "满足递减趋于0，条件收敛；和函数$\\ln(1+x)$代$x=1$得$\\ln2$",
+          warnings: "条件收敛注意区分绝对收敛",
+          optionDetails: { A:"✓", C:"✓", E:"✓", B:"✗", D:"✗", F:"✗" },
+          exampleQuestion: "求 $\\sum_{n=1}^\\infty \\frac{(-1)^{n-1}}{2n-1}$",
+          exampleAnswer: "$\\frac{\\pi}{4}$" },
+        // 第15题
+        { chapter: "常数项级数", text: "下列级数中发散的是？", type: "多选题", difficulty: 7, maxScore: 7,
+          options: ["A. $\\sum_{n=1}^{\\infty} \\frac{1}{n^2}$", "B. $\\sum_{n=1}^{\\infty} \\frac{1}{n}$", "C. $\\sum_{n=1}^{\\infty} \\frac{1}{\\sqrt{n}}$", "D. $\\sum_{n=1}^{\\infty} \\frac{1}{n^{1.5}}$", "E. $\\sum_{n=1}^{\\infty} \\frac{1}{n\\ln n}$", "F. $\\sum_{n=1}^{\\infty} \\frac{1}{n\\ln^2 n}$"],
+          correct: ["B","C","E"],
+          theorems: "$p$级数：$p>1$收敛，$p\\le1$发散；积分判别法",
+          conclusions: "$\\sum 1/n$发散，$\\sum 1/\\sqrt{n}$发散($p=1/2$)，$\\sum 1/(n\\ln n)$发散",
+          method: "比较判别法和积分判别法",
+          solution: "调和级数发散；$p=1/2<1$发散；$\\int_2^\\infty \\frac{dx}{x\\ln x}=\\ln(\\ln x)\\to\\infty$发散",
+          warnings: "$\\sum 1/(n\\ln^2 n)$收敛",
+          optionDetails: { A:"✗ 收敛", B:"✓ 发散", C:"✓ 发散", D:"✗ 收敛", E:"✓ 发散", F:"✗ 收敛" },
+          exampleQuestion: "判断 $\\sum \\frac{1}{n\\ln n\\ln\\ln n}$ 敛散性",
+          exampleAnswer: "发散" },
+        // 第16题
+        { chapter: "幂级数", text: "幂级数 $\\sum_{n=0}^\\infty \\frac{x^n}{n!}$ 的和函数是？", type: "多选题", difficulty: 7, maxScore: 7,
+          options: ["A. $e^x$", "B. $\\sin x$", "C. 收敛域为 $(-\\infty,+\\infty)$", "D. 收敛域为 $(-1,1)$", "E. 收敛半径为 $+\\infty$", "F. 和函数为 $\\cos x$"],
+          correct: ["A","C","E"],
+          theorems: "指数函数泰勒展开",
+          conclusions: "$e^x=\\sum_{n=0}^\\infty \\frac{x^n}{n!}$，收敛半径$+\\infty$",
+          method: "直接识别标准展开式",
+          solution: "这是$e^x$的麦克劳林展开，收敛于全体实数",
+          warnings: "注意阶乘在分母，收敛半径无穷大",
+          optionDetails: { A:"✓", C:"✓", E:"✓", B:"✗", D:"✗", F:"✗" },
+          exampleQuestion: "求 $\\sum_{n=0}^\\infty \\frac{(-1)^n x^{2n}}{(2n)!}$",
+          exampleAnswer: "$\\cos x$" },
+        // 第17题
+        { chapter: "多元函数极值（拉格朗日乘数法）", text: "某工厂生产两种产品，产量分别为 $x$ 和 $y$，利润函数为 $P(x,y)=100x+120y-2x^2-3y^2-xy$，生产受原材料限制满足 $x+y=50$，则最大利润为？", type: "多选题", difficulty: 9, maxScore: 9,
+          options: ["A. 拉格朗日函数 $L=100x+120y-2x^2-3y^2-xy+\\lambda(x+y-50)$", "B. 求偏导得：$\\begin{cases} 100-4x-y+\\lambda=0 \\\\ 120-6y-x+\\lambda=0 \\\\ x+y=50 \\end{cases}$", "C. 解得 $x=30, y=20$", "D. 最大利润 $P=100\\times30+120\\times20-2\\times900-3\\times400-600=2700$", "E. 解得 $x=20, y=30$", "F. 最大利润为 $2800$"],
+          correct: ["A","B","C","D"],
+          theorems: "【拉格朗日乘数法】求 $f(x,y)$ 在约束 $g(x,y)=0$ 下的极值，构造 $L=f+\\lambda g$，解 $\\nabla L=0$。",
+          conclusions: "最优产量 $x=30$，$y=20$，最大利润 $2700$。",
+          method: "构造拉格朗日函数 → 求偏导 → 解线性方程组 → 代入得利润。",
+          solution: "由 $100-4x-y+\\lambda=0$，$120-6y-x+\\lambda=0$，两式相减得 $20+3y-3x=0$，结合 $x+y=50$，解得 $x=30,y=20$，代入得 $P=2700$。",
+          warnings: "注意利润函数中的交叉项 $-xy$ 求导时不要遗漏。",
+          optionDetails: { A:"✓", B:"✓", C:"✓", D:"✓", E:"✗", F:"✗" },
+          exampleQuestion: "求 $P=80x+100y-x^2-2y^2-xy$ 在 $x+y=40$ 下的最大值",
+          exampleAnswer: "$x=15,y=25$，最大利润 $2075$" },
+        // 第18题
+        { chapter: "多元函数极值（拉格朗日乘数法）", text: "求原点到平面 $2x+3y+4z=29$ 的最短距离，下列步骤正确的是？", type: "多选题", difficulty: 8, maxScore: 8,
+          options: ["A. 目标函数为 $d^2=x^2+y^2+z^2$（距离平方）", "B. 约束条件为 $2x+3y+4z=29$", "C. 拉格朗日函数 $L=x^2+y^2+z^2+\\lambda(2x+3y+4z-29)$", "D. 偏导得 $2x+2\\lambda=0$，$2y+3\\lambda=0$，$2z+4\\lambda=0$", "E. 解得 $x=\\frac{29}{\\sqrt{29}},\\cdots$", "F. 最短距离为 $\\frac{29}{\\sqrt{29}}=\\sqrt{29}$"],
+          correct: ["A","B","C","D","F"],
+          theorems: "点到平面的最短距离问题转化为条件极值。",
+          conclusions: "最短距离为 $\\sqrt{29}$。",
+          method: "设点坐标，用距离平方为目标函数，平面方程为约束。",
+          solution: "$x=-\\lambda$，$y=-\\frac{3}{2}\\lambda$，$z=-2\\lambda$，代入平面得 $(-2\\lambda)+3(-\\frac{3}{2}\\lambda)+4(-2\\lambda)=-2\\lambda-\\frac{9}{2}\\lambda-8\\lambda=-\\frac{29}{2}\\lambda=29$，解得 $\\lambda=-2$，则 $(x,y,z)=(2,3,4)$，距离 $\\sqrt{4+9+16}=\\sqrt{29}$。",
+          warnings: "也可以用点到平面距离公式直接验证。",
+          optionDetails: { A:"✓", B:"✓", C:"✓", D:"✓", E:"✗ 计算错误", F:"✓" },
+          exampleQuestion: "求点$(1,2,3)$到平面$x+2y+3z=14$的距离",
+          exampleAnswer: "$\\frac{|1+4+9-14|}{\\sqrt{1+4+9}}=\\frac{0}{\\sqrt{14}}=0$，点在平面上" },
+        // 第19题
+        { chapter: "幂级数", text: "幂级数 $\\sum_{n=1}^\\infty \\frac{x^n}{n}$ 的收敛域和和函数？", type: "多选题", difficulty: 8, maxScore: 8,
+          options: ["A. 收敛半径 $R=1$", "B. 收敛域为 $(-1,1)$", "C. 收敛域为 $[-1,1)$", "D. 和函数为 $-\\ln(1-x)$", "E. 和函数为 $\\ln(1+x)$", "F. 端点$x=1$处发散"],
+          correct: ["A","C","D","F"],
+          theorems: "幂级数收敛半径公式，$\\ln(1-x)$的展开式",
+          conclusions: "$R=1$，$x=-1$时收敛，$x=1$时发散，和函数$-\\ln(1-x)$",
+          method: "利用$\\ln(1-x)$的麦克劳林展开",
+          solution: "$\\sum_{n=1}^\\infty \\frac{x^n}{n} = -\\ln(1-x)$，收敛域$[-1,1)$",
+          warnings: "端点$x=-1$处为交错调和级数收敛",
+          optionDetails: { A:"✓", B:"✗", C:"✓", D:"✓", E:"✗", F:"✓" },
+          exampleQuestion: "求 $\\sum_{n=1}^\\infty \\frac{x^{2n}}{n}$",
+          exampleAnswer: "$-\\ln(1-x^2)$，收敛域$[-1,1)$" },
+        // 第20题
+        { chapter: "傅里叶级数", text: "函数 $f(x)=x$ 在 $[-\\pi,\\pi]$ 上展开为傅里叶级数，正确的是？", type: "多选题", difficulty: 8, maxScore: 8,
+          options: ["A. $a_0=0$", "B. $a_n=0$", "C. $b_n = \\frac{2}{n}(-1)^{n+1}$", "D. 傅里叶级数为 $2\\sum_{n=1}^\\infty \\frac{(-1)^{n+1}}{n}\\sin(nx)$", "E. 在$x=\\pi$处级数收敛于0", "F. $f(x)$是奇函数"],
+          correct: ["A","B","C","D","E","F"],
+          theorems: "傅里叶系数公式：$a_n=\\frac{1}{\\pi}\\int_{-\\pi}^{\\pi}f(x)\\cos(nx)dx$，$b_n=\\frac{1}{\\pi}\\int_{-\\pi}^{\\pi}f(x)\\sin(nx)dx$",
+          conclusions: "$f(x)=x$是奇函数，$a_n=0$，$b_n=\\frac{2}{n}(-1)^{n+1}$",
+          method: "利用奇偶性简化计算",
+          solution: "$b_n=\\frac{2}{\\pi}\\int_0^\\pi x\\sin(nx)dx = \\frac{2}{n}(-1)^{n+1}$，级数$=2\\sum_{n=1}^\\infty \\frac{(-1)^{n+1}}{n}\\sin(nx)$",
+          warnings: "间断点处收敛于左右极限平均值",
+          optionDetails: { A:"✓", B:"✓", C:"✓", D:"✓", E:"✓", F:"✓" },
+          exampleQuestion: "求$f(x)=|x|$在$[-\\pi,\\pi]$的傅里叶级数",
+          exampleAnswer: "$\\frac{\\pi}{2}-\\frac{4}{\\pi}\\sum_{n=1}^\\infty \\frac{\\cos((2n-1)x)}{(2n-1)^2}$" },
+        // 第21题
+        { chapter: "傅里叶级数", text: "设 $f(x)$ 是以 $2\\pi$ 为周期的函数，在 $[-\\pi,\\pi)$ 上 $f(x)=x^2$，则其傅里叶级数收敛于？", type: "多选题", difficulty: 7, maxScore: 7,
+          options: ["A. 在 $x=0$ 处收敛于 $0$", "B. 在 $x=0$ 处收敛于 $\\pi^2$", "C. 在 $x=\\pi$ 处收敛于 $\\pi^2$", "D. 在 $x=\\pi$ 处收敛于 $\\frac{\\pi^2+(-\\pi)^2}{2}=\\pi^2$", "E. 在连续点收敛于 $x^2$", "F. $a_0=\\frac{2\\pi^2}{3}$"],
+          correct: ["B","D","E","F"],
+          theorems: "狄利克雷收敛定理",
+          conclusions: "在间断点处收敛于左右极限平均值，$x=\\pi$是间断点",
+          method: "计算傅里叶系数，利用收敛定理",
+          solution: "$f(x)=x^2$是偶函数，$b_n=0$，$a_0=\\frac{2\\pi^2}{3}$，在$x=\\pi$处收敛于$\\frac{f(\\pi^-)+f(-\\pi^+)}{2}=\\frac{\\pi^2+\\pi^2}{2}=\\pi^2$",
+          warnings: "注意周期延拓后端点处的收敛值",
+          optionDetails: { A:"✗", B:"✓", C:"✗", D:"✓", E:"✓", F:"✓" },
+          exampleQuestion: "求$f(x)=x$的傅里叶级数在$x=\\pi$处的收敛值",
+          exampleAnswer: "0" }
     ];
 
-    // 扩展题库
+    // 扩展题库确保足够覆盖活动期间每一天
     while(fullQuestionSet.length < 35) {
         for(let q of [...fullQuestionSet.slice(0,5)]) {
             let newQ = JSON.parse(JSON.stringify(q));
@@ -530,7 +504,6 @@
                 localStorage.setItem("scores_backup", JSON.stringify(data));
                 console.log('✅ 加载成功，共', data.length, '条记录');
             } else {
-                // 尝试从本地加载
                 const localData = localStorage.getItem("scores_backup");
                 if (localData) {
                     allSubmissions = JSON.parse(localData);
@@ -540,7 +513,6 @@
             return true;
         } catch(e) { 
             console.warn("加载失败:", e);
-            // 降级到本地数据
             const localData = localStorage.getItem("scores_backup");
             if (localData) {
                 allSubmissions = JSON.parse(localData);
@@ -580,8 +552,6 @@
             
             if (error) {
                 console.error('❌ 保存失败:', error);
-                
-                // 检查是否是唯一约束冲突（重复提交）
                 if (error.code === '23505' || (error.message && error.message.includes('duplicate'))) {
                     console.log('⚠️ 重复提交被阻止');
                     await loadFromCloud();
@@ -606,7 +576,6 @@
     async function hasSubmittedToday(studentId, dateStr) {
         console.log('🔍 检查是否已提交:', { studentId, dateStr });
         
-        // 1. 先从本地检查
         const localExists = allSubmissions.some(s => 
             s.studentId === studentId && s.dateStr === dateStr
         );
@@ -616,7 +585,6 @@
             return true;
         }
         
-        // 2. 从云端验证
         try {
             const { data, error } = await supabaseClient
                 .from('scores')
@@ -811,7 +779,6 @@
     const submitBtn = document.getElementById("submitAnswerBtn");
 
     async function handleSubmit() {
-        // 防止快速点击
         if (submitCooldown) {
             console.log('⏳ 正在提交中，请勿重复点击');
             return;
@@ -840,7 +807,6 @@
         
         let dateStr = formatDate(today);
         
-        // 异步验证是否已提交
         const alreadySubmitted = await hasSubmittedToday(studentId, dateStr);
         if (alreadySubmitted) {
             alert("您今日已经提交过答案，不可重复提交。");
@@ -856,7 +822,6 @@
         
         if (!confirm("⚠️ 确认提交？每人每日仅有一次提交机会，提交后不可修改。")) return;
         
-        // 设置冷却状态
         submitCooldown = true;
         isSubmitting = true;
         submitBtn.disabled = true;
@@ -932,7 +897,6 @@
         renderOptions(currentQuestion);
         
         let sid = document.getElementById("studentId").value.trim();
-        // 使用异步检查
         if(sid) {
             hasSubmittedToday(sid, fmt).then(submitted => {
                 if(submitted) {
@@ -1083,4 +1047,3 @@
 </script>
 </body>
 </html>
-
