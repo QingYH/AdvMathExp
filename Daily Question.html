@@ -441,6 +441,18 @@
           optionDetails: { A:"✓", C:"✓", E:"✓", B:"✗", D:"✗", F:"✗" },
           exampleQuestion: "求 $\\sum_{n=0}^\\infty \\frac{(-1)^n x^{2n}}{(2n)!}$",
           exampleAnswer: "$\\cos x$" },
+         // 第16题
+        { chapter: "幂级数", text: "幂级数 $\\sum_{n=0}^\\infty \\frac{x^n}{n!}$ 的和函数是？", type: "多选题", difficulty: 7, maxScore: 7,
+          options: ["A. $e^x$", "B. $\\sin x$", "C. 收敛域为 $(-\\infty,+\\infty)$", "D. 收敛域为 $(-1,1)$", "E. 收敛半径为 $+\\infty$", "F. 和函数为 $\\cos x$"],
+          correct: ["A","C","E"],
+          theorems: "指数函数泰勒展开",
+          conclusions: "$e^x=\\sum_{n=0}^\\infty \\frac{x^n}{n!}$，收敛半径$+\\infty$",
+          method: "直接识别标准展开式",
+          solution: "这是$e^x$的麦克劳林展开，收敛于全体实数",
+          warnings: "注意阶乘在分母，收敛半径无穷大",
+          optionDetails: { A:"✓", C:"✓", E:"✓", B:"✗", D:"✗", F:"✗" },
+          exampleQuestion: "求 $\\sum_{n=0}^\\infty \\frac{(-1)^n x^{2n}}{(2n)!}$",
+          exampleAnswer: "$\\cos x$" },
         // 第19题
         { chapter: "幂级数", text: "幂级数 $\\sum_{n=1}^\\infty \\frac{x^n}{n}$ 的收敛域和和函数？", type: "多选题", difficulty: 8, maxScore: 8,
           options: ["A. 收敛半径 $R=1$", "B. 收敛域为 $(-1,1)$", "C. 收敛域为 $[-1,1)$", "D. 和函数为 $-\\ln(1-x)$", "E. 和函数为 $\\ln(1+x)$", "F. 端点$x=1$处发散"],
