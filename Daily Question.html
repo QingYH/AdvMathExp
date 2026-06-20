@@ -372,18 +372,7 @@
           optionDetails: { A:"✗ 收敛", B:"✓ 发散", C:"✓ 发散", D:"✗ 收敛", E:"✓ 发散", F:"✗ 收敛" },
           exampleQuestion: "判断 $\\sum \\frac{1}{n\\ln n\\ln\\ln n}$ 敛散性",
           exampleAnswer: "发散" },
-        // 第16题
-        { chapter: "幂级数", text: "幂级数 $\\sum_{n=0}^\\infty \\frac{x^n}{n!}$ 的和函数是？", type: "多选题", difficulty: 7, maxScore: 7,
-          options: ["A. $e^x$", "B. $\\sin x$", "C. 收敛域为 $(-\\infty,+\\infty)$", "D. 收敛域为 $(-1,1)$", "E. 收敛半径为 $+\\infty$", "F. 和函数为 $\\cos x$"],
-          correct: ["A","C","E"],
-          theorems: "指数函数泰勒展开",
-          conclusions: "$e^x=\\sum_{n=0}^\\infty \\frac{x^n}{n!}$，收敛半径$+\\infty$",
-          method: "直接识别标准展开式",
-          solution: "这是$e^x$的麦克劳林展开，收敛于全体实数",
-          warnings: "注意阶乘在分母，收敛半径无穷大",
-          optionDetails: { A:"✓", C:"✓", E:"✓", B:"✗", D:"✗", F:"✗" },
-          exampleQuestion: "求 $\\sum_{n=0}^\\infty \\frac{(-1)^n x^{2n}}{(2n)!}$",
-          exampleAnswer: "$\\cos x$" },
+        
         // 第17题
         { chapter: "多元函数极值（拉格朗日乘数法）", text: "某工厂生产两种产品，产量分别为 $x$ 和 $y$，利润函数为 $P(x,y)=100x+120y-2x^2-3y^2-xy$，生产受原材料限制满足 $x+y=50$，则最大利润为？", type: "多选题", difficulty: 9, maxScore: 9,
           options: ["A. 拉格朗日函数 $L=100x+120y-2x^2-3y^2-xy+\\lambda(x+y-50)$", "B. 求偏导得：$\\begin{cases} 100-4x-y+\\lambda=0 \\\\ 120-6y-x+\\lambda=0 \\\\ x+y=50 \\end{cases}$", "C. 解得 $x=30, y=20$", "D. 最大利润 $P=100\\times30+120\\times20-2\\times900-3\\times400-600=2700$", "E. 解得 $x=20, y=30$", "F. 最大利润为 $2800$"],
@@ -409,38 +398,49 @@
           exampleQuestion: "求点$(1,2,3)$到平面$x+2y+3z=14$的距离",
           exampleAnswer: "$\\frac{|1+4+9-14|}{\\sqrt{1+4+9}}=\\frac{0}{\\sqrt{14}}=0$，点在平面上" },
         // 第23题：空间解析几何 - 点到平面距离
-    {
-    chapter: "空间解析几何",
-    text: "点 $P(1,2,3)$ 到平面 $2x - y + 2z = 10$ 的距离，下列正确的是？",
-    type: "多选题",
-    difficulty: 6,
-    maxScore: 6,
-    options: [
+        {
+       chapter: "空间解析几何",
+       text: "点 $P(1,2,3)$ 到平面 $2x - y + 2z = 10$ 的距离，下列正确的是？",
+       type: "多选题",
+       difficulty: 6,
+       maxScore: 6,
+       options: [
         "A. 距离公式 $d = \\dfrac{|2\\times1 - 2 + 2\\times3 - 10|}{\\sqrt{2^2+(-1)^2+2^2}}$",
         "B. 分子为 $|2-2+6-10| = |-4| = 4$",
         "C. 分母为 $\\sqrt{4+1+4} = 3$",
         "D. 距离 $d = \\dfrac{4}{3}$",
         "E. 距离 $d = 3$",
         "F. 点 $P$ 在平面 $2x - y + 2z = 10$ 上"
-    ],
-    correct: ["A", "B", "C", "D"],
-    theorems: "【点到平面距离公式】\n点 $P(x_0,y_0,z_0)$ 到平面 $Ax+By+Cz+D=0$ 的距离为 $$d = \\frac{|Ax_0+By_0+Cz_0+D|}{\\sqrt{A^2+B^2+C^2}}$$",
-    conclusions: "✅ $d = \\dfrac{|2\\times1 - 2 + 2\\times3 - 10|}{\\sqrt{4+1+4}} = \\dfrac{|-4|}{3} = \\dfrac{4}{3}$",
-    method: "代入公式 → 计算绝对值 → 除以法向量模长",
-    solution: "分子 $|2\\times1 - 2 + 2\\times3 - 10| = |2-2+6-10| = |-4| = 4$；分母 $\\sqrt{4+1+4} = 3$；距离 $d = \\frac{4}{3}$。",
-    warnings: "⚠️ 注意平面方程要化为标准形式 $Ax+By+Cz+D=0$。",
-    optionDetails: {
+       ],
+      correct: ["A", "B", "C", "D"],
+       theorems: "【点到平面距离公式】\n点 $P(x_0,y_0,z_0)$ 到平面 $Ax+By+Cz+D=0$ 的距离为 $$d = \\frac{|Ax_0+By_0+Cz_0+D|}{\\sqrt{A^2+B^2+C^2}}$$",
+       conclusions: "✅ $d = \\dfrac{|2\\times1 - 2 + 2\\times3 - 10|}{\\sqrt{4+1+4}} = \\dfrac{|-4|}{3} = \\dfrac{4}{3}$",
+       method: "代入公式 → 计算绝对值 → 除以法向量模长",
+       solution: "分子 $|2\\times1 - 2 + 2\\times3 - 10| = |2-2+6-10| = |-4| = 4$；分母 $\\sqrt{4+1+4} = 3$；距离 $d = \\frac{4}{3}$。",
+       warnings: "⚠️ 注意平面方程要化为标准形式 $Ax+By+Cz+D=0$。",
+       optionDetails: {
         A: "✓ 公式正确",
         B: "✓ 分子计算正确",
         C: "✓ 分母计算正确",
         D: "✓ 距离 $\\frac{4}{3}$",
         E: "✗ 计算错误",
         F: "✗ 代入平面方程 $4 \\neq 10$，不在平面上"
-    },
-    exampleQuestion: "求点 $(0,0,0)$ 到平面 $x+2y+2z=9$ 的距离",
-    exampleAnswer: "$d = \\frac{|0+0+0-9|}{\\sqrt{1+4+4}} = \\frac{9}{3} = 3$"
-    },
-
+       },
+       exampleQuestion: "求点 $(0,0,0)$ 到平面 $x+2y+2z=9$ 的距离",
+       exampleAnswer: "$d = \\frac{|0+0+0-9|}{\\sqrt{1+4+4}} = \\frac{9}{3} = 3$"
+       },
+        // 第16题
+        { chapter: "幂级数", text: "幂级数 $\\sum_{n=0}^\\infty \\frac{x^n}{n!}$ 的和函数是？", type: "多选题", difficulty: 7, maxScore: 7,
+          options: ["A. $e^x$", "B. $\\sin x$", "C. 收敛域为 $(-\\infty,+\\infty)$", "D. 收敛域为 $(-1,1)$", "E. 收敛半径为 $+\\infty$", "F. 和函数为 $\\cos x$"],
+          correct: ["A","C","E"],
+          theorems: "指数函数泰勒展开",
+          conclusions: "$e^x=\\sum_{n=0}^\\infty \\frac{x^n}{n!}$，收敛半径$+\\infty$",
+          method: "直接识别标准展开式",
+          solution: "这是$e^x$的麦克劳林展开，收敛于全体实数",
+          warnings: "注意阶乘在分母，收敛半径无穷大",
+          optionDetails: { A:"✓", C:"✓", E:"✓", B:"✗", D:"✗", F:"✗" },
+          exampleQuestion: "求 $\\sum_{n=0}^\\infty \\frac{(-1)^n x^{2n}}{(2n)!}$",
+          exampleAnswer: "$\\cos x$" },
         // 第19题
         { chapter: "幂级数", text: "幂级数 $\\sum_{n=1}^\\infty \\frac{x^n}{n}$ 的收敛域和和函数？", type: "多选题", difficulty: 8, maxScore: 8,
           options: ["A. 收敛半径 $R=1$", "B. 收敛域为 $(-1,1)$", "C. 收敛域为 $[-1,1)$", "D. 和函数为 $-\\ln(1-x)$", "E. 和函数为 $\\ln(1+x)$", "F. 端点$x=1$处发散"],
@@ -798,8 +798,8 @@
         return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`; 
     }
     
-    const ACTIVITY_START = new Date(2026, 4, 31);
-    const ACTIVITY_END = new Date(2026, 5, 26);
+    const ACTIVITY_START = new Date(2026, 5, 31);
+    const ACTIVITY_END = new Date(2026, 6, 30);
     
     function getDailyQuestionByDate(date) {
         let target = new Date(date);
@@ -813,8 +813,8 @@
 
     function getAllDateColumns() {
         let dates = [];
-        let start = new Date(2026, 4, 31);
-        let end = new Date(2026, 5, 26);
+        let start = new Date(2026, 5, 31);
+        let end = new Date(2026, 6, 30);
         for(let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) dates.push(formatDate(d));
         return dates;
     }
@@ -1259,7 +1259,7 @@
 
     // ======================= 倒计时 =======================
     function updateCountdown() {
-        let exam = new Date(2026,5,27);
+        let exam = new Date(2026,5,31);
         let now = new Date();
         let diff = exam - now;
         if(diff <= 0) { document.getElementById("countdownClock").innerHTML = "期末考试今日进行，沉着应战！"; return; }
