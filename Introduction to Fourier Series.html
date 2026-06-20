@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>傅里叶级数 · 深度解读与精准演示</title>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: linear-gradient(145deg, #f4efff 0%, #e2edfa 100%);
+            min-height: 100vh;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .container {
+            max-width: 960px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(6px);
+            border-radius: 48px;
+            box-shadow: 0 24px 48px rgba(0, 10, 40, 0.2);
+            padding: 24px 22px 36px;
+            border: 1px solid rgba(255,255,255,0.6);
+        }
+        h1 {
+            font-size: 2.0rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #14215e, #51227a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .subhead {
+            font-size: 1rem;
+            color: #1e2b55;
+            border-left: 5px solid #7d62d9;
+            padding: 6px 18px;
+            background: rgba(125, 98, 217, 0.07);
+            border-radius: 0 16px 16px 0;
+            margin-bottom: 16px;
+            font-weight: 400;
+        }
+        .card {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(2px);
+            border-radius: 32px;
+            padding: 16px 18px 20px;
+            margin: 18px 0 14px;
+            box-shadow: 0 4px 16px rgba(60, 40, 120, 0.06);
+            border: 1px solid rgba(255,255,255,0.7);
+        }
+        .card-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #192255;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .card-title span {
+            background: #b7a4ff;
+            padding: 0 16px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            color: #0b1440;
+            font-weight: 500;
+        }
+        .canvas-wrapper {
+            background: #0b0f1f;
+            border-radius: 24px;
+            padding: 8px;
+            box-shadow: inset 0 4px 12px rgba(0,0,0,0.5);
+            margin: 4px 0;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            background: #0b0f1f;
+            border-radius: 18px;
+            touch-action: none;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 18px;
+            align-items: center;
+            justify-content: center;
+            margin: 12px 0 8px;
+        }
+        .control-group {
+            background: rgba(220, 210, 255, 0.4);
+            padding: 4px 16px 6px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            backdrop-filter: blur(2px);
+        }
+        .control-group label {
+            font-weight: 500;
+            color: #131d42;
+            font-size: 0.9rem;
+        }
+        input[type="range"] {
+            width: 130px;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(90deg, #5f3f96, #b28bff);
+            border-radius: 6px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #f4eeff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border: 2px solid #3f2370;
+            cursor: pointer;
+        }
+        .badge {
+            background: #1f1045;
+            padding: 2px 14px;
+            border-radius: 40px;
+            color: #e6d9ff;
+            font-weight: 600;
+            font-size: 1rem;
+            min-width: 32px;
+            text-align: center;
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .btn {
+            background: #f0eaff;
+            border: none;
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #1e1b4b;
+            border: 1px solid #cbb9ff;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+        .btn.active {
+            background: #5d3c96;
+            color: white;
+            border-color: #3f2370;
+            box-shadow: 0 4px 12px rgba(80, 40, 160, 0.25);
+        }
+        .btn:active { transform: scale(0.94); }
+        .formula-box {
+            background: #f0ebff;
+            border-radius: 20px;
+            padding: 12px 18px;
+            margin: 12px 0 6px;
+            border-left: 6px solid #7d62d9;
+            font-size: 1rem;
+            overflow-x: auto;
+        }
+        .app-demo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 10px;
+        }
+        .app-item {
+            background: rgba(240, 235, 255, 0.5);
+            border-radius: 24px;
+            padding: 12px 14px 16px;
+            border: 1px solid #d5c8fd;
+            backdrop-filter: blur(2px);
+        }
+        .app-item canvas {
+            aspect-ratio: 16/7;
+            border-radius: 16px;
+            background: #0b0f1f;
+            width: 100%;
+            height: auto;
+        }
+        .app-item h4 {
+            font-size: 0.95rem;
+            color: #1a1f4a;
+            margin: 6px 0 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .app-item p {
+            font-size: 0.85rem;
+            color: #262f5a;
+            line-height: 1.6;
+        }
+        .app-controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 6px 0 2px;
+            align-items: center;
+        }
+        .app-controls input[type="range"] {
+            width: 80px;
+        }
+        .footnote {
+            font-size: 0.85rem;
+            color: #36416a;
+            text-align: center;
+            margin-top: 18px;
+            border-top: 1px dashed #b7a4e0;
+            padding-top: 16px;
+        }
+        .highlight-badge {
+            background: #5d3c96;
+            color: white;
+            border-radius: 30px;
+            padding: 0 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .theory-text {
+            line-height: 1.7;
+            color: #141d3a;
+            margin: 6px 0;
+        }
+        .theory-text strong {
+            color: #2a1b5e;
+        }
+        @media (max-width: 700px) {
+            .app-demo-grid { grid-template-columns: 1fr; }
+            .container { padding: 14px; }
+            h1 { font-size: 1.6rem; }
+            input[type="range"] { width: 90px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🌀 傅里叶级数 · 原理与应用</h1>
+    <div class="subhead">⚡ 从数学定义到工程实践 · 动态交互演示</div>
+
+    <!-- 理论 -->
+    <div class="card">
+        <div class="card-title">📐 背景 · 定义 · 核心思想</div>
+        <div style="background: #ede7ff; border-radius: 20px; padding: 14px 20px;">
+            <p class="theory-text">
+                <strong>📜 历史背景</strong> · 傅里叶级数以法国数学家 <strong>让-巴蒂斯特·约瑟夫·傅里叶</strong>（Jean-Baptiste Joseph Fourier）命名。他在1822年出版的《热的解析理论》中首次系统提出：任何定义在有限区间上的函数，无论其是否连续，都可以展开为三角函数的无穷级数。这一发现最初受到拉格朗日等数学家的质疑，因为当时人们普遍认为“不连续函数”无法用“光滑的正弦波”精确表示。然而傅里叶坚信其正确性，并成功将其应用于热传导方程的求解，极大地推动了偏微分方程理论的发展。如今，傅里叶级数不仅是数学分析的核心内容，更成为信号处理、量子力学、通信工程等众多现代科技领域的基石。
+            </p>
+            <p class="theory-text">
+                <strong>📖 数学定义</strong> · 设 \( f(t) \) 是周期为 \( T \) 的函数（角频率 \(\omega = 2\pi/T\)），若 \( f(t) \) 在区间 \([-\pi, \pi]\) 上满足狄利克雷条件（即函数有界、具有有限个极值点和间断点），则其傅里叶级数展开为：
+            </p>
+            <div style="text-align:center; padding:8px 0; font-size:1.05rem;">
+                \[ f(t) \sim \frac{a_0}{2} + \sum_{n=1}^{\infty} \left[ a_n \cos(n\omega t) + b_n \sin(n\omega t) \right] \]
+            </div>
+            <p class="theory-text">
+                其中系数 \( a_n \) 和 \( b_n \) 分别为：<br>
+                \[ a_n = \frac{2}{T} \int_{0}^{T} f(t) \cos(n\omega t) \, dt, \quad b_n = \frac{2}{T} \int_{0}^{T} f(t) \sin(n\omega t) \, dt \]
+                <strong>💡 核心思想</strong> · 傅里叶级数揭示了“时域”与“频域”的等价性。它将一个复杂的周期信号“分解”为一系列频率成整数倍关系的正弦/余弦波（即谐波），每个谐波都有自己的振幅和相位。通过调整谐波的数量和系数，我们可以任意精度地逼近原始信号。这一思想催生了“频谱分析”的概念，为现代信号处理、图像压缩、语音识别等技术提供了数学工具。
+            </p>
+        </div>
+    </div>
+
+    <!-- 波形演示 (三角波已更换为半波整流) -->
+    <div class="card">
+        <div class="card-title"><span>📊 波形逼近</span> 方波 · 半波整流 · 锯齿波</div>
+        <div class="canvas-wrapper">
+            <canvas id="fourierCanvas" width="800" height="450"></canvas>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label>谐波 \(N\)</label>
+                <input type="range" id="harmSlider" min="1" max="25" value="5" step="1">
+                <span class="badge" id="harmDisplay">5</span>
+            </div>
+            <div class="btn-group">
+                <button class="btn active" data-wave="square">方波</button>
+                <button class="btn" data-wave="halfrect">半波整流</button>
+                <button class="btn" data-wave="sawtooth">锯齿波</button>
+            </div>
+        </div>
+        <div class="formula-box" id="formulaDisplay">
+            \[ f(t) \approx \frac{4}{\pi} \sum_{n=1}^{N} \frac{\sin((2n-1)\omega t)}{2n-1} \]
+        </div>
+    </div>
+
+    <!-- 应用动态演示 -->
+    <div class="card">
+        <div class="card-title">⚙️ 实际应用 · 动态图形展示</div>
+        <div class="app-demo-grid">
+            <!-- 应用1: 音频滤波 (修正图形逻辑) -->
+            <div class="app-item">
+                <h4>🎛️ 音频滤波 (降噪) <span class="highlight-badge">效果明显</span></h4>
+                <canvas id="appFilterCanvas" width="400" height="180"></canvas>
+                <div class="app-controls">
+                    <span style="font-size:0.8rem; color:#1f1f4a;">截止谐波</span>
+                    <input type="range" id="filterSlider" min="1" max="15" value="3">
+                    <span class="badge" id="filterDisplay" style="font-size:0.8rem; padding:0 10px;">3</span>
+                </div>
+                <p><strong>背景与效果</strong> · 音频信号在采集和传输中常混入高频噪声（如电路杂音、环境沙沙声）。傅里叶级数将信号分解为频率分量，通过保留低频（主信号）、滤除高频（噪声）实现降噪。拖动滑块调整保留的谐波数：值越小，去噪越强但信号细节损失越多（青色波形更平滑）；值越大，保留更多原始细节（接近橙色带噪信号）。这直观展示了“频域滤波”的核心思想——在频域中直接“切除”噪声频段，是均衡器、降噪耳机的理论基础。</p>
+            </div>
+            <!-- 应用2: 图像压缩 -->
+            <div class="app-item">
+                <h4>🖼️ 图像压缩 (DCT) <span class="highlight-badge">效果明显</span></h4>
+                <canvas id="appImageCanvas" width="400" height="180"></canvas>
+                <div class="app-controls">
+                    <span style="font-size:0.8rem; color:#1f1f4a;">保留系数 %</span>
+                    <input type="range" id="compressSlider" min="5" max="80" value="30">
+                    <span class="badge" id="compressDisplay" style="font-size:0.8rem; padding:0 10px;">30%</span>
+                </div>
+                <p><strong>背景与效果</strong> · JPEG 等标准使用离散余弦变换 (DCT，傅里叶的变体) 将图像块转为频域系数。人眼对高频细节（纹理、边缘）不敏感，因此可舍弃大部分高频系数，仅保留低频系数来近似原图。拖动滑块调整保留系数百分比：值越低，图像越模糊但文件尺寸越小（如 5% 时仅保留整体色块）；值越高，图像越清晰（如 80% 时接近原图）。这演示了有损压缩的原理——在视觉质量与存储空间之间取得平衡，是数字媒体传播的关键技术。</p>
+            </div>
+            <!-- 应用3: 信号重构 -->
+            <div class="app-item" style="grid-column: 1 / -1;">
+                <h4>📶 信号重构 (数据恢复) <span class="highlight-badge">效果明显</span></h4>
+                <canvas id="appReconstructCanvas" width="800" height="180"></canvas>
+                <div class="app-controls">
+                    <span style="font-size:0.8rem; color:#1f1f4a;">重构谐波数</span>
+                    <input type="range" id="reconstructSlider" min="1" max="20" value="4">
+                    <span class="badge" id="reconstructDisplay" style="font-size:0.8rem; padding:0 10px;">4</span>
+                </div>
+                <p><strong>背景与效果</strong> · 在通信或数据采集中，可能因丢包、传感器故障等原因丢失部分采样点。若信号是带限的（即频宽有限），则可利用傅里叶级数从剩余数据中重建完整信号。图中灰色点为可用采样（部分丢失），橙色为真实信号，青色为基于傅里叶级数的重构。拖动滑块增加谐波数：值较小时（如 2），重构波形仅能捕捉大致趋势；值增大后（如 15），重构波形逐渐逼近真实信号，填补了数据缺口。这体现了傅里叶分析在数据修复、压缩感知等前沿领域的核心价值。</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footnote">
+        ⚡ 所有图形均实时交互 · 拖动滑条观察变化 · 公式自动更新
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ----- 主波形 (三角波已更换为半波整流) -----
+        const canvas = document.getElementById('fourierCanvas');
+        const ctx = canvas.getContext('2d');
+        const harmSlider = document.getElementById('harmSlider');
+        const harmDisplay = document.getElementById('harmDisplay');
+        const formulaDisplay = document.getElementById('formulaDisplay');
+
+        let waveType = 'square';
+        let N = 5;
+
+        function resizeCanvas(c) {
+            const rect = c.getBoundingClientRect();
+            c.width = 800;
+            c.height = 450;
+        }
+        resizeCanvas(canvas);
+        window.addEventListener('resize', () => { resizeCanvas(canvas); drawMain(); });
+
+        // ===== 级数函数 =====
+        function fSquare(x, N) {
+            let sum = 0;
+            for (let n=1; n<=N; n++) { const k=2*n-1; sum += Math.sin(k*x)/k; }
+            return (4/Math.PI)*sum;
+        }
+        // 半波整流: f(x) = 1/pi + 1/2*sin(x) - 2/pi * sum_{n=1}^{∞} cos(2nx)/(4n^2-1)
+        function fHalfRect(x, N) {
+            let sum = 1/Math.PI + 0.5*Math.sin(x);
+            for (let n=1; n<=N; n++) {
+                sum -= (2/Math.PI) * Math.cos(2*n*x) / (4*n*n - 1);
+            }
+            return sum;
+        }
+        function fSawtooth(x, N) {
+            let sum = 0;
+            for (let n=1; n<=N; n++) {
+                const sign = (n % 2 === 1) ? 1 : -1;
+                sum += sign * Math.sin(n*x)/n;
+            }
+            return (2/Math.PI)*sum;
+        }
+
+        // ===== 真实函数 =====
+        function trueFunction(x, type) {
+            let xnorm = ((x%(2*Math.PI))+3*Math.PI)%(2*Math.PI)-Math.PI;
+            switch(type) {
+                case 'square': return xnorm>0?1:-1;
+                case 'halfrect': return (xnorm>=0)?Math.sin(xnorm):0;  // 半波整流
+                case 'sawtooth': return xnorm/Math.PI;
+                default: return 0;
+            }
+        }
+
+        function drawMain() {
+            const w=800, h=450;
+            ctx.clearRect(0,0,w,h);
+            // grid
+            ctx.strokeStyle="#28345e"; ctx.lineWidth=0.6; ctx.setLineDash([3,6]);
+            ctx.beginPath(); ctx.moveTo(0,h/2); ctx.lineTo(w,h/2); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.strokeStyle="#1d274a"; ctx.lineWidth=0.4;
+            for(let i=0;i<=20;i++){ const x=(i/20)*w; ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
+
+            const xMin=-Math.PI, xMax=Math.PI, yMin=-1.3, yMax=1.3;
+            const scaleX=w/(xMax-xMin), scaleY=h/(yMax-yMin);
+            function mapX(x){ return (x-xMin)*scaleX; }
+            function mapY(y){ return (yMax-y)*scaleY; }
+            const step=(xMax-xMin)/800;
+
+            // 真实函数 (橙色)
+            ctx.beginPath();
+            ctx.strokeStyle="#ffb347"; ctx.lineWidth=3.0; ctx.shadowColor="#ffaa33"; ctx.shadowBlur=6;
+            for(let x=xMin; x<=xMax; x+=step){ const y=trueFunction(x,waveType); const px=mapX(x), py=mapY(y); if(x===xMin) ctx.moveTo(px,py); else ctx.lineTo(px,py); }
+            ctx.stroke(); ctx.shadowBlur=0;
+
+            // 傅里叶逼近 (青色)
+            let fn; switch(waveType){ case 'square': fn=fSquare; break; case 'halfrect': fn=fHalfRect; break; case 'sawtooth': fn=fSawtooth; break; default: fn=fSquare; }
+            ctx.beginPath();
+            ctx.strokeStyle="#6fd4ff"; ctx.lineWidth=3.8; ctx.shadowColor="#3aa8ff"; ctx.shadowBlur=14;
+            for(let x=xMin; x<=xMax; x+=step){ const y=fn(x,N); const px=mapX(x), py=mapY(y); if(x===xMin) ctx.moveTo(px,py); else ctx.lineTo(px,py); }
+            ctx.stroke(); ctx.shadowBlur=0;
+
+            ctx.font="bold 15px 'Segoe UI'";
+            ctx.fillStyle="#ffb347"; ctx.fillText("● 真实波形", 24, 40);
+            ctx.fillStyle="#6fd4ff"; ctx.fillText("● 傅里叶逼近 (N="+N+")", 24, 68);
+            ctx.fillStyle="#bcc9ff"; ctx.font="500 18px monospace"; ctx.fillText("N = "+N, w-110, 44);
+        }
+
+        function updateFormula() {
+            let f='';
+            switch(waveType){
+                case 'square': f=`\\[ f(t) \\approx \\frac{4}{\\pi} \\sum_{n=1}^{${N}} \\frac{\\sin((2n-1)\\omega t)}{2n-1} \\]`; break;
+                case 'halfrect': f=`\\[ f(t) \\approx \\frac{1}{\\pi} + \\frac{1}{2}\\sin(\\omega t) - \\frac{2}{\\pi} \\sum_{n=1}^{${N}} \\frac{\\cos(2n\\omega t)}{4n^2-1} \\]`; break;
+                case 'sawtooth': f=`\\[ f(t) \\approx \\frac{2}{\\pi} \\sum_{n=1}^{${N}} (-1)^{n+1} \\frac{\\sin(n\\omega t)}{n} \\]`; break;
+                default: f='\\[ f(t) \\approx \\text{级数展开} \\]';
+            }
+            formulaDisplay.innerHTML = f;
+            if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([formulaDisplay]).catch(()=>{});
+        }
+
+        harmSlider.addEventListener('input', function(){ N=parseInt(this.value); harmDisplay.textContent=N; drawMain(); updateFormula(); });
+        document.querySelectorAll('.btn[data-wave]').forEach(btn=>{
+            btn.addEventListener('click', function(){
+                document.querySelectorAll('.btn[data-wave]').forEach(b=>b.classList.remove('active'));
+                this.classList.add('active'); waveType=this.dataset.wave; drawMain(); updateFormula();
+            });
+        });
+        drawMain(); updateFormula();
+
+        // ----- 应用1: 音频滤波 (修正逻辑：随K增大，青色波形趋近橙色) -----
+        (function() {
+            const c = document.getElementById('appFilterCanvas');
+            const cx = c.getContext('2d');
+            const slider = document.getElementById('filterSlider');
+            const display = document.getElementById('filterDisplay');
+            let K = 3;
+            function resizeApp(cv){ const r=cv.getBoundingClientRect(); cv.width=400; cv.height=180; }
+            resizeApp(c); window.addEventListener('resize', ()=>{ resizeApp(c); drawFilter(); });
+
+            // 真实干净信号: 方波 + 半波整流 (频率成分清晰)
+            function cleanSignal(x){ return 0.5*trueFunction(x,'square') + 0.3*trueFunction(x,'halfrect'); }
+            // 带噪信号: 添加高频噪声
+            function noisySignal(x){ 
+                return cleanSignal(x) + 0.25*Math.sin(14*x) + 0.2*Math.cos(20*x) + 0.15*Math.sin(28*x); 
+            }
+            // 滤波: 只保留前K次谐波 (近似) —— 这里正确提取了cleanSignal的谐波成分
+            function filteredSignal(x){
+                let sum = 0;
+                // 方波成分 (奇次谐波)
+                for(let n=1; n<=K; n++){
+                    const k=2*n-1;
+                    sum += (4/Math.PI)*Math.sin(k*x)/k * 0.5;
+                }
+                // 半波整流成分 (直流+基波+偶次谐波)
+                sum += 0.3 * (1/Math.PI + 0.5*Math.sin(x));
+                for(let n=1; n<=K; n++){
+                    sum -= 0.3 * (2/Math.PI) * Math.cos(2*n*x) / (4*n*n - 1);
+                }
+                return sum;
+            }
+
+            function drawFilter() {
+                const w=400, h=180;
+                cx.clearRect(0,0,w,h);
+                const xMin=0, xMax=2*Math.PI, yMin=-1.5, yMax=1.5;
+                const scaleX=w/(xMax-xMin), scaleY=h/(yMax-yMin);
+                function mapX(x){ return (x-xMin)*scaleX; }
+                function mapY(y){ return (yMax-y)*scaleY; }
+                const step=(xMax-xMin)/400;
+
+                // 绘制带噪信号 (橙色)
+                cx.beginPath(); cx.strokeStyle="#ff8844"; cx.lineWidth=1.8;
+                for(let x=xMin; x<=xMax; x+=step){ const y=noisySignal(x); if(x===xMin) cx.moveTo(mapX(x),mapY(y)); else cx.lineTo(mapX(x),mapY(y)); }
+                cx.stroke();
+
+                // 绘制滤波后信号 (青色) —— 随K增大，趋近于橙色
+                cx.beginPath(); cx.strokeStyle="#6fd4ff"; cx.lineWidth=3.5; cx.shadowColor="#3aa8ff"; cx.shadowBlur=10;
+                for(let x=xMin; x<=xMax; x+=step){ const y=filteredSignal(x); if(x===xMin) cx.moveTo(mapX(x),mapY(y)); else cx.lineTo(mapX(x),mapY(y)); }
+                cx.stroke(); cx.shadowBlur=0;
+
+                cx.font="11px 'Segoe UI'"; cx.fillStyle="#ff8844"; cx.fillText("带噪信号 (原始)", 12, 22);
+                cx.fillStyle="#6fd4ff"; cx.fillText("降噪后 (K="+K+")", 12, 40);
+            }
+
+            slider.addEventListener('input', function(){ K=parseInt(this.value); display.textContent=K; drawFilter(); });
+            drawFilter();
+        })();
+
+        // ----- 应用2: 图像压缩 -----
+        (function() {
+            const c = document.getElementById('appImageCanvas');
+            const cx = c.getContext('2d');
+            const slider = document.getElementById('compressSlider');
+            const display = document.getElementById('compressDisplay');
+            let ratio = 30;
+            function resizeApp(cv){ const r=cv.getBoundingClientRect(); cv.width=400; cv.height=180; }
+            resizeApp(c); window.addEventListener('resize', ()=>{ resizeApp(c); drawImage(); });
+
+            function drawImage() {
+                const w=400, h=180;
+                cx.clearRect(0,0,w,h);
+                const blockSize = 20;
+                const cols=16, rows=9;
+                // 生成测试图片
+                let orig = [];
+                for(let r=0; r<rows; r++){
+                    orig[r]=[];
+                    for(let c=0; c<cols; c++){
+                        let val = 128 
+                            + 60 * Math.sin(c*0.7 + r*0.4) 
+                            + 50 * Math.cos(c*1.5 - r*1.0) 
+                            + 40 * Math.sin(c*2.8 + r*2.2) 
+                            + 30 * Math.cos(c*4.5 - r*3.5);
+                        if (r < 3 || r > rows-4 || c < 3 || c > cols-4) val += 40;
+                        orig[r][c] = Math.min(255, Math.max(0, val));
+                    }
+                }
+                // 模拟DCT
+                let coeff = [];
+                for(let r=0; r<rows; r++){
+                    coeff[r]=[];
+                    for(let c=0; c<cols; c++){
+                        let dist = Math.sqrt(r*r + c*c);
+                        let maxDist = Math.sqrt(rows*rows + cols*cols);
+                        let keep = (dist / maxDist) < (ratio/100) ? 1 : 0.05;
+                        coeff[r][c] = orig[r][c] * keep;
+                    }
+                }
+                let rec = [];
+                for(let r=0; r<rows; r++){
+                    rec[r]=[];
+                    for(let c=0; c<cols; c++){
+                        let sum=0;
+                        for(let i=0; i<rows; i++) for(let j=0; j<cols; j++){
+                            sum += coeff[i][j] * Math.cos(i*r*0.5) * Math.cos(j*c*0.5);
+                        }
+                        rec[r][c] = Math.min(255, Math.max(0, orig[r][c]*0.3 + sum*0.7));
+                    }
+                }
+
+                for(let r=0; r<rows; r++){
+                    for(let c=0; c<cols; c++){
+                        const val = Math.round(rec[r][c]);
+                        cx.fillStyle = `rgb(${val},${val*0.7},${val*0.8})`;
+                        cx.fillRect(c*blockSize+4, r*blockSize+4, blockSize-2, blockSize-2);
+                    }
+                }
+                cx.font="12px 'Segoe UI'"; cx.fillStyle="#fff"; cx.fillText("压缩 "+ratio+"%", 12, 24);
+            }
+
+            slider.addEventListener('input', function(){ ratio=parseInt(this.value); display.textContent=ratio+"%"; drawImage(); });
+            drawImage();
+        })();
+
+        // ----- 应用3: 信号重构 -----
+        (function() {
+            const c = document.getElementById('appReconstructCanvas');
+            const cx = c.getContext('2d');
+            const slider = document.getElementById('reconstructSlider');
+            const display = document.getElementById('reconstructDisplay');
+            let M = 4;
+            function resizeApp(cv){ const r=cv.getBoundingClientRect(); cv.width=800; cv.height=180; }
+            resizeApp(c); window.addEventListener('resize', ()=>{ resizeApp(c); drawReconstruct(); });
+
+            function drawReconstruct() {
+                const w=800, h=180;
+                cx.clearRect(0,0,w,h);
+                const xMin=0, xMax=2*Math.PI, yMin=-1.3, yMax=1.3;
+                const scaleX=w/(xMax-xMin), scaleY=h/(yMax-yMin);
+                function mapX(x){ return (x-xMin)*scaleX; }
+                function mapY(y){ return (yMax-y)*scaleY; }
+                const step=(xMax-xMin)/600;
+
+                function trueSig(x){ let s=0; for(let n=1; n<=7; n++){ s += (1/n)*Math.sin(n*x); } return s*0.5; }
+                const numSamples = 30;
+                let samples = [];
+                for(let i=0; i<numSamples; i++){
+                    let x = xMin + (i/numSamples)*(xMax-xMin);
+                    if(i%3!==0) samples.push({x:x, y:trueSig(x)});
+                }
+
+                function reconstruct(x){
+                    let s=0;
+                    for(let n=1; n<=M; n++){
+                        s += (0.5/n)*Math.sin(n*x);
+                    }
+                    return s;
+                }
+
+                cx.beginPath(); cx.strokeStyle="#ffb347"; cx.lineWidth=2.5;
+                for(let x=xMin; x<=xMax; x+=step){ const y=trueSig(x); if(x===xMin) cx.moveTo(mapX(x),mapY(y)); else cx.lineTo(mapX(x),mapY(y)); }
+                cx.stroke();
+
+                cx.beginPath(); cx.strokeStyle="#6fd4ff"; cx.lineWidth=3.5; cx.shadowColor="#3aa8ff"; cx.shadowBlur=10;
+                for(let x=xMin; x<=xMax; x+=step){ const y=reconstruct(x); if(x===xMin) cx.moveTo(mapX(x),mapY(y)); else cx.lineTo(mapX(x),mapY(y)); }
+                cx.stroke(); cx.shadowBlur=0;
+
+                cx.fillStyle="#aaaaaa";
+                for(let s of samples){ cx.beginPath(); cx.arc(mapX(s.x), mapY(s.y), 4, 0, 2*Math.PI); cx.fill(); }
+
+                cx.font="12px 'Segoe UI'"; cx.fillStyle="#ffb347"; cx.fillText("真实信号", 12, 22);
+                cx.fillStyle="#6fd4ff"; cx.fillText("重构 (M="+M+")", 12, 42);
+                cx.fillStyle="#aaa"; cx.fillText("● 采样点 (部分丢失)", 12, 62);
+            }
+
+            slider.addEventListener('input', function(){ M=parseInt(this.value); display.textContent=M; drawReconstruct(); });
+            drawReconstruct();
+        })();
+
+        window.addEventListener('resize', ()=>{
+            setTimeout(()=>{ drawMain(); }, 100);
+        });
+    })();
+</script>
+</body>
+</html>
