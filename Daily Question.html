@@ -122,7 +122,7 @@
             </div>
         </div>
     </div>
-    <div class="footer-text"><i class="fas fa-clock"></i> 每日00:00自动更新题目 · 活动：2026.05.31 — 2026.06.26 (6月27日期末考试)</div>
+    <div class="footer-text"><i class="fas fa-clock"></i> 每日00:00自动更新题目 · 活动：2026.05.31 — 2026.06.30 </div>
 </div>
 
 <!-- 教师后台弹窗 -->
@@ -779,7 +779,7 @@
     ];
 
     // 扩展题库确保足够覆盖活动期间每一天
-    while(fullQuestionSet.length < 35) {
+    while(fullQuestionSet.length < 30) {
         for(let q of [...fullQuestionSet.slice(0,5)]) {
             let newQ = JSON.parse(JSON.stringify(q));
             newQ.chapter = q.chapter + " (变式)";
