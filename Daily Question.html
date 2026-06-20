@@ -750,12 +750,64 @@
             const { error } = await supabaseClient.from('scores').upsert(record, { onConflict: 'id' });
             if (error) throw error;
             return true;
-        } catch(e) { console.error("保存失败:", e); return false; }
+        } catch(e) { console.error("保存失败:", error);
+    
+    // 检查是否是唯一约束冲突（重复提交）
+    if (error.code === '23505' || (error.message && error.message.includes('duplicate'))) {
+        console.log('⚠️ 重复提交被阻止');
+        await loadFromCloud();
+        document.getElementById("submitMessage").innerHTML = 
+            `<span style="color:#d97706;">⚠️ 您今日已提交过答案，不能重复提交</span>`;
+        return false;
+    }
+    
+    return false; }
     }
 
-    function hasSubmittedToday(studentId, dateStr) {
-        return allSubmissions.some(s => s.studentId === studentId && s.dateStr === dateStr);
+    // ============================================
+// 防重复提交（云端验证）
+// ============================================
+
+async function hasSubmittedToday(studentId, dateStr) {
+    console.log('🔍 检查是否已提交:', { studentId, dateStr });
+    
+    // 1. 先从本地检查
+    const localExists = allSubmissions.some(s => 
+        s.studentId === studentId && s.dateStr === dateStr
+    );
+    
+    if (localExists) {
+        console.log('📱 本地发现重复记录');
+        return true;
     }
+    
+    // 2. 从云端验证（防止本地数据过期）
+    try {
+        const { data, error } = await supabaseClient
+            .from('scores')
+            .select('id')
+            .eq('studentId', studentId)
+            .eq('dateStr', dateStr)
+            .limit(1);
+        
+        if (error) {
+            console.warn('云端验证失败:', error);
+            return localExists;
+        }
+        
+        if (data && data.length > 0) {
+            console.log('☁️ 云端发现重复记录');
+            await loadFromCloud(); // 同步到本地
+            return true;
+        }
+        
+        console.log('✅ 可以提交');
+        return false;
+    } catch(e) {
+        console.warn('云端验证异常:', e);
+        return localExists;
+    }
+}
 
     function showSuccessToast() {
         let toast = document.createElement('div');
@@ -927,51 +979,115 @@
     let isSubmitting = false;
     const submitBtn = document.getElementById("submitAnswerBtn");
     
-    async function handleSubmit() {
-        if(isSubmitting) return;
-        let studentName = document.getElementById("studentName").value.trim();
-        let studentId = document.getElementById("studentId").value.trim();
-        if(!studentName || !studentId) { alert("请完整填写姓名和学号"); return; }
-        if(validStudents.get(studentId) !== studentName) { alert("验证失败：学号与姓名不匹配"); return; }
-        let today = new Date();
-        if(today < ACTIVITY_START || today > ACTIVITY_END) { alert("活动时间2026.05.31-2026.06.26"); return; }
-        let dateStr = formatDate(today);
-        if(hasSubmittedToday(studentId, dateStr)) { alert("您今日已经提交过答案，不可重复提交。"); displayStudentResult(studentId, dateStr); return; }
-        let selected = getSelectedAnswers();
-        if(selected.length === 0) { alert("请至少选择一个选项"); return; }
-        if(!confirm("⚠️ 确认提交？每人每日仅有一次提交机会，提交后不可修改。")) return;
-        isSubmitting = true;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = "<i class='fas fa-spinner fa-pulse'></i> 批阅中...";
-        try {
-            let q = currentQuestion;
-            let grading = await performGrading(selected, q);
-            let newRecord = {
-                id: Date.now() + Math.random(),
-                studentId, studentName, dateStr,
-                score: grading.score, maxScore: q.maxScore,
-                evaluationText: grading.evaluation,
-                chapter: q.chapter, questionText: q.text, timestamp: new Date().toISOString(),
-                optionAnalysis: grading.optionAnalysis,
-                theorems: q.theorems,
-                conclusions: q.conclusions,
-                method: q.method,
-                solution: q.solution,
-                warnings: q.warnings,
-                exampleQuestion: q.exampleQuestion,
-                exampleAnswer: q.exampleAnswer
-            };
-            if(upsertSubmission(newRecord)) {
-                displayStudentResult(studentId, dateStr);
-                document.getElementById("submitMessage").innerHTML = `<span style="color:#4f6b5c;">✓ 提交成功！得分：${grading.score} 分</span>`;
-                document.querySelectorAll('#optionsArea input').forEach(i => i.disabled = true);
-                submitBtn.disabled = true;
-                submitBtn.textContent = "今日已完成";
-                if(adminModal.style.display === "flex") renderMatrixTable();
-            } else { alert("提交失败"); submitBtn.disabled = false; submitBtn.innerHTML = "提交答案"; }
-        } catch(e) { alert("批阅失败，请重试"); submitBtn.disabled = false; submitBtn.innerHTML = "提交答案"; }
-        isSubmitting = false;
+    let submitCooldown = false;
+
+   async function handleSubmit() {
+    // 防止快速点击
+    if (submitCooldown) {
+        console.log('⏳ 正在提交中，请勿重复点击');
+        return;
     }
+    
+    if (isSubmitting) return;
+    
+    let studentName = document.getElementById("studentName").value.trim();
+    let studentId = document.getElementById("studentId").value.trim();
+    
+    if (!studentName || !studentId) {
+        alert("请完整填写姓名和学号");
+        return;
+    }
+    
+    if (validStudents.get(studentId) !== studentName) {
+        alert("验证失败：学号与姓名不匹配");
+        return;
+    }
+    
+    let today = new Date();
+    if (today < ACTIVITY_START || today > ACTIVITY_END) {
+        alert("活动时间2026.05.31-2026.06.26");
+        return;
+    }
+    
+    let dateStr = formatDate(today);
+    
+    // 异步验证是否已提交
+    const alreadySubmitted = await hasSubmittedToday(studentId, dateStr);
+    if (alreadySubmitted) {
+        alert("您今日已经提交过答案，不可重复提交。");
+        displayStudentResult(studentId, dateStr);
+        return;
+    }
+    
+    let selected = getSelectedAnswers();
+    if (selected.length === 0) {
+        alert("请至少选择一个选项");
+        return;
+    }
+    
+    if (!confirm("⚠️ 确认提交？每人每日仅有一次提交机会，提交后不可修改。")) return;
+    
+    // 设置冷却状态
+    submitCooldown = true;
+    isSubmitting = true;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = "<i class='fas fa-spinner fa-pulse'></i> 批阅中...";
+    
+    try {
+        let q = currentQuestion;
+        let grading = await performGrading(selected, q);
+        
+        let newRecord = {
+            id: 'rec_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+            studentId: studentId,
+            studentName: studentName,
+            dateStr: dateStr,
+            score: grading.score,
+            maxScore: q.maxScore,
+            evaluationText: grading.evaluation,
+            chapter: q.chapter,
+            questionText: q.text,
+            timestamp: new Date().toISOString(),
+            optionAnalysis: grading.optionAnalysis,
+            theorems: q.theorems,
+            conclusions: q.conclusions,
+            method: q.method,
+            solution: q.solution,
+            warnings: q.warnings,
+            exampleQuestion: q.exampleQuestion,
+            exampleAnswer: q.exampleAnswer
+        };
+        
+        const saveResult = await saveToCloud(newRecord);
+        
+        if (saveResult) {
+            await loadFromCloud();
+            displayStudentResult(studentId, dateStr);
+            document.getElementById("submitMessage").innerHTML = 
+                `<span style="color:#4f6b5c;">✓ 提交成功！得分：${grading.score} 分</span>`;
+            document.querySelectorAll('#optionsArea input').forEach(i => i.disabled = true);
+            submitBtn.disabled = true;
+            submitBtn.textContent = "✅ 今日已完成";
+            
+            if (adminModal.style.display === "flex") renderMatrixTable();
+        } else {
+            document.getElementById("submitMessage").innerHTML = 
+                `<span style="color:#b1624b;">❌ 提交失败，请重试</span>`;
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = "🔄 重试提交";
+        }
+    } catch(e) {
+        console.error('提交异常:', e);
+        alert("提交失败，请重试");
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = "提交答案";
+    }
+    
+    isSubmitting = false;
+    setTimeout(() => {
+        submitCooldown = false;
+    }, 3000);
+   }
     
     submitBtn.addEventListener("click", handleSubmit);
     
@@ -1191,6 +1307,18 @@
             refreshDaily();
         }
     });
+
+    // ============================================
+// 版本管理（每次修改代码时更新版本号）
+// ============================================
+  const APP_VERSION = '2026-06-20-v1';
+
+  if (localStorage.getItem('app_version') !== APP_VERSION) {
+    console.log('🔄 版本更新，清除旧缓存...');
+    localStorage.clear();
+    localStorage.setItem('app_version', APP_VERSION);
+    location.reload(true);
+    }
     
     (async function init() {
         await loadFromCloud();
@@ -1200,7 +1328,7 @@
     })();
     //-------------------------
     // 强制刷新版本（每次修改网页时，把下面的日期改成当天）
-const APP_VERSION = '2026-06-19-v1'; 
+const APP_VERSION = '2026-06-20-v1'; 
 
 // 检查本地版本号，如果不一致就强制清除缓存并刷新
 if (localStorage.getItem('app_version') !== APP_VERSION) {
