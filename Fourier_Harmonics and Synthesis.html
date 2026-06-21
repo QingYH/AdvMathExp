@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>傅里叶级数 · 谐波分解 ｜ 高等数学</title>
+    <!-- 使用 MathJax 渲染数学公式 -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' },
+            options: { skipHtmlTypes: 'script' }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, system-ui, sans-serif;
+            background: radial-gradient(circle at 20% 30%, #0b0f2a, #030518);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            margin: 0;
+        }
+        .card {
+            max-width: 880px;
+            width: 100%;
+            background: rgba(18, 28, 56, 0.72);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 48px 48px 40px 40px;
+            padding: 24px 20px 28px;
+            box-shadow: 0 25px 50px -8px rgba(0, 10, 40, 0.8), 0 0 0 1px rgba(90, 180, 255, 0.15);
+            border: 1px solid rgba(80, 160, 255, 0.2);
+        }
+        h1 {
+            font-size: 2.0rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #b3e0ff, #7aa9ff, #b47cff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        .sub {
+            text-align: center;
+            color: rgba(180, 210, 255, 0.45);
+            font-size: 1.05rem;
+            letter-spacing: 2px;
+            margin-bottom: 14px;
+            border-bottom: 1px dashed rgba(100, 180, 255, 0.08);
+            padding-bottom: 10px;
+        }
+
+        /* ===== 详细知识介绍 ===== */
+        .knowledge-section {
+            background: rgba(10, 20, 50, 0.35);
+            border-radius: 24px;
+            padding: 16px 20px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(100, 180, 255, 0.06);
+        }
+        .knowledge-section h2 {
+            color: rgba(180, 210, 255, 0.5);
+            font-size: 1.1rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            border-bottom: 1px dashed rgba(100, 180, 255, 0.06);
+            padding-bottom: 6px;
+        }
+        .knowledge-section p {
+            color: rgba(190, 215, 255, 0.65);
+            font-size: 1.0rem;
+            line-height: 1.7;
+            font-weight: 300;
+            margin-bottom: 6px;
+        }
+        .knowledge-section p:last-child { margin-bottom: 0; }
+        .knowledge-section strong { color: #b3d9ff; font-weight: 500; }
+        .knowledge-section .hl { color: #ffaa66; }
+        .knowledge-section .hlb { color: #66ddff; }
+        .knowledge-section .hlp { color: #b47cff; }
+        .knowledge-section .hlg { color: #7dffb3; }
+        .knowledge-section .hlr { color: #ff6688; }
+        .knowledge-section .hly { color: #ffcc66; }
+        .knowledge-section .hlc { color: #88ddff; }
+        .knowledge-section .hlm { color: #ff99cc; }
+        .knowledge-section .formula-block {
+            display: block;
+            text-align: center;
+            padding: 8px 0 4px 0;
+            font-size: 1.05rem;
+            color: rgba(180, 210, 255, 0.5);
+        }
+        .knowledge-section .formula-block .math {
+            display: inline-block;
+            padding: 0 4px;
+        }
+        /* 公式内文字颜色微调 */
+        .knowledge-section .formula-block .math-jax {
+            color: rgba(200, 220, 255, 0.6);
+        }
+
+        .canvas-block {
+            margin-bottom: 20px;
+        }
+        .canvas-block:last-of-type {
+            margin-bottom: 14px;
+        }
+        .canvas-wrapper {
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+            background: rgba(6, 12, 30, 0.5);
+            box-shadow: inset 0 0 30px rgba(0, 20, 80, 0.4), 0 6px 24px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(70, 160, 255, 0.12);
+            touch-action: none;
+        }
+        .canvas-wrapper canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            background: transparent;
+            touch-action: none;
+        }
+        .canvas-label {
+            position: absolute;
+            top: 8px;
+            left: 14px;
+            font-size: 0.85rem;
+            color: rgba(160, 200, 255, 0.3);
+            font-weight: 300;
+            letter-spacing: 1px;
+            pointer-events: none;
+            background: rgba(0, 10, 30, 0.4);
+            padding: 2px 14px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .wave-type-selector {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px 14px;
+            margin: 8px 0 4px 0;
+        }
+        .wave-type-btn {
+            background: rgba(30, 60, 130, 0.15);
+            border: 1px solid rgba(100, 180, 255, 0.08);
+            color: #a0c0e8;
+            padding: 6px 18px;
+            border-radius: 28px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+            font-weight: 400;
+        }
+        .wave-type-btn.active {
+            background: rgba(60, 140, 255, 0.15);
+            border-color: rgba(100, 180, 255, 0.3);
+            color: #d0eaff;
+            box-shadow: 0 0 12px rgba(60, 140, 255, 0.06);
+        }
+        .wave-type-btn:active { transform: scale(0.95); }
+
+        .block-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 12px 18px;
+            background: rgba(12, 22, 50, 0.4);
+            backdrop-filter: blur(4px);
+            border-radius: 34px;
+            padding: 10px 18px;
+            margin-top: 10px;
+            border: 1px solid rgba(100, 180, 255, 0.08);
+        }
+        .block-controls .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1 1 120px;
+            min-width: 100px;
+        }
+        .block-controls .slider-group label {
+            color: #b0ccff;
+            font-weight: 400;
+            font-size: 0.95rem;
+            opacity: 0.85;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .block-controls .slider-group label i {
+            font-style: normal;
+            background: rgba(60, 140, 255, 0.1);
+            padding: 0 8px;
+            border-radius: 14px;
+            font-size: 0.85rem;
+            color: #8bb8ff;
+        }
+        .block-controls input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            flex: 1;
+            height: 4px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #1f3f7a, #6a9eff);
+            outline: none;
+            min-width: 40px;
+        }
+        .block-controls input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #b3d9ff, #3d7eff);
+            cursor: pointer;
+            box-shadow: 0 0 16px #3f7eff;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .block-controls input[type=range]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #b3d9ff, #3d7eff);
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 0 16px #3f7eff;
+        }
+        .block-controls .value-badge {
+            min-width: 28px;
+            text-align: center;
+            color: #d0e5ff;
+            background: rgba(0, 30, 80, 0.3);
+            padding: 0 10px;
+            border-radius: 18px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(100, 180, 255, 0.08);
+        }
+
+        .harmonics-selector {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px 10px;
+            padding: 6px 0;
+        }
+        .harm-btn {
+            background: rgba(30, 60, 130, 0.12);
+            border: 1px solid rgba(100, 180, 255, 0.06);
+            color: #a0c0e8;
+            padding: 5px 12px;
+            border-radius: 24px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+            font-weight: 400;
+        }
+        .harm-btn.active {
+            background: rgba(60, 140, 255, 0.15);
+            border-color: rgba(100, 180, 255, 0.25);
+            color: #d0eaff;
+            box-shadow: 0 0 10px rgba(60, 140, 255, 0.05);
+        }
+        .harm-btn:active { transform: scale(0.95); }
+        .harm-btn .dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+
+        .pause-btn {
+            background: rgba(30, 60, 130, 0.2);
+            border: 1px solid rgba(100, 180, 255, 0.1);
+            color: #b0ccff;
+            padding: 6px 18px;
+            border-radius: 28px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .pause-btn:hover { background: rgba(60, 140, 255, 0.12); }
+        .pause-btn.paused { background: rgba(255, 180, 80, 0.08); border-color: rgba(255, 180, 80, 0.15); color: #ffcc88; }
+
+        .block-footer {
+            text-align: center;
+            color: rgba(130, 170, 230, 0.2);
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+        .separator {
+            border: none;
+            border-top: 1px dashed rgba(100, 180, 255, 0.06);
+            margin: 8px 0 12px 0;
+        }
+
+        @media (max-width: 480px) {
+            .card { padding: 14px 12px 18px; border-radius: 32px; }
+            h1 { font-size: 1.5rem; }
+            .knowledge-section p { font-size: 0.85rem; }
+            .knowledge-section .formula-block { font-size: 0.85rem; }
+            .block-controls { padding: 8px 12px; gap: 8px 12px; }
+            .block-controls .slider-group { flex: 1 1 80px; min-width: 70px; }
+            .block-controls .slider-group label { font-size: 0.8rem; }
+            .harm-btn { font-size: 0.7rem; padding: 3px 8px; }
+            .wave-type-btn { font-size: 0.8rem; padding: 4px 12px; }
+            .canvas-label { font-size: 0.7rem; }
+            .pause-btn { font-size: 0.8rem; padding: 4px 14px; }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>⚡ 傅里叶 · 谐波分解</h1>
+    <div class="sub">Fourier Series · 三种波形 · 双窗口独立</div>
+
+    <!-- ===== 详细知识介绍（数学公式用 MathJax 渲染） ===== -->
+    <div class="knowledge-section">
+        <h2>📐 傅里叶级数 · 谐波理论基础</h2>
+        <p>
+            <strong>傅里叶级数</strong> 是高等数学中连接时域与频域的核心工具。它指出：
+            <strong>任何满足狄利克雷条件的周期信号</strong>，都可以分解为 <strong>直流分量</strong> 与一系列 <strong>谐波</strong>（正弦波）的线性叠加。
+            谐波频率为基波频率的 <strong>整数倍</strong>：$\omega,\;2\omega,\;3\omega,\;\ldots$，其振幅与相位决定了信号的时域波形。
+        </p>
+        <p>
+            <strong>🔹 基波</strong>（<span class="hlb">1次</span>）：频率为 $\omega$，决定信号的基本周期与轮廓。<br>
+            <strong>🔹 谐波</strong>（<span class="hlg">2次</span>、<span class="hlp">3次</span>、<span class="hl">4次</span>、<span class="hlr">5次</span>…）：频率为 $n\omega$，对波形进行精细调整，次数越高，对细节的贡献越大。
+        </p>
+        <p>
+            <strong>📊 不同波形的谐波构成：</strong><br>
+            • <strong>方波</strong>：只含 <strong>奇次谐波</strong> ($1, 3, 5, 7,\ldots$)，振幅与频率成反比 ($1/k$)。<br>
+            • <strong>三角波</strong>：只含 <strong>奇次谐波</strong> ($1, 3, 5, 7,\ldots$)，振幅与频率平方成反比 ($1/k^2$)，收敛更快。<br>
+            • <strong>锯齿波</strong>：包含 <strong>所有整数次谐波</strong> ($1, 2, 3, 4,\ldots$)，振幅与频率成反比 ($1/k$)。
+        </p>
+        <div class="formula-block">
+            <span class="math math-jax">方波：$\displaystyle f(t) = \frac{4}{\pi} \sum_{k=1,3,5,\ldots}^{\infty} \frac{\sin(k\omega t)}{k}$</span>
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            <span class="math math-jax">三角波：$\displaystyle f(t) = \frac{8}{\pi^2} \sum_{k=1,3,5,\ldots}^{\infty} (-1)^{\frac{k-1}{2}} \frac{\sin(k\omega t)}{k^2}$</span>
+            <br>
+            <span class="math math-jax">锯齿波：$\displaystyle f(t) = \frac{2}{\pi} \sum_{k=1}^{\infty} (-1)^{k+1} \frac{\sin(k\omega t)}{k}$</span>
+        </div>
+        <p>
+            <strong>🎯 教学演示</strong>：<strong>上窗口</strong>展示三种波形的合成逼近（拖动 <strong>$N$</strong> 增加谐波数量，观察逼近效果）；
+            <strong>下窗口</strong>展示 <strong>1~8次谐波</strong> 的独立形态（与上方波形无关，纯粹展示各次谐波的正弦波形）。
+        </p>
+    </div>
+
+    <!-- ===== 区块1：合成逼近（三种波形） ===== -->
+    <div class="canvas-block">
+        <div class="canvas-wrapper">
+            <canvas id="canvasSynthesis" width="600" height="340"></canvas>
+            <span class="canvas-label">合成逼近</span>
+        </div>
+        <div class="wave-type-selector" id="waveTypeSelector">
+            <button class="wave-type-btn active" data-type="square">⬛ 方波</button>
+            <button class="wave-type-btn" data-type="triangle">🔺 三角波</button>
+            <button class="wave-type-btn" data-type="sawtooth">⚡ 锯齿波</button>
+        </div>
+        <div class="block-controls" id="controlsSyn">
+            <div class="slider-group">
+                <label><i>$N$</i> 谐波数</label>
+                <input type="range" id="synNSlider" min="1" max="31" value="9" step="1">
+                <span class="value-badge" id="synNVal">9</span>
+            </div>
+            <div class="slider-group">
+                <label><i>$\omega$</i> 频率</label>
+                <input type="range" id="synFreqSlider" min="1" max="6" value="2" step="0.1">
+                <span class="value-badge" id="synFreqVal">2.0</span>
+            </div>
+            <button class="pause-btn" id="synPauseBtn">⏸️ 暂停</button>
+        </div>
+        <div class="block-footer">拖动 $N$ 增加谐波 · 切换波形观察不同逼近 · 灰色虚线为目标波形</div>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ===== 区块2：独立谐波（1~8次） ===== -->
+    <div class="canvas-block">
+        <div class="canvas-wrapper">
+            <canvas id="canvasComponents" width="600" height="340"></canvas>
+            <span class="canvas-label">谐波分量</span>
+        </div>
+        <div class="block-controls" id="controlsComp">
+            <div class="slider-group">
+                <label><i>$\omega$</i> 基频</label>
+                <input type="range" id="compFreqSlider" min="1" max="6" value="2" step="0.1">
+                <span class="value-badge" id="compFreqVal">2.0</span>
+            </div>
+            <button class="pause-btn" id="compPauseBtn">⏸️ 暂停</button>
+        </div>
+        <div class="harmonics-selector" id="harmSelector">
+            <button class="harm-btn active" data-harm="1"><span class="dot" style="background:#66ddff;"></span>1次</button>
+            <button class="harm-btn active" data-harm="2"><span class="dot" style="background:#7dffb3;"></span>2次</button>
+            <button class="harm-btn active" data-harm="3"><span class="dot" style="background:#b47cff;"></span>3次</button>
+            <button class="harm-btn active" data-harm="4"><span class="dot" style="background:#ffaa66;"></span>4次</button>
+            <button class="harm-btn active" data-harm="5"><span class="dot" style="background:#ff6688;"></span>5次</button>
+            <button class="harm-btn active" data-harm="6"><span class="dot" style="background:#ffcc66;"></span>6次</button>
+            <button class="harm-btn active" data-harm="7"><span class="dot" style="background:#88ddff;"></span>7次</button>
+            <button class="harm-btn active" data-harm="8"><span class="dot" style="background:#ff99cc;"></span>8次</button>
+            <button class="harm-btn" data-harm="all"><span class="dot" style="background:#ffffff;"></span>全选</button>
+        </div>
+        <div class="block-footer">
+            <span class="hlb">● 1次基波</span> · 
+            <span class="hlg">● 2次</span> · 
+            <span class="hlp">● 3次</span> · 
+            <span class="hl">● 4次</span> · 
+            <span class="hlr">● 5次</span> · 
+            <span class="hly">● 6次</span> · 
+            <span class="hlc">● 7次</span> · 
+            <span class="hlm">● 8次</span> &nbsp;｜&nbsp; 点击按钮切换显示
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ---------- DOM ----------
+        const canvasSyn = document.getElementById('canvasSynthesis');
+        const ctxSyn = canvasSyn.getContext('2d');
+        const canvasComp = document.getElementById('canvasComponents');
+        const ctxComp = canvasComp.getContext('2d');
+
+        const synNSlider = document.getElementById('synNSlider');
+        const synFreqSlider = document.getElementById('synFreqSlider');
+        const synNVal = document.getElementById('synNVal');
+        const synFreqVal = document.getElementById('synFreqVal');
+        const synPauseBtn = document.getElementById('synPauseBtn');
+
+        const compFreqSlider = document.getElementById('compFreqSlider');
+        const compFreqVal = document.getElementById('compFreqVal');
+        const compPauseBtn = document.getElementById('compPauseBtn');
+
+        const waveBtns = document.querySelectorAll('.wave-type-btn');
+        let currentWaveType = 'square';
+
+        const harmBtns = document.querySelectorAll('.harm-btn');
+        let selectedHarmonics = { 1: true, 2: true, 3: true, 4: true, 5: true, 6: true, 7: true, 8: true };
+
+        // ---------- 尺寸 ----------
+        function resizeCanvases() {
+            [canvasSyn, canvasComp].forEach(c => {
+                const rect = c.getBoundingClientRect();
+                const w = rect.width || 600;
+                const aspect = 340/600;
+                let displayW = w;
+                let displayH = displayW * aspect;
+                if (displayH > 400) { displayH = 400; displayW = displayH / aspect; }
+                c.style.width = displayW + 'px';
+                c.style.height = displayH + 'px';
+                c.width = 600;
+                c.height = 340;
+            });
+        }
+        resizeCanvases();
+        window.addEventListener('resize', resizeCanvases);
+
+        // ---------- 状态 ----------
+        let synN = parseInt(synNSlider.value, 10);
+        let synOmega = parseFloat(synFreqSlider.value);
+        let compOmega = parseFloat(compFreqSlider.value);
+        let synTime = 0, compTime = 0;
+        let synPaused = false, compPaused = false;
+        let animId = null;
+
+        function updateDisplay() {
+            synNVal.textContent = synN;
+            synFreqVal.textContent = synOmega.toFixed(1);
+            compFreqVal.textContent = compOmega.toFixed(1);
+        }
+
+        // ---------- 波形切换 ----------
+        waveBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                waveBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentWaveType = this.dataset.type;
+            });
+        });
+
+        // ---------- 谐波按钮 ----------
+        harmBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const h = this.dataset.harm;
+                if (h === 'all') {
+                    const allOn = Object.values(selectedHarmonics).every(v => v === true);
+                    const newVal = !allOn;
+                    for (let k = 1; k <= 8; k++) selectedHarmonics[k] = newVal;
+                    harmBtns.forEach(b => {
+                        if (b.dataset.harm !== 'all') b.classList.toggle('active', newVal);
+                    });
+                    this.classList.toggle('active', !allOn);
+                    return;
+                }
+                const idx = parseInt(h, 10);
+                selectedHarmonics[idx] = !selectedHarmonics[idx];
+                this.classList.toggle('active');
+                const allOn = Object.values(selectedHarmonics).every(v => v === true);
+                const allBtn = document.querySelector('.harm-btn[data-harm="all"]');
+                allBtn.classList.toggle('active', allOn);
+            });
+        });
+        document.querySelector('.harm-btn[data-harm="all"]').classList.add('active');
+
+        // ---------- 暂停 ----------
+        synPauseBtn.addEventListener('click', function() {
+            synPaused = !synPaused;
+            this.textContent = synPaused ? '▶️ 继续' : '⏸️ 暂停';
+            this.classList.toggle('paused', synPaused);
+        });
+        compPauseBtn.addEventListener('click', function() {
+            compPaused = !compPaused;
+            this.textContent = compPaused ? '▶️ 继续' : '⏸️ 暂停';
+            this.classList.toggle('paused', compPaused);
+        });
+
+        // ---------- 滑块 ----------
+        synNSlider.addEventListener('input', function() {
+            synN = parseInt(this.value, 10);
+            synNVal.textContent = synN;
+        });
+        synFreqSlider.addEventListener('input', function() {
+            synOmega = parseFloat(this.value);
+            synFreqVal.textContent = synOmega.toFixed(1);
+        });
+        compFreqSlider.addEventListener('input', function() {
+            compOmega = parseFloat(this.value);
+            compFreqVal.textContent = compOmega.toFixed(1);
+        });
+
+        // ---------- 绘图：合成逼近 ----------
+        function drawSynthesis() {
+            const W = 600, H = 340;
+            ctxSyn.clearRect(0, 0, W, H);
+            ctxSyn.save();
+            ctxSyn.strokeStyle = 'rgba(60,130,255,0.06)';
+            ctxSyn.lineWidth = 0.5;
+            for (let x = 0; x <= W; x += 30) { ctxSyn.beginPath(); ctxSyn.moveTo(x,0); ctxSyn.lineTo(x,H); ctxSyn.stroke(); }
+            for (let y = 0; y <= H; y += 30) { ctxSyn.beginPath(); ctxSyn.moveTo(0,y); ctxSyn.lineTo(W,y); ctxSyn.stroke(); }
+            ctxSyn.restore();
+
+            const centerY = H/2;
+            const scaleX = W / (2 * Math.PI * 1.6);
+            const offsetX = 60;
+            const amp = 0.8;
+            const phase = synTime * 0.2;
+
+            let sumY = new Float32Array(W);
+
+            for (let px = 0; px < W; px++) {
+                const xVal = (px - offsetX) / scaleX;
+                let sum = 0;
+
+                if (currentWaveType === 'square') {
+                    for (let k = 1; k <= synN; k+=2) {
+                        const coef = 4 / Math.PI * (1 / k);
+                        sum += coef * Math.sin(k * synOmega * xVal + phase);
+                    }
+                } else if (currentWaveType === 'triangle') {
+                    for (let k = 1; k <= synN; k+=2) {
+                        const sign = (((k-1)/2) % 2 === 0) ? 1 : -1;
+                        const coef = 8 / (Math.PI * Math.PI) * sign / (k * k);
+                        sum += coef * Math.sin(k * synOmega * xVal + phase);
+                    }
+                } else if (currentWaveType === 'sawtooth') {
+                    for (let k = 1; k <= synN; k++) {
+                        const sign = (k % 2 === 1) ? 1 : -1;
+                        const coef = 2 / Math.PI * sign / k;
+                        sum += coef * Math.sin(k * synOmega * xVal + phase);
+                    }
+                }
+                sumY[px] = sum * amp * 0.9;
+            }
+
+            // 目标波形
+            ctxSyn.save();
+            ctxSyn.setLineDash([4, 6]);
+            ctxSyn.strokeStyle = 'rgba(200,220,255,0.2)';
+            ctxSyn.lineWidth = 1.2;
+            ctxSyn.beginPath();
+            for (let px = 0; px < W; px++) {
+                const xVal = (px - offsetX) / scaleX;
+                let target = 0;
+                const t = synOmega * xVal + phase;
+                if (currentWaveType === 'square') {
+                    target = Math.sign(Math.sin(t));
+                    if (target === 0) target = 1;
+                } else if (currentWaveType === 'triangle') {
+                    target = Math.asin(Math.sin(t)) / (Math.PI/2);
+                } else if (currentWaveType === 'sawtooth') {
+                    const norm = t / (2 * Math.PI);
+                    target = 2 * (norm - Math.floor(norm + 0.5));
+                }
+                const y = centerY - target * 0.85 * 45;
+                px === 0 ? ctxSyn.moveTo(px, y) : ctxSyn.lineTo(px, y);
+            }
+            ctxSyn.stroke();
+            ctxSyn.restore();
+
+            // 合成波
+            ctxSyn.save();
+            ctxSyn.shadowColor = 'rgba(255,180,80,0.6)';
+            ctxSyn.shadowBlur = 18;
+            ctxSyn.beginPath();
+            for (let px = 0; px < W; px++) {
+                const y = centerY - sumY[px] * 45;
+                px === 0 ? ctxSyn.moveTo(px, y) : ctxSyn.lineTo(px, y);
+            }
+            ctxSyn.strokeStyle = '#ffaa66';
+            ctxSyn.lineWidth = 2.8;
+            ctxSyn.stroke();
+            ctxSyn.restore();
+
+            ctxSyn.save();
+            ctxSyn.shadowColor = 'rgba(255,180,80,0.2)';
+            ctxSyn.shadowBlur = 30;
+            ctxSyn.beginPath();
+            for (let px = 0; px < W; px++) {
+                const y = centerY - sumY[px] * 45;
+                px === 0 ? ctxSyn.moveTo(px, y) : ctxSyn.lineTo(px, y);
+            }
+            ctxSyn.strokeStyle = 'rgba(255,170,80,0.15)';
+            ctxSyn.lineWidth = 6;
+            ctxSyn.stroke();
+            ctxSyn.restore();
+
+            const waveNames = { square: '方波', triangle: '三角波', sawtooth: '锯齿波' };
+            ctxSyn.save();
+            ctxSyn.fillStyle = 'rgba(160,200,255,0.25)';
+            ctxSyn.font = '14px "Segoe UI", sans-serif';
+            ctxSyn.fillText(`${waveNames[currentWaveType]}  N=${synN}  ω=${synOmega.toFixed(1)}`, 12, 24);
+            ctxSyn.restore();
+        }
+
+        // ---------- 绘图：独立谐波 ----------
+        function drawComponents() {
+            const W = 600, H = 340;
+            ctxComp.clearRect(0, 0, W, H);
+            ctxComp.save();
+            ctxComp.strokeStyle = 'rgba(60,130,255,0.06)';
+            ctxComp.lineWidth = 0.5;
+            for (let x = 0; x <= W; x += 30) { ctxComp.beginPath(); ctxComp.moveTo(x,0); ctxComp.lineTo(x,H); ctxComp.stroke(); }
+            for (let y = 0; y <= H; y += 30) { ctxComp.beginPath(); ctxComp.moveTo(0,y); ctxComp.lineTo(W,y); ctxComp.stroke(); }
+            ctxComp.restore();
+
+            const centerY = H/2;
+            const scaleX = W / (2 * Math.PI * 1.6);
+            const offsetX = 60;
+            const amp = 0.7;
+            const phase = compTime * 0.2;
+
+            const colors = {
+                1: '#66ddff', 2: '#7dffb3', 3: '#b47cff', 4: '#ffaa66',
+                5: '#ff6688', 6: '#ffcc66', 7: '#88ddff', 8: '#ff99cc'
+            };
+
+            for (let idx = 1; idx <= 8; idx++) {
+                if (!selectedHarmonics[idx]) continue;
+
+                let harmY = new Float32Array(W);
+                const coef = 1.0;
+                for (let px = 0; px < W; px++) {
+                    const xVal = (px - offsetX) / scaleX;
+                    harmY[px] = coef * Math.sin(idx * compOmega * xVal + phase) * amp * 0.9;
+                }
+
+                ctxComp.save();
+                ctxComp.shadowColor = colors[idx] + '80';
+                ctxComp.shadowBlur = 10;
+                ctxComp.beginPath();
+                for (let px = 0; px < W; px++) {
+                    const y = centerY - harmY[px] * 45;
+                    px === 0 ? ctxComp.moveTo(px, y) : ctxComp.lineTo(px, y);
+                }
+                ctxComp.strokeStyle = colors[idx];
+                ctxComp.lineWidth = 2.0;
+                ctxComp.stroke();
+                ctxComp.restore();
+
+                ctxComp.save();
+                ctxComp.fillStyle = colors[idx] + '90';
+                ctxComp.font = '12px sans-serif';
+                const labelY = centerY - harmY[Math.floor(W*0.12)] * 45 - 14;
+                ctxComp.fillText(`${idx}次`, 10, Math.min(Math.max(labelY, 20), H-10));
+                ctxComp.restore();
+            }
+
+            ctxComp.save();
+            ctxComp.strokeStyle = 'rgba(140,190,255,0.08)';
+            ctxComp.lineWidth = 0.6;
+            ctxComp.beginPath();
+            ctxComp.moveTo(0, centerY);
+            ctxComp.lineTo(W, centerY);
+            ctxComp.stroke();
+            ctxComp.restore();
+
+            ctxComp.save();
+            ctxComp.fillStyle = 'rgba(160,200,255,0.2)';
+            ctxComp.font = '14px "Segoe UI", sans-serif';
+            ctxComp.fillText('各次谐波 (1~8次)', 12, 24);
+            ctxComp.restore();
+        }
+
+        // ---------- 动画 ----------
+        function animate() {
+            if (!synPaused) synTime += 0.6;
+            if (!compPaused) compTime += 0.6;
+            drawSynthesis();
+            drawComponents();
+            animId = requestAnimationFrame(animate);
+        }
+
+        updateDisplay();
+        if (animId) cancelAnimationFrame(animId);
+        animate();
+
+        window.addEventListener('beforeunload', () => { if (animId) cancelAnimationFrame(animId); });
+    })();
+</script>
+</body>
+</html>
