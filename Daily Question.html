@@ -811,7 +811,7 @@
     }
     
     const ACTIVITY_START = new Date(2026, 4, 31);
-    const ACTIVITY_END = new Date(2026, 5, 30);
+    const ACTIVITY_END = new Date(2026, 5, 29);
     
     function getDailyQuestionByDate(date) {
         let target = new Date(date);
@@ -826,7 +826,7 @@
     function getAllDateColumns() {
         let dates = [];
         let start = new Date(2026, 4, 31);
-        let end = new Date(2026, 5, 30);
+        let end = new Date(2026, 5, 29);
         for(let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) dates.push(formatDate(d));
         return dates;
     }
@@ -1145,7 +1145,7 @@
         
         let today = new Date();
         if (today < ACTIVITY_START || today > ACTIVITY_END) {
-            alert("活动时间2026.05.31-2026.06.30");
+            alert("活动时间2026.05.31-2026.06.29");
             return;
         }
         
@@ -1271,7 +1271,7 @@
 
     // ======================= 倒计时 =======================
     function updateCountdown() {
-        let exam = new Date(2026,6,1);
+        let exam = new Date(2026,5,29);
         let now = new Date();
         let diff = exam - now;
         if(diff <= 0) { document.getElementById("countdownClock").innerHTML = "期末考试今日进行，沉着应战！"; return; }
