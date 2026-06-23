@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>函数展开为傅里叶级数方法总结与案例</title>
+    <!-- MathJax 渲染公式 -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(145deg, #f7f0e8 0%, #efe0d2 100%);
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, system-ui, sans-serif;
+            padding: 1.5rem 1rem 3rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .main-container {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(255, 248, 238, 0.7);
+            backdrop-filter: blur(4px);
+            border-radius: 3rem 3rem 2rem 2rem;
+            padding: 1.8rem 1.2rem 2.2rem;
+            box-shadow: 0 20px 40px -12px rgba(80, 50, 30, 0.35);
+            border: 3px solid #6a9b5a;
+            /* 绿叶色外圈 */
+        }
+        h1 {
+            font-size: 2.0rem;
+            font-weight: 700;
+            text-align: center;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.2rem 0.6rem;
+            background: linear-gradient(135deg, #8a5a3a, #5a3a28);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.5px;
+        }
+        .logic-bar {
+            background: rgba(225, 200, 180, 0.4);
+            border-radius: 60px;
+            padding: 0.6rem 1.2rem;
+            margin: 0.2rem 0 1.2rem;
+            border: 1px solid #d4b69a;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 0.3rem 0.8rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #3d2a1b;
+        }
+        .logic-bar .step {
+            background: #b58b6e;
+            color: #fcf3ea;
+            padding: 0.1rem 0.9rem;
+            border-radius: 30px;
+        }
+        .logic-bar .arrow {
+            color: #7a4f33;
+            font-size: 1.2rem;
+        }
+        .graph-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
+            margin: 0.8rem 0 1.2rem;
+        }
+        .card {
+            background: rgba(255, 250, 240, 0.8);
+            backdrop-filter: blur(4px);
+            border-radius: 28px;
+            padding: 1.0rem 0.9rem 1.2rem;
+            box-shadow: 0 8px 18px -8px rgba(100, 65, 40, 0.2), 0 0 0 1px rgba(230, 195, 165, 0.5);
+            border: 1px solid #f0dac8;
+            transition: 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 24px -10px rgba(120, 75, 45, 0.25);
+            background: rgba(255, 248, 235, 0.9);
+            border-color: #d4b292;
+        }
+        .card.active {
+            border: 2px solid #a86d48;
+            box-shadow: 0 0 0 3px rgba(168, 109, 72, 0.2);
+        }
+        .card-title {
+            font-size: 1.0rem;
+            font-weight: 600;
+            color: #3f2a1b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 2px dashed #dec6b0;
+            padding-bottom: 0.4rem;
+            margin-bottom: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .card-title .tag {
+            background: #b77d5b;
+            color: white;
+            font-size: 0.65rem;
+            padding: 0.05rem 0.6rem;
+            border-radius: 30px;
+            margin-left: auto;
+        }
+        .card-content {
+            font-size: 0.92rem;
+            line-height: 1.6;
+            color: #2e1f14;
+            flex: 1;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+        }
+        .math-block {
+            display: block;
+            text-align: center;
+            margin: 0.3rem 0;
+            padding: 0.2rem 0;
+            background: rgba(225, 200, 180, 0.25);
+            border-radius: 24px;
+            font-size: 1.0rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+        }
+        @media (max-width: 600px) {
+            .math-block {
+                white-space: normal;
+                font-size: 0.85rem;
+                padding: 0.3rem 0.1rem;
+            }
+            .card-content {
+                font-size: 0.85rem;
+            }
+            .card-title {
+                font-size: 0.9rem;
+            }
+            .main-container {
+                padding: 1.0rem 0.6rem 1.5rem;
+            }
+            .logic-bar {
+                font-size: 0.7rem;
+                padding: 0.4rem 0.6rem;
+                gap: 0.2rem 0.4rem;
+            }
+            .logic-bar .step {
+                padding: 0.05rem 0.5rem;
+                font-size: 0.7rem;
+            }
+            .graph-grid {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            .control-row {
+                gap: 0.4rem;
+            }
+            .control-row label {
+                font-size: 0.75rem;
+            }
+            .range-slider-row span {
+                font-size: 0.7rem;
+                min-width: 30px;
+            }
+            .legend {
+                font-size: 0.6rem;
+            }
+            .canvas-container {
+                height: 160px;
+            }
+        }
+        @media (max-width: 400px) {
+            .math-block {
+                font-size: 0.7rem;
+            }
+            .card-content {
+                font-size: 0.75rem;
+            }
+            .card-title {
+                font-size: 0.8rem;
+            }
+        }
+        .converge-box {
+            background: #e7d3bf;
+            border-radius: 20px;
+            padding: 0.1rem 0.6rem;
+            font-size: 0.8rem;
+            margin-top: 0.2rem;
+            border-left: 4px solid #a86d48;
+        }
+        .goto-chart {
+            display: inline-block;
+            margin-top: 0.4rem;
+            padding: 0.05rem 0.8rem;
+            background: #b58b6e;
+            color: white;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.15s;
+            border: none;
+            align-self: flex-start;
+        }
+        .goto-chart:hover {
+            background: #9a745a;
+        }
+        .chart-wrapper {
+            background: rgba(245, 235, 222, 0.6);
+            backdrop-filter: blur(4px);
+            border-radius: 40px;
+            padding: 1.0rem 0.8rem 0.8rem;
+            margin-top: 1.0rem;
+            border: 1px solid #decbb8;
+        }
+        .chart-title {
+            font-weight: 600;
+            color: #4c3322;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            font-size: 0.95rem;
+        }
+        .chart-title .scenario-label {
+            background: #b58b6e;
+            color: white;
+            padding: 0.05rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+        }
+        .canvas-container {
+            position: relative;
+            height: 220px;
+            width: 100%;
+        }
+        @media (max-width: 600px) {
+            .canvas-container {
+                height: 160px;
+            }
+        }
+        .control-row {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            align-items: center;
+            margin: 0.3rem 0;
+        }
+        .control-row label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #3d2b1d;
+        }
+        .control-row input[type="range"] {
+            flex: 2;
+            min-width: 80px;
+            accent-color: #a86d48;
+        }
+        .control-row select {
+            padding: 0.1rem 0.4rem;
+            border-radius: 20px;
+            border: 1px solid #c9b09b;
+            background: #fcf6ef;
+            font-size: 0.8rem;
+            outline: none;
+        }
+        .control-row button {
+            background: #b87d5a;
+            border: none;
+            color: white;
+            border-radius: 40px;
+            padding: 0.2rem 1.2rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .control-row button:hover {
+            background: #a06d4a;
+        }
+        .range-slider-row {
+            display: flex;
+            gap: 0.6rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .range-slider-row input[type="range"] {
+            flex: 3;
+            min-width: 120px;
+        }
+        .range-slider-row span {
+            font-size: 0.8rem;
+            color: #4d3523;
+            min-width: 40px;
+        }
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: #4d3523;
+            padding: 0.2rem 0.3rem;
+        }
+        .footer-note {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #4a3221;
+            background: rgba(215, 185, 160, 0.3);
+            padding: 0.3rem 1.2rem;
+            border-radius: 60px;
+            border: 1px solid #d4b69a;
+            display: inline-block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .init-interval-label {
+            font-size: 0.75rem;
+            color: #27ae60;
+            font-weight: 600;
+            background: #eafaf1;
+            padding: 0.05rem 0.6rem;
+            border-radius: 30px;
+            display: inline-block;
+            margin-left: 0.3rem;
+        }
+        #initIntervalDisplay {
+            font-size: 0.75rem;
+            background: #eafaf1;
+            color: #27ae60;
+            padding: 0.05rem 0.6rem;
+            border-radius: 30px;
+            display: inline-block;
+        }
+        .MathJax {
+            font-size: 100% !important;
+        }
+        .math-block mjx-container {
+            display: inline-block !important;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            max-width: 100% !important;
+        }
+        .card-content mjx-container {
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            max-width: 100% !important;
+        }
+        .checkbox-row {
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .checkbox-row label {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.8rem;
+            color: #3d2b1d;
+            cursor: pointer;
+        }
+        .checkbox-row input[type="checkbox"] {
+            accent-color: #a86d48;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <h1>
+        <span>🌀 函数展开为傅里叶级数</span>
+        <span style="font-size:1.4rem; -webkit-text-fill-color:#7b4d30;">·</span>
+        <span style="font-size:1.2rem; -webkit-text-fill-color:#8b5e3f;">方法总结与案例</span>
+    </h1>
+
+    <div class="logic-bar">
+        <span class="step">\(f\in C_{2\pi}\)</span>
+        <span class="arrow">→</span>
+        <span class="step">周期延拓 (\(2\pi\))</span>
+        <span class="arrow">→</span>
+        <span class="step">奇/偶延拓 (\(2\pi\))</span>
+        <span class="arrow">→</span>
+        <span class="step">一般周期 \(2l\)</span>
+        <span class="arrow">→</span>
+        <span class="step">周期延拓 (\(2l\))</span>
+        <span class="arrow">→</span>
+        <span class="step">奇/偶延拓 (\(2l\))</span>
+        <span class="arrow">→</span>
+        <span class="step">任意区间 \([a,b]\)</span>
+        <span class="arrow">→</span>
+        <span class="step">任意区间→奇偶延拓</span>
+    </div>
+
+    <div class="graph-grid" id="cardGrid">
+        <!-- 1. 2π 周期函数 (R) -->
+        <div class="card active" data-scenario="0" style="border-left:6px solid #2a7a9c;">
+            <div class="card-title"><span style="color:#1f6b8a;">🌐</span> 周期 \(2\pi\) <span class="tag" style="background:#2a7a9c;">R</span><span class="init-interval-label">初始区间: R</span></div>
+            <div class="card-content">
+                <p><strong>区间:</strong> \(x\in\mathbb{R}\)，\(f(x+2\pi)=f(x)\)</p>
+                <div class="math-block">\[
+                f(x)\sim \frac{a_0}{2}+\sum_{n=1}^\infty (a_n\cos nx + b_n\sin nx)
+                \]</div>
+                <div style="font-size:0.8rem; overflow-x:auto;">\(a_n=\frac1\pi\int_{-\pi}^{\pi}f(x)\cos nx\,dx,\; b_n=\frac1\pi\int_{-\pi}^{\pi}f(x)\sin nx\,dx\)</div>
+                <div class="converge-box" style="border-left-color:#2a7a9c; background:#d9e6f0;">
+                    <strong>收敛定理:</strong> 若 \(f\) 在 \([-\pi,\pi]\) 上连续或仅有有限个第一类间断点，且极值点有限，则级数收敛于 \(\frac{f(x^+)+f(x^-)}{2}\)。
+                </div>
+                <button class="goto-chart" data-scenario="0">📊 图形案例</button>
+            </div>
+        </div>
+        <!-- 2. 周期延拓 (2π) -->
+        <div class="card" data-scenario="1" style="border-left:6px solid #b58b6e;">
+            <div class="card-title"><span style="color:#8a5f40;">🔁</span> 周期延拓 (\(2\pi\)) <span class="tag" style="background:#8a5f40;">延拓</span><span class="init-interval-label">初始区间: [-π, π]</span></div>
+            <div class="card-content">
+                <p><strong>区间:</strong> \(f\) 定义于 \([-\pi,\pi]\)，延拓至 \(\mathbb{R}\)</p>
+                <div class="math-block" style="font-size:0.9rem;">\(f(x+2k\pi)=f(x),\;k\in\mathbb{Z}\)</div>
+                <ul style="font-size:0.85rem; padding-left:1rem;"><li>间断点收敛于均值</li><li>保持周期 \(2\pi\)</li></ul>
+                <div class="converge-box" style="border-left-color:#8a5f40; background:#f0e3d8;">
+                    <strong>收敛:</strong> 连续或有限个第一类间断点，极值有限 ➜ 收敛于延拓后函数的 \(\frac{f(x^+)+f(x^-)}{2}\)。
+                </div>
+                <button class="goto-chart" data-scenario="1">📊 图形案例</button>
+            </div>
+        </div>
+        <!-- 3. 奇偶延拓 (2π) -->
+        <div class="card" data-scenario="2" style="border-left:6px solid #b37b5a;">
+            <div class="card-title"><span style="color:#a86d48;">⚡</span> 奇/偶延拓 (\(2\pi\)) <span class="tag" style="background:#a86d48;">对称</span><span class="init-interval-label">初始区间: [0, π]</span></div>
+            <div class="card-content">
+                <p><strong>区间:</strong> \(f\) 定义于 \([0,\pi]\)，延拓至 \([-\pi,\pi]\) 再周期延拓。</p>
+                <div style="font-size:0.8rem; background:#f0ddd0; border-radius:16px; padding:0.1rem 0.4rem;">
+                    <span style="background:#8a5f40; color:white; padding:0.05rem 0.5rem; border-radius:20px;">奇</span> 
+                    \(f_{\text{odd}}(x)=\begin{cases}x/\pi,x>0\\x/\pi,x<0\end{cases}\)  → 正弦级数
+                </div>
+                <div style="font-size:0.8rem; background:#f0ddd0; border-radius:16px; padding:0.1rem 0.4rem; margin-top:0.2rem;">
+                    <span style="background:#8a5f40; color:white; padding:0.05rem 0.5rem; border-radius:20px;">偶</span> 
+                    \(f_{\text{even}}(x)=\begin{cases}x/\pi,x>0\\-x/\pi,x<0\end{cases}\)  → 余弦级数
+                </div>
+                <div class="converge-box" style="border-left-color:#a86d48; background:#f0e3d8;">
+                    <strong>收敛:</strong> 在 \((0,\pi)\) 内收敛于 \(f(x)\)，端点收敛于相应均值。
+                </div>
+                <button class="goto-chart" data-scenario="2">📊 图形案例</button>
+            </div>
+        </div>
+        <!-- 4. 一般周期 2l -->
+        <div class="card" data-scenario="3" style="border-left:6px solid #7d9b6a;">
+            <div class="card-title"><span style="color:#5f7f4e;">📏</span> 一般周期 \(2l\) <span class="tag" style="background:#5f7f4e;">推广</span><span class="init-interval-label">初始区间: R</span></div>
+            <div class="card-content">
+                <p><strong>区间:</strong> \(x\in\mathbb{R}\)，\(f(x+2l)=f(x)\)</p>
+                <div class="math-block">\[
+                f(x)\sim \frac{a_0}{2}+\sum_{n=1}^\infty \left(a_n\cos\frac{n\pi x}{l}+b_n\sin\frac{n\pi x}{l}\right)
+                \]</div>
+                <div style="font-size:0.8rem; overflow-x:auto;">\(a_n=\frac1l\int_{-l}^{l}f(x)\cos\frac{n\pi x}{l}dx,\; b_n=\frac1l\int_{-l}^{l}f(x)\sin\frac{n\pi x}{l}dx\)</div>
+                <div class="converge-box" style="border-left-color:#5f7f4e; background:#dce8d4;">
+                    <strong>收敛:</strong> 连续或有限个第一类间断点，极值有限 ➜ 收敛于 \(\frac{f(x^+)+f(x^-)}{2}\)。
+                </div>
+                <button class="goto-chart" data-scenario="3">📊 图形案例</button>
+            </div>
+        </div>
+        <!-- 5. 周期延拓 (2l) -->
+        <div class="card" data-scenario="4" style="border-left:6px solid #b58b6e;">
+            <div class="card-title"><span style="color:#8a5f40;">🔄</span> 周期延拓 (\(2l\)) <span class="tag" style="background:#8a5f40;">延拓</span><span class="init-interval-label">初始区间: [-2, 2]</span></div>
+            <div class="card-content">
+                <p><strong>区间:</strong> \(f\) 定义于 \([-l,l]\)，延拓至 \(\mathbb{R}\)</p>
+                <div class="math-block" style="font-size:0.9rem;">\(f(x+2kl)=f(x),\;k\in\mathbb{Z}\)</div>
+                <ul style="font-size:0.85rem; padding-left:1rem;"><li>展开系数以 \(l\) 计算</li><li>间断点收敛于均值</li></ul>
+                <div class="converge-box" style="border-left-color:#8a5f40; background:#f0e3d8;">
+                    <strong>收敛:</strong> 连续或有限个第一类间断点，极值有限 ➜ 收敛于延拓后函数的 \(\frac{f(x^+)+f(x^-)}{2}\)。
+                </div>
+                <button class="goto-chart" data-scenario="4">📊 图形案例</button>
+            </div>
+        </div>
+        <!-- 6. 奇偶延拓 (2l) -->
+        <div class="card" data-scenario="5" style="border-left:6px solid #b37b5a;">
+            <div class="card-title"><span style="color:#a86d48;">🧮</span> 奇/偶延拓 (\(2l\)) <span class="tag" style="background:#a86d48;">对称</span><span class="init-interval-label">初始区间: [0, 2]</span></div>
+            <div class="card-content">
+                <p><strong>区间:</strong> \(f\) 定义于 \([0,l]\)，延拓至 \([-l,l]\) 再周期延拓。</p>
+                <div style="font-size:0.8rem; background:#f0ddd0; border-radius:16px; padding:0.1rem 0.4rem;">
+                    <span style="background:#8a5f40; color:white; padding:0.05rem 0.5rem; border-radius:20px;">奇</span> 
+                    \(f_{\text{odd}}(x)=\begin{cases}x/l,x\in(0,l)\\x/l,x\in(-l,0)\end{cases}\)  → 正弦级数
+                </div>
+                <div style="font-size:0.8rem; background:#f0ddd0; border-radius:16px; padding:0.1rem 0.4rem; margin-top:0.2rem;">
+                    <span style="background:#8a5f40; color:white; padding:0.05rem 0.5rem; border-radius:20px;">偶</span> 
+                    \(f_{\text{even}}(x)=\begin{cases}x/l,x\in(0,l)\\-x/l,x\in(-l,0)\end{cases}\)  → 余弦级数
+                </div>
+                <div class="converge-box" style="border-left-color:#a86d48; background:#f0e3d8;">
+                    <strong>收敛:</strong> 在 \((0,l)\) 内收敛于 \(f(x)\)，端点收敛于相应均值。
+                </div>
+                <button class="goto-chart" data-scenario="5">📊 图形案例</button>
+            </div>
+        </div>
+        <!-- 7. 任意区间 [a,b] -->
+        <div class="card" data-scenario="6" style="border-left:6px solid #b08a7a;">
+            <div class="card-title"><span style="color:#8a6a5a;">🎯</span> 任意区间 \([a,b]\) <span class="tag" style="background:#b08a7a;">一般</span><span class="init-interval-label">初始区间: [a, b]</span></div>
+            <div class="card-content">
+                <p><strong>区间:</strong> \(f\) 定义于 \([a,b]\)，令 \(l=\frac{b-a}{2}\)，\(c=\frac{a+b}{2}\)</p>
+                <div class="math-block" style="font-size:0.85rem; overflow-x:auto;">\[
+                f(x)\sim \frac{a_0}{2}+\sum_{n=1}^\infty \left[a_n\cos\frac{n\pi (x-c)}{l}+b_n\sin\frac{n\pi (x-c)}{l}\right]\]</div>
+                <p style="font-size:0.8rem;">系数在 \([a,b]\) 上积分，周期 \(2l\)。</p>
+                <div class="converge-box" style="border-left-color:#8a6a5a; background:#efe3dc;">
+                    <strong>收敛:</strong> 连续或有限个第一类间断点，极值有限 ➜ 在 \((a,b)\) 内收敛于 \(f(x)\)，端点收敛于均值。
+                </div>
+                <button class="goto-chart" data-scenario="6">📊 图形案例</button>
+            </div>
+        </div>
+        <!-- 8. 任意区间 → 奇偶延拓 -->
+        <div class="card" data-scenario="7" style="border-left:6px solid #b37b5a;">
+            <div class="card-title"><span style="color:#a86d48;">🔀</span> 任意区间→奇偶延拓 <span class="tag" style="background:#b37b5a;">综合</span><span class="init-interval-label">初始区间: [a, b]</span></div>
+            <div class="card-content">
+                <p><strong>步骤:</strong> \(f\) 定义于 \([a,b]\)，先映射到 \([0,l]\)，再奇/偶延拓至 \([-l,l]\)，最后周期延拓。</p>
+                <div style="font-size:0.8rem; background:#f0ddd0; border-radius:16px; padding:0.1rem 0.4rem;">
+                    令 \(l=\frac{b-a}{2}\)，\(c=\frac{a+b}{2}\)，\(t = x-c\)，则 \(t\in[-l,l]\)
+                </div>
+                <div class="converge-box" style="border-left-color:#a86d48; background:#f0e3d8;">
+                    <strong>收敛:</strong> 在 \((0,l)\) 内收敛于 \(f\)，端点收敛于均值。
+                </div>
+                <button class="goto-chart" data-scenario="7">📊 图形案例</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 动态图形区 -->
+    <div class="chart-wrapper" id="chartSection">
+        <div class="chart-title">
+            <span>📊 动态演示 · <span id="scenarioName">周期 \(2\pi\) 函数</span></span>
+            <span class="scenario-label" id="scenarioLabel">原函数</span>
+            <span id="initIntervalDisplay">初始区间: R</span>
+        </div>
+        <div class="control-row">
+            <label>谐波数 \(N\): <span id="nValDisplay">3</span></label>
+            <input type="range" id="nSlider" min="1" max="30" value="3" step="1">
+            <button id="resetBtn">重置</button>
+        </div>
+        <div class="control-row">
+            <label>绘图区间: </label>
+            <div class="range-slider-row">
+                <span id="rangeLeftLabel">-10.0</span>
+                <input type="range" id="rangeSlider" min="-20" max="20" value="-10" step="0.1">
+                <span id="rangeRightLabel">10.0</span>
+                <input type="range" id="rangeSliderRight" min="-20" max="20" value="10" step="0.1">
+            </div>
+        </div>
+        <div class="control-row">
+            <div class="checkbox-row">
+                <label><input type="checkbox" id="showOriginal" checked> 原函数</label>
+                <label><input type="checkbox" id="showFourier" checked> 傅里叶级数近似</label>
+                <label><input type="checkbox" id="showExtend" checked> 延拓后函数</label>
+            </div>
+        </div>
+        <div class="control-row" id="oddSelectRow" style="display:none;">
+            <label>延拓方式: 
+                <select id="oddSelect">
+                    <option value="odd">奇延拓</option>
+                    <option value="even">偶延拓</option>
+                </select>
+            </label>
+        </div>
+        <div class="canvas-container">
+            <canvas id="fourierCanvas" width="600" height="220" style="width:100%; height:100%; display:block; border-radius:30px; background:#fcf6ef;"></canvas>
+        </div>
+        <div class="legend">
+            <span><span style="color:#2a7a9c; border-bottom:2px dashed #2a7a9c;">---</span> 延拓后函数 (虚线)</span>
+            <span><span style="color:#c0392b;">●</span> 部分和 \(S_N(x)\)</span>
+            <span><span style="color:#d1a78a;">●</span> 间断点收敛于均值</span>
+            <span><span style="color:#27ae60;">●</span> 原始区间函数 (实线)</span>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        <span style="background:#b17d5c; color:white; padding:0.05rem 0.6rem; border-radius:30px;">📘</span> 
+        收敛定理：连续或有限个第一类间断点 + 极值点有限 ➜ 级数收敛于 \(\frac{f(x^+)+f(x^-)}{2}\)
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ============================================================
+        // 场景配置
+        // ============================================================
+        const scenarios = [
+            { name: '周期 \(2\pi\) 函数', label: '原函数', type: 'base', hasOdd: false, needExtend: false, initInterval: 'R' },
+            { name: '周期延拓 (\(2\pi\))', label: '延拓', type: 'periodic', hasOdd: false, needExtend: true, initInterval: '[-π, π]' },
+            { name: '奇/偶延拓 (\(2\pi\))', label: '奇延拓', type: 'odd', hasOdd: true, needExtend: true, initInterval: '[0, π]' },
+            { name: '一般周期 \(2l\)', label: '一般周期', type: 'general', hasOdd: false, needExtend: false, initInterval: 'R' },
+            { name: '周期延拓 (\(2l\))', label: '延拓', type: 'periodic_l', hasOdd: false, needExtend: true, initInterval: '[-2, 2]' },
+            { name: '奇/偶延拓 (\(2l\))', label: '奇延拓', type: 'odd_l', hasOdd: true, needExtend: true, initInterval: '[0, 2]' },
+            { name: '任意区间 \([a,b]\)', label: '任意区间', type: 'any', hasOdd: false, needExtend: true, initInterval: '[a, b] (示例 [1,5])' },
+            { name: '任意区间→奇偶延拓', label: '奇延拓', type: 'any_odd', hasOdd: true, needExtend: true, initInterval: '[a, b] (示例 [1,5])' }
+        ];
+
+        // ============================================================
+        // DOM 元素
+        // ============================================================
+        const cards = document.querySelectorAll('.card');
+        const gotoButtons = document.querySelectorAll('.goto-chart');
+        const canvas = document.getElementById('fourierCanvas');
+        const ctx = canvas.getContext('2d');
+        const nSlider = document.getElementById('nSlider');
+        const nValDisplay = document.getElementById('nValDisplay');
+        const resetBtn = document.getElementById('resetBtn');
+        const scenarioName = document.getElementById('scenarioName');
+        const scenarioLabel = document.getElementById('scenarioLabel');
+        const initIntervalDisplay = document.getElementById('initIntervalDisplay');
+        const rangeSlider = document.getElementById('rangeSlider');
+        const rangeSliderRight = document.getElementById('rangeSliderRight');
+        const rangeLeftLabel = document.getElementById('rangeLeftLabel');
+        const rangeRightLabel = document.getElementById('rangeRightLabel');
+        const oddSelectRow = document.getElementById('oddSelectRow');
+        const oddSelect = document.getElementById('oddSelect');
+        const showOriginal = document.getElementById('showOriginal');
+        const showFourier = document.getElementById('showFourier');
+        const showExtend = document.getElementById('showExtend');
+
+        let currentScenario = 0;
+        let currentN = 3;
+        let currentOddMode = 'odd';
+        let userXMin = -10,
+            userXMax = 10;
+
+        // ============================================================
+        // 1. 定义各种情形下的函数
+        // ============================================================
+
+        function tent(L, x) {
+            const xMod = ((x % (2 * L)) + 2 * L) % (2 * L);
+            if (xMod <= L) return xMod / L;
+            else return (2 * L - xMod) / L;
+        }
+
+        function tentOdd(L, x) {
+            const xMod = ((x % (2 * L)) + 2 * L) % (2 * L);
+            if (xMod === 0 || xMod === L) return 0;
+            if (xMod < L) return xMod / L;
+            else return (xMod - 2 * L) / L;
+        }
+
+        function tentEven(L, x) {
+            return tent(L, x);
+        }
+
+        function tent2pi(x) { return tent(Math.PI, x); }
+
+        function oddTent2pi(x) { return tentOdd(Math.PI, x); }
+
+        function evenTent2pi(x) { return tentEven(Math.PI, x); }
+
+        const L_GENERAL = 2;
+
+        function tentGeneral(x) { return tent(L_GENERAL, x); }
+
+        function oddTentGeneral(x) { return tentOdd(L_GENERAL, x); }
+
+        function evenTentGeneral(x) { return tentEven(L_GENERAL, x); }
+
+        const A = 1,
+            B = 5,
+            L_ANY = 2,
+            C = 3;
+
+        function tentAny(x) {
+            const xMod = ((x - A) % (2 * L_ANY) + 2 * L_ANY) % (2 * L_ANY);
+            const t = xMod - L_ANY;
+            return tent(L_ANY, t);
+        }
+
+        function oddTentAny(x) {
+            const xMod = ((x - A) % (2 * L_ANY) + 2 * L_ANY) % (2 * L_ANY);
+            const t = xMod - L_ANY;
+            return tentOdd(L_ANY, t);
+        }
+
+        function evenTentAny(x) {
+            const xMod = ((x - A) % (2 * L_ANY) + 2 * L_ANY) % (2 * L_ANY);
+            const t = xMod - L_ANY;
+            return tentEven(L_ANY, t);
+        }
+
+        function getFunc(scenario, mode) {
+            switch (scenario) {
+                case 0:
+                    return tent2pi;
+                case 1:
+                    return tent2pi;
+                case 2:
+                    return (mode === 'odd') ? oddTent2pi : evenTent2pi;
+                case 3:
+                    return tentGeneral;
+                case 4:
+                    return tentGeneral;
+                case 5:
+                    return (mode === 'odd') ? oddTentGeneral : evenTentGeneral;
+                case 6:
+                    return tentAny;
+                case 7:
+                    return (mode === 'odd') ? oddTentAny : evenTentAny;
+                default:
+                    return tent2pi;
+            }
+        }
+
+        function getInitFunc(scenario, mode) {
+            switch (scenario) {
+                case 0:
+                    return (x) => (x >= -Math.PI && x <= Math.PI) ? tent2pi(x) : undefined;
+                case 1:
+                    return (x) => (x >= -Math.PI && x <= Math.PI) ? tent2pi(x) : undefined;
+                case 2:
+                    return (x) => (x >= 0 && x <= Math.PI) ? (x / Math.PI) : undefined;
+                case 3:
+                    return (x) => (x >= -2 && x <= 2) ? tentGeneral(x) : undefined;
+                case 4:
+                    return (x) => (x >= -2 && x <= 2) ? tentGeneral(x) : undefined;
+                case 5:
+                    return (x) => (x >= 0 && x <= 2) ? (x / 2) : undefined;
+                case 6:
+                    return (x) => (x >= 1 && x <= 5) ? Math.abs(x - 3) / 2 : undefined;
+                case 7:
+                    return (x) => (x >= 1 && x <= 5) ? ((mode === 'odd') ? (x - 3) / 2 : Math.abs(x - 3) / 2) : undefined;
+                default:
+                    return () => undefined;
+            }
+        }
+
+        // ============================================================
+        // 2. 傅里叶级数部分和
+        // ============================================================
+        function getPartialSum(scenario, x, N, mode) {
+            const PI = Math.PI;
+
+            if (scenario === 0 || scenario === 1) {
+                let sum = 0.5;
+                for (let n = 1; n <= N; n++) {
+                    const a_n = 2 * (Math.cos(n * PI) - 1) / (n * n * PI * PI);
+                    sum += a_n * Math.cos(n * x);
+                }
+                return sum;
+            }
+
+            if (scenario === 2) {
+                if (mode === 'odd') {
+                    let sum = 0;
+                    for (let n = 1; n <= N; n++) {
+                        const b_n = 2 * Math.pow(-1, n + 1) / (PI * n);
+                        sum += b_n * Math.sin(n * x);
+                    }
+                    return sum;
+                } else {
+                    let sum = 0.5;
+                    for (let n = 1; n <= N; n++) {
+                        const a_n = 2 * (Math.cos(n * PI) - 1) / (n * n * PI * PI);
+                        sum += a_n * Math.cos(n * x);
+                    }
+                    return sum;
+                }
+            }
+
+            if (scenario === 3 || scenario === 4) {
+                const L = 2;
+                let sum = 0.5;
+                for (let n = 1; n <= N; n++) {
+                    const a_n = 2 * (Math.cos(n * PI) - 1) / (n * n * PI * PI);
+                    sum += a_n * Math.cos(n * PI * x / L);
+                }
+                return sum;
+            }
+
+            if (scenario === 5) {
+                const L = 2;
+                if (mode === 'odd') {
+                    let sum = 0;
+                    for (let n = 1; n <= N; n++) {
+                        const b_n = 2 * Math.pow(-1, n + 1) / (PI * n);
+                        sum += b_n * Math.sin(n * PI * x / L);
+                    }
+                    return sum;
+                } else {
+                    let sum = 0.5;
+                    for (let n = 1; n <= N; n++) {
+                        const a_n = 2 * (Math.cos(n * PI) - 1) / (n * n * PI * PI);
+                        sum += a_n * Math.cos(n * PI * x / L);
+                    }
+                    return sum;
+                }
+            }
+
+            if (scenario === 6) {
+                const L = 2,
+                    C = 3;
+                let sum = 0.5;
+                for (let n = 1; n <= N; n++) {
+                    const a_n = 2 * (Math.cos(n * PI) - 1) / (n * n * PI * PI);
+                    sum += a_n * Math.cos(n * PI * (x - C) / L);
+                }
+                return sum;
+            }
+
+            if (scenario === 7) {
+                const L = 2,
+                    C = 3;
+                if (mode === 'odd') {
+                    let sum = 0;
+                    for (let n = 1; n <= N; n++) {
+                        const b_n = 2 * Math.pow(-1, n + 1) / (PI * n);
+                        sum += b_n * Math.sin(n * PI * (x - C) / L);
+                    }
+                    return sum;
+                } else {
+                    let sum = 0.5;
+                    for (let n = 1; n <= N; n++) {
+                        const a_n = 2 * (Math.cos(n * PI) - 1) / (n * n * PI * PI);
+                        sum += a_n * Math.cos(n * PI * (x - C) / L);
+                    }
+                    return sum;
+                }
+            }
+
+            return 0;
+        }
+
+        function getInitInterval(scenario) {
+            switch (scenario) {
+                case 0:
+                    return [-Math.PI, Math.PI];
+                case 1:
+                    return [-Math.PI, Math.PI];
+                case 2:
+                    return [0, Math.PI];
+                case 3:
+                    return [-2, 2];
+                case 4:
+                    return [-2, 2];
+                case 5:
+                    return [0, 2];
+                case 6:
+                    return [1, 5];
+                case 7:
+                    return [1, 5];
+                default:
+                    return [-Math.PI, Math.PI];
+            }
+        }
+
+        // ============================================================
+        // 3. 绘图
+        // ============================================================
+
+        function draw(scenario, N, mode) {
+            const width = canvas.width;
+            const height = canvas.height;
+            ctx.clearRect(0, 0, width, height);
+
+            ctx.beginPath();
+            ctx.strokeStyle = '#b09078';
+            ctx.lineWidth = 0.8;
+            ctx.moveTo(0, height / 2);
+            ctx.lineTo(width, height / 2);
+            ctx.stroke();
+
+            let xMin = userXMin;
+            let xMax = userXMax;
+
+            const margin = 20;
+            const plotWidth = width - 2 * margin;
+            const scaleX = plotWidth / (xMax - xMin);
+
+            function mapX(x) { return margin + (x - xMin) * scaleX; }
+
+            const func = getFunc(scenario, mode);
+            const initFunc = getInitFunc(scenario, mode);
+            const initInterval = getInitInterval(scenario);
+            const steps = 500;
+            const needExtend = scenarios[scenario].needExtend;
+
+            const showOrig = showOriginal.checked;
+            const showFour = showFourier.checked;
+            const showExt = showExtend.checked;
+
+            // ---- 绘制初始区间 (绿色实线) ----
+            if (showOrig) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#27ae60';
+                ctx.lineWidth = 3.0;
+                let started = false;
+                for (let i = 0; i <= steps; i++) {
+                    const x = xMin + (i / steps) * (xMax - xMin);
+                    if (x < initInterval[0] || x > initInterval[1]) {
+                        started = false;
+                        continue;
+                    }
+                    const y = initFunc(x);
+                    if (y === undefined || y === null) { started = false; continue; }
+                    const px = mapX(x);
+                    const py = height / 2 - y * (height / 2 * 0.7);
+                    if (!started) { ctx.moveTo(px, py);
+                        started = true; } else ctx.lineTo(px, py);
+                }
+                ctx.stroke();
+            }
+
+            // ---- 绘制延拓后的函数 ----
+            // 对于情形0和情形3 (needExtend = false)，原函数与延拓函数完全重合
+            // 使用蓝色实线表示（与绿色重合，但为了区分，用蓝色实线）
+            if (showExt) {
+                if (needExtend) {
+                    // 需要延拓：蓝色虚线
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#2a7a9c';
+                    ctx.lineWidth = 2.0;
+                    ctx.setLineDash([6, 4]);
+                    for (let i = 0; i <= steps; i++) {
+                        const x = xMin + (i / steps) * (xMax - xMin);
+                        const y = func(x);
+                        if (y === undefined || y === null) continue;
+                        const px = mapX(x);
+                        const py = height / 2 - y * (height / 2 * 0.7);
+                        if (i === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                } else {
+                    // 不需要延拓：蓝色实线（与绿色重合，只在原函数未显示时展示）
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#2a7a9c';
+                    ctx.lineWidth = 2.0;
+                    for (let i = 0; i <= steps; i++) {
+                        const x = xMin + (i / steps) * (xMax - xMin);
+                        const y = func(x);
+                        if (y === undefined || y === null) continue;
+                        const px = mapX(x);
+                        const py = height / 2 - y * (height / 2 * 0.7);
+                        if (i === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.stroke();
+                }
+            }
+
+            // ---- 部分和 (红色) ----
+            if (showFour) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#c0392b';
+                ctx.lineWidth = 2.2;
+                for (let i = 0; i <= steps; i++) {
+                    const x = xMin + (i / steps) * (xMax - xMin);
+                    const y = getPartialSum(scenario, x, N, mode);
+                    const px = mapX(x);
+                    const py = height / 2 - y * (height / 2 * 0.7);
+                    if (i === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.stroke();
+            }
+
+            // ---- 间断点 ----
+            if (showOrig || showExt) {
+                let discontinuityPoints = [];
+                if (scenario === 2 && mode === 'odd') discontinuityPoints = [-Math.PI, 0, Math.PI];
+                else if (scenario === 5 && mode === 'odd') discontinuityPoints = [-2, 0, 2];
+                else if (scenario === 7 && mode === 'odd') discontinuityPoints = [1, 3, 5];
+                discontinuityPoints.forEach(x => {
+                    if (x >= xMin && x <= xMax) {
+                        ctx.beginPath();
+                        ctx.arc(mapX(x), height / 2, 5, 0, 2 * Math.PI);
+                        ctx.fillStyle = '#d1a78a';
+                        ctx.shadowColor = '#7a4d2e';
+                        ctx.shadowBlur = 6;
+                        ctx.fill();
+                        ctx.shadowBlur = 0;
+                    }
+                });
+            }
+
+            ctx.fillStyle = '#4d3424';
+            ctx.font = '11px "Segoe UI", sans-serif';
+            if (scenario === 6 || scenario === 7) {
+                ctx.fillText('1', mapX(1) - 6, height / 2 + 18);
+                ctx.fillText('3', mapX(3) - 6, height / 2 + 18);
+                ctx.fillText('5', mapX(5) - 6, height / 2 + 18);
+                ctx.fillStyle = '#27ae60';
+                ctx.font = '10px "Segoe UI", sans-serif';
+                ctx.fillText('[1,5]', mapX(1) + 10, height / 2 - 10);
+            } else if (scenario === 3 || scenario === 4 || scenario === 5) {
+                ctx.fillStyle = '#4d3424';
+                ctx.font = '11px "Segoe UI", sans-serif';
+                ctx.fillText('-2', mapX(-2) - 10, height / 2 + 18);
+                ctx.fillText('0', mapX(0) - 6, height / 2 + 18);
+                ctx.fillText('2', mapX(2) - 6, height / 2 + 18);
+            } else {
+                ctx.fillStyle = '#4d3424';
+                ctx.font = '11px "Segoe UI", sans-serif';
+                ctx.fillText('-π', mapX(-Math.PI) - 12, height / 2 + 18);
+                ctx.fillText('0', mapX(0) - 6, height / 2 + 18);
+                ctx.fillText('π', mapX(Math.PI) - 6, height / 2 + 18);
+            }
+        }
+
+        function updateScenario(scenario) {
+            currentScenario = scenario;
+            const s = scenarios[scenario];
+            scenarioName.innerHTML = s.name;
+            scenarioLabel.textContent = s.label;
+            if (scenario === 6 || scenario === 7) {
+                initIntervalDisplay.textContent = '初始区间: [a, b] (示例 [1,5])';
+            } else {
+                initIntervalDisplay.textContent = '初始区间: ' + s.initInterval;
+            }
+
+            if (s.hasOdd) {
+                oddSelectRow.style.display = 'flex';
+            } else {
+                oddSelectRow.style.display = 'none';
+            }
+
+            cards.forEach((card, idx) => {
+                card.classList.toggle('active', idx === scenario);
+            });
+
+            draw(scenario, currentN, currentOddMode);
+        }
+
+        function updateN() {
+            currentN = parseInt(nSlider.value, 10);
+            nValDisplay.textContent = currentN;
+            draw(currentScenario, currentN, currentOddMode);
+        }
+
+        function updateRange() {
+            userXMin = parseFloat(rangeSlider.value);
+            userXMax = parseFloat(rangeSliderRight.value);
+            if (userXMin > userXMax) {
+                const tmp = userXMin;
+                userXMin = userXMax;
+                userXMax = tmp;
+                rangeSlider.value = userXMin;
+                rangeSliderRight.value = userXMax;
+            }
+            rangeLeftLabel.textContent = userXMin.toFixed(1);
+            rangeRightLabel.textContent = userXMax.toFixed(1);
+            draw(currentScenario, currentN, currentOddMode);
+        }
+
+        // ============================================================
+        // 事件绑定
+        // ============================================================
+        cards.forEach((card, idx) => {
+            card.addEventListener('click', () => {
+                updateScenario(idx);
+                document.getElementById('chartSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        gotoButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(btn.dataset.scenario, 10);
+                updateScenario(idx);
+                document.getElementById('chartSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        nSlider.addEventListener('input', updateN);
+
+        rangeSlider.addEventListener('input', updateRange);
+        rangeSliderRight.addEventListener('input', updateRange);
+
+        oddSelect.addEventListener('change', function() {
+            currentOddMode = this.value;
+            const s = scenarios[currentScenario];
+            scenarioLabel.textContent = (currentOddMode === 'odd') ? '奇延拓' : '偶延拓';
+            draw(currentScenario, currentN, currentOddMode);
+        });
+
+        showOriginal.addEventListener('change', () => draw(currentScenario, currentN, currentOddMode));
+        showFourier.addEventListener('change', () => draw(currentScenario, currentN, currentOddMode));
+        showExtend.addEventListener('change', () => draw(currentScenario, currentN, currentOddMode));
+
+        resetBtn.addEventListener('click', () => {
+            nSlider.value = 5;
+            currentN = 5;
+            nValDisplay.textContent = '5';
+            rangeSlider.value = '-10';
+            rangeSliderRight.value = '10';
+            userXMin = -10;
+            userXMax = 10;
+            rangeLeftLabel.textContent = '-10.0';
+            rangeRightLabel.textContent = '10.0';
+            if (scenarios[currentScenario].hasOdd) {
+                oddSelect.value = 'odd';
+                currentOddMode = 'odd';
+            }
+            showOriginal.checked = true;
+            showFourier.checked = true;
+            showExtend.checked = true;
+            draw(currentScenario, currentN, currentOddMode);
+        });
+
+        // ============================================================
+        // 初始化
+        // ============================================================
+        rangeSlider.value = '-10';
+        rangeSliderRight.value = '10';
+        userXMin = -10;
+        userXMax = 10;
+        rangeLeftLabel.textContent = '-10.0';
+        rangeRightLabel.textContent = '10.0';
+        updateScenario(0);
+
+        window.addEventListener('resize', () => {
+            draw(currentScenario, currentN, currentOddMode);
+        });
+
+        if (window.MathJax) {
+            MathJax.typesetPromise().then(() => {
+                draw(currentScenario, currentN, currentOddMode);
+            }).catch(() => {});
+        }
+    })();
+</script>
+</body>
+</html>
