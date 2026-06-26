@@ -316,9 +316,11 @@
         <span class="arrow">→</span>
         <span class="step">情形6: 奇/偶延拓 (\(2l\))</span>
         <span class="arrow">→</span>
-        <span class="step">情形7: 任意区间→方法1：周期延拓)</span>
+        <span class="step">情形7: 任意区间 \([a,b]\)</span>
         <span class="arrow">→</span>
-        <span class="step">情形8: 任意区间→方法2：奇偶延拓再周期延拓</span>
+        <span class="step">情形8: 任意区间→奇偶延拓</span>
+        <span class="arrow">→</span>
+        <span class="step">情形9: 复数形式</span>
     </div>
 
     <div class="graph-grid" id="cardGrid">
@@ -420,7 +422,7 @@
         </div>
         <!-- 情形7 -->
         <div class="card" data-scenario="6" style="border-left:6px solid #b08a7a;">
-            <div class="card-title"><span class="scenario-num">情形7</span><span style="color:#8a6a5a;">🎯</span> 任意区间 \([a,b]\) <span class="tag" style="background:#b08a7a;">一般</span><span class="init-interval-label">初始区间: [a, b]</span></div>
+            <div class="card-title"><span class="scenario-num">情形7</span><span style="color:#8a6a5a;">🎯</span> 任意区间→方法1：周期延拓 <span class="tag" style="background:#b08a7a;">一般</span><span class="init-interval-label">初始区间: [a, b]</span></div>
             <div class="card-content">
                 <p><strong>方法概述：</strong> 设 \(f(x)\) 定义于 \([a,b]\)。通过线性变换将 \([a,b]\) 映射到标准区间。</p>
                 <p style="font-size:0.85rem;">令 \(l=\frac{b-a}{2}\)，\(c=\frac{a+b}{2}\)，则变换为 \(t=\frac{\pi(x-c)}{l}\)，将区间 \([a,b]\) 变换到 \([-\pi,\pi]\)。</p>
@@ -440,7 +442,7 @@
         </div>
         <!-- 情形8 -->
         <div class="card" data-scenario="7" style="border-left:6px solid #b37b5a;">
-            <div class="card-title"><span class="scenario-num">情形8</span><span style="color:#a86d48;">🔀</span> 任意区间→奇偶延拓 <span class="tag" style="background:#b37b5a;">综合</span><span class="init-interval-label">初始区间: [a, b]</span></div>
+            <div class="card-title"><span class="scenario-num">情形8</span><span style="color:#a86d48;">🔀</span> 任意区间→方法2：奇偶延拓再周期延拓 <span class="tag" style="background:#b37b5a;">综合</span><span class="init-interval-label">初始区间: [a, b]</span></div>
             <div class="card-content">
                 <p><strong>方法概述：</strong> 设 \(f(x)\) 定义于 \([a,b]\)。令 \(l=b-a\)，\(c=\frac{a+b}{2}\)。先通过平移将 \([a,b]\) 变换到 \([0,l]\)（令 \(u=x-a\)），然后按情形6（奇/偶延拓 \(2l\)）展开。</p>
                 <div class="method-desc">
@@ -456,6 +458,27 @@
                     <strong>收敛定理：</strong> 延拓后函数在间断点处收敛于左右极限平均值。若 \(f\) 连续，则级数在延拓区间内收敛于延拓后的函数值。
                 </div>
                 <button class="goto-chart" data-scenario="7">📊 图形案例</button>
+            </div>
+        </div>
+        <!-- 情形9: 复数形式 -->
+        <div class="card" data-scenario="8" style="border-left:6px solid #8e44ad;">
+            <div class="card-title"><span class="scenario-num">情形9</span><span style="color:#8e44ad;">🔢</span> 复数形式 <span class="tag" style="background:#8e44ad;">指数</span><span class="init-interval-label">初始区间: R</span></div>
+            <div class="card-content">
+                <p><strong>方法概述：</strong> 利用欧拉公式 \(e^{i\theta}=\cos\theta+i\sin\theta\)，将傅里叶级数表示为复指数形式。</p>
+                <div class="math-block">\[
+                f(x)\sim \sum_{n=-\infty}^{\infty} c_n e^{inx}
+                \]</div>
+                <div style="font-size:0.8rem; overflow-x:auto;">
+                    \(c_n=\frac{1}{2\pi}\int_{-\pi}^{\pi} f(x)e^{-inx}\,dx,\quad n\in\mathbb{Z}\)
+                </div>
+                <div style="font-size:0.8rem; background:#f0e3d8; border-radius:16px; padding:0.2rem 0.6rem; margin-top:0.3rem;">
+                    <strong>与实数形式的关系：</strong> 
+                    \(c_0=\frac{a_0}{2},\quad c_n=\frac{a_n-ib_n}{2},\quad c_{-n}=\frac{a_n+ib_n}{2}\)
+                </div>
+                <div class="converge-box" style="border-left-color:#8e44ad; background:#ede0f0;">
+                    <strong>收敛定理：</strong> 若 \(f\) 在 \([-\pi,\pi]\) 上满足狄利克雷条件，则复数形式的傅里叶级数收敛于 \(\frac{f(x^+)+f(x^-)}{2}\)。
+                </div>
+                <button class="goto-chart" data-scenario="8">📊 图形案例</button>
             </div>
         </div>
     </div>
@@ -525,7 +548,7 @@
 <script>
     (function() {
         // ============================================================
-        // 场景配置 (8种情形)
+        // 场景配置 (9种情形)
         // ============================================================
         const scenarios = [
             { name: '情形1: 周期 \(2\pi\) 函数', label: '原函数', type: 'base', hasOdd: false, needExtend: false, initInterval: 'R', period: '2π' },
@@ -534,8 +557,9 @@
             { name: '情形4: 一般周期 \(2l\)', label: '一般周期', type: 'general', hasOdd: false, needExtend: false, initInterval: 'R', period: '2l = 4' },
             { name: '情形5: 周期延拓 (\(2l\))', label: '延拓', type: 'periodic_l', hasOdd: false, needExtend: true, initInterval: '[-l, l]', period: '2l = 4' },
             { name: '情形6: 奇/偶延拓 (\(2l\))', label: '奇延拓', type: 'odd_l', hasOdd: true, needExtend: true, initInterval: '[0, l]', period: '2l = 4' },
-            { name: '情形7: 任意区间→方法1：周期延拓', label: '任意区间', type: 'any', hasOdd: false, needExtend: true, initInterval: '[a, b]', period: '2π' },
-            { name: '情形8: 任意区间→方法2：奇偶延拓--周期延拓', label: '奇延拓', type: 'any_odd', hasOdd: true, needExtend: true, initInterval: '[a, b]', period: '4π' }
+            { name: '情形7: 任意区间 \([a,b]\)', label: '任意区间', type: 'any', hasOdd: false, needExtend: true, initInterval: '[a, b]', period: '2π' },
+            { name: '情形8: 任意区间→奇偶延拓', label: '奇延拓', type: 'any_odd', hasOdd: true, needExtend: true, initInterval: '[a, b]', period: '4π' },
+            { name: '情形9: 复数形式', label: '复数形式', type: 'complex', hasOdd: false, needExtend: false, initInterval: 'R', period: '2π' }
         ];
 
         // ============================================================
@@ -724,6 +748,7 @@
                 case 5: return (mode === 'odd') ? oddTentGeneral : evenTentGeneral;
                 case 6: return halfRect;
                 case 7: return (mode === 'odd') ? halfRectOdd : halfRectEven;
+                case 8: return squareWave;  // 复数形式使用方波
                 default: return squareWave;
             }
         }
@@ -738,6 +763,7 @@
                 case 5: return (x) => (x >= 0 && x <= 2) ? (x / 2) : undefined;
                 case 6: return (x) => (x >= PI && x <= 3 * PI) ? halfRectOriginal(x) : undefined;
                 case 7: return (x) => (x >= PI && x <= 3 * PI) ? halfRectOriginal(x) : undefined;
+                case 8: return (x) => squareWave(x);  // 复数形式使用方波
                 default: return () => undefined;
             }
         }
@@ -759,6 +785,7 @@
                 case 5: return [0, 2];
                 case 6: return [PI, 3 * PI];
                 case 7: return [PI, 3 * PI];
+                case 8: return [-Infinity, Infinity];
                 default: return [-PI, PI];
             }
         }
@@ -796,13 +823,15 @@
                     } else {
                         return '$$f(x) = \\begin{cases} 0, & \\pi < x < 2\\pi \\\\ \\sin x, & 2\\pi < x < 3\\pi \\end{cases}, \\quad x \\in [\\pi, 3\\pi], \\text{ 偶延拓} \\ (f(2\\pi-x)=f(x))$$';
                     }
+                case 8:
+                    return '$$f(x) = \\begin{cases} 1, & 0 < x < \\pi \\\\ -1, & -\\pi < x < 0 \\end{cases}, \\quad f(x+2\\pi)=f(x), \\text{ 复数形式}$$';
                 default:
                     return '$$f(x) = \\text{定义于给定区间}$$';
             }
         }
 
         // ============================================================
-        // 7. 傅里叶级数部分和
+        // 7. 傅里叶级数部分和 (包含复数形式)
         // ============================================================
         const fourierCache = {};
 
@@ -904,6 +933,7 @@
         }
 
         function getPartialSum(scenario, x, N, mode) {
+            // 情形1: 周期2π 方波
             if (scenario === 0 || scenario === 1) {
                 let sum = 0;
                 for (let n = 1; n <= N; n += 2) {
@@ -913,6 +943,7 @@
                 return sum;
             }
 
+            // 情形3: 奇/偶延拓 2π 分段函数
             if (scenario === 2) {
                 const coeff = computeStepFuncCoeffs(N, mode);
                 if (mode === 'odd') {
@@ -930,6 +961,7 @@
                 }
             }
 
+            // 情形4: 一般周期2l 帐篷函数
             if (scenario === 3 || scenario === 4) {
                 const L = 2;
                 let sum = 0.5;
@@ -940,6 +972,7 @@
                 return sum;
             }
 
+            // 情形6: 奇/偶延拓 2l 帐篷函数
             if (scenario === 5) {
                 const L = 2;
                 if (mode === 'odd') {
@@ -959,6 +992,7 @@
                 }
             }
 
+            // 情形7-8: 使用数值积分
             if (scenario === 6 || scenario === 7) {
                 const coeff = computeFourierCoefficients(scenario, N, mode);
                 if (!coeff) return 0;
@@ -980,6 +1014,25 @@
                 return sum;
             }
 
+            // 情形9: 复数形式 - 使用方波的复数形式
+            if (scenario === 8) {
+                let sum = 0;
+                // 方波的复数形式: c_n = 0 (n偶), c_n = -2i/(nπ) (n奇)
+                for (let n = -N; n <= N; n++) {
+                    if (n === 0) continue;
+                    if (n % 2 === 0) continue;  // 偶数项系数为0
+                    // c_n = -2i/(nπ) for 方波
+                    const c_n_real = 0;
+                    const c_n_imag = -2 / (n * PI);
+                    // c_n * e^{inx} = (c_n_real + i*c_n_imag) * (cos(nx) + i*sin(nx))
+                    // 实部 = c_n_real*cos(nx) - c_n_imag*sin(nx)
+                    // 虚部 = c_n_real*sin(nx) + c_n_imag*cos(nx)
+                    // 我们只需要实部（因为f(x)是实函数）
+                    sum += (-c_n_imag) * Math.sin(n * x);
+                }
+                return sum;
+            }
+
             return 0;
         }
 
@@ -989,43 +1042,38 @@
         function getDiscontinuityPoints(scenario, mode) {
             let points = [];
             if (scenario === 0 || scenario === 1) {
-                // 方波在 kπ 处间断
                 for (let k = -9; k <= 9; k++) {
                     points.push({x: k * PI, converge: 0});
                 }
             } else if (scenario === 2) {
                 if (mode === 'odd') {
-                    // 奇延拓: 在 kπ 处收敛于0，在 kπ+π/2 处收敛于 ±0.75
                     for (let k = -9; k <= 9; k++) {
                         points.push({x: k * PI, converge: 0});
                         const convVal = (k % 2 === 0) ? 0.75 : -0.75;
                         points.push({x: k * PI + PI/2, converge: convVal});
                     }
                 } else {
-                    // 偶延拓: 在 kπ+π/2 处间断，收敛于0.75
                     for (let k = -9; k <= 9; k++) {
                         points.push({x: k * PI + PI/2, converge: 0.75});
                     }
                 }
             } else if (scenario === 5) {
-                // 情形6: 奇/偶延拓 2l，l=2
                 if (mode === 'odd') {
-                    // 奇延拓再周期延拓: 在 x = 2 + 4k 处间断，收敛于0
                     for (let k = -8; k <= 8; k++) {
                         points.push({x: 2 + 4 * k, converge: 0});
                     }
                 } else {
-                    // 偶延拓再周期延拓: 在 x = 2 + 4k 处间断，收敛于1
-                    // 偶延拓：f(-x)=f(x)，在 x=2 处，左极限=1，右极限=f(-2)=1，连续！
-                    // 实际上偶延拓是连续的，没有间断点
                     return [];
                 }
             } else if (scenario === 6) {
-                // 情形7: 没有间断点
                 return [];
             } else if (scenario === 7) {
-                // 情形8: 没有间断点
                 return [];
+            } else if (scenario === 8) {
+                // 复数形式使用方波，与情形1相同
+                for (let k = -9; k <= 9; k++) {
+                    points.push({x: k * PI, converge: 0});
+                }
             }
             return points;
         }
@@ -1088,7 +1136,7 @@
             let tickLabels = [];
             let tickPositions = [];
 
-            if (scenario === 0 || scenario === 1 || scenario === 2) {
+            if (scenario === 0 || scenario === 1 || scenario === 2 || scenario === 8) {
                 tickInterval = PI;
                 let start = Math.ceil(-30 / tickInterval) * tickInterval;
                 for (let x = start; x <= 30; x += tickInterval) {
@@ -1213,7 +1261,7 @@
                 let started = false;
                 for (let i = 0; i <= steps; i++) {
                     const x = xMin + (i / steps) * (xMax - xMin);
-                    if (scenario === 0 || scenario === 3) {
+                    if (scenario === 0 || scenario === 3 || scenario === 8) {
                         const y = initFunc(x);
                         if (y === undefined || y === null || !isFinite(y)) { 
                             started = false; 
@@ -1369,7 +1417,7 @@
             ctx.textAlign = 'center';
             ctx.textBaseline = 'bottom';
             
-            if (scenario === 0 || scenario === 3) {
+            if (scenario === 0 || scenario === 3 || scenario === 8) {
                 const midX = (xMin + xMax) / 2;
                 if (midX >= xMin && midX <= xMax) {
                     ctx.fillStyle = '#27ae60';
@@ -1427,7 +1475,8 @@
             const hasOdd = s.hasOdd;
             const needExtend = s.needExtend;
 
-            if (scenario === 0 || scenario === 3) {
+            // 情形9: 没有延拓选项
+            if (scenario === 0 || scenario === 3 || scenario === 8) {
                 chkPeriodic.style.display = 'none';
                 chkOddEven.style.display = 'none';
                 oddSelectRow.style.display = 'none';
