@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>高数下册·同济八版 · 精讲（最终版）</title>
+  <!-- 使用 MathJax 渲染标准数学公式 -->
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+    body {
+      background: #f3f5f0;
+      padding: 16px 12px 40px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 920px;
+      width: 100%;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 750;
+      color: #1a2e1a;
+      letter-spacing: 0.5px;
+      border-left: 12px solid #6a9c6a;
+      padding-left: 24px;
+      margin: 6px 0 8px 0;
+      background: linear-gradient(135deg, #e2f0e2 0%, #ffffff 90%);
+      border-radius: 0 40px 40px 0;
+      line-height: 1.3;
+    }
+    .subhead {
+      font-size: 1.05rem;
+      color: #3a5a3a;
+      margin-top: -6px;
+      margin-bottom: 24px;
+      padding-left: 36px;
+      font-weight: 500;
+      opacity: 0.85;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 34px;
+      padding: 18px 20px 16px;
+      margin-bottom: 30px;
+      box-shadow: 0 12px 32px rgba(40, 80, 40, 0.10), 0 4px 12px rgba(0,0,0,0.02);
+      border: 1px solid #dce8dc;
+    }
+    .card-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 6px 18px;
+      margin-bottom: 16px;
+      border-bottom: 3px solid #c0d8c0;
+      padding-bottom: 12px;
+    }
+    .card-header h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #1a331a;
+      letter-spacing: -0.3px;
+    }
+    .card-header .tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 4px 18px;
+      border-radius: 40px;
+      letter-spacing: 0.4px;
+      background: #b8d9b8;
+      color: #1a2e1a;
+    }
+    .topic-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 26px;
+    }
+    .topic-item {
+      background: #fafcfa;
+      border-radius: 26px;
+      padding: 16px 20px 20px;
+      border-left: 8px solid #8cb88c;
+      box-shadow: 0 2px 8px rgba(40, 80, 40, 0.04);
+      transition: 0.1s;
+    }
+    .topic-item:nth-child(2) { border-left-color: #7fb3c2; }
+    .topic-item:nth-child(3) { border-left-color: #d4b07a; }
+    .topic-item:nth-child(4) { border-left-color: #c78fbf; }
+    .topic-item:nth-child(5) { border-left-color: #a8b8d9; }
+    .topic-title {
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: #1f3a1f;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .topic-title .badge {
+      padding: 0 18px;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      background: #c9d9f0;
+      color: #1a2a3a;
+    }
+    .core-content {
+      background: #ffffff;
+      border-radius: 22px;
+      padding: 16px 20px;
+      margin-top: 4px;
+      box-shadow: inset 0 1px 6px rgba(0,0,0,0.02);
+      border-left: 6px solid #9ac09a;
+    }
+    .core-content p {
+      margin: 10px 0;
+      font-size: 0.98rem;
+      line-height: 1.8;
+      color: #1a2a1a;
+    }
+    .core-content .formula-block {
+      background: #f0f7f0;
+      padding: 8px 16px;
+      border-radius: 16px;
+      margin: 10px 0;
+      text-align: center;
+      border: 1px solid #c8dec8;
+      overflow-x: auto;
+      font-size: 1.05rem;
+      color: #1a2a1a;
+    }
+    .highlight-tag {
+      border-radius: 40px;
+      padding: 4px 18px;
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin: 6px 6px 0 0;
+      border: 1px solid #c8dcc8;
+      background: #e2f0e2;
+      color: #1a3a1a;
+    }
+    .highlight-tag.green { background: #c6e9d6; border-color: #8bc9a8; color: #1a3a2a; }
+    .highlight-tag.blue { background: #c3ddf5; border-color: #8bb9e0; color: #1a2a4a; }
+    .highlight-tag.pink { background: #f5c8d4; border-color: #e8a0b4; color: #4a1a2a; }
+    .highlight-tag.orange { background: #f5e0c8; border-color: #dbb88a; color: #4a3a1a; }
+    .exam-tag {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      align-items: center;
+    }
+    .exam-tag span {
+      border-radius: 30px;
+      padding: 5px 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: #d5e8d5;
+      color: #1a2e1a;
+    }
+    .footnote {
+      margin-top: 24px;
+      font-size: 0.8rem;
+      color: #5a7a5a;
+      text-align: center;
+      opacity: 0.75;
+      border-top: 1px solid #c8dcc8;
+      padding-top: 24px;
+    }
+    .text-em {
+      color: #2d7a3d;
+      font-weight: 650;
+    }
+    .text-em.blue { color: #2f7a9e; }
+    .text-em.pink { color: #b3407a; }
+    .text-em.orange { color: #b37a2f; }
+    .method-box {
+      background: #f5faf5;
+      border-radius: 16px;
+      padding: 12px 16px;
+      margin: 8px 0;
+      border-left: 4px solid #6a9c6a;
+    }
+    @media (max-width: 480px) {
+      .card { padding: 14px 12px; }
+      .card-header h2 { font-size: 1.3rem; }
+      .topic-title { font-size: 1.0rem; }
+      .core-content p { font-size: 0.9rem; }
+      .formula-block { font-size: 0.95rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>📐 高等数学下册 · 同济八版</h1>
+  <div class="subhead">核心知识 · 计算方法 · 公式适用场景 · 常见题型</div>
+
+  <!-- 1. 空间解析几何 -->
+  <div class="card">
+    <div class="card-header"><h2>🧊 空间解析几何</h2><span class="tag">向量 · 平面 · 曲面 · 柱面 · 锥面 · 旋转曲面</span></div>
+    <div class="topic-grid">
+      <div class="topic-item">
+        <div class="topic-title">📌 向量的数量积与向量积 <span class="badge">基本运算</span></div>
+        <div class="core-content">
+          <p><span class="text-em">数量积（点积）</span>：$\mathbf{a} \cdot \mathbf{b} = |\mathbf{a}||\mathbf{b}|\cos\theta = a_1b_1 + a_2b_2 + a_3b_3$，用于求夹角、投影、判定垂直。</p>
+          <p><span class="text-em blue">向量积（叉积）</span>：$\mathbf{a} \times \mathbf{b} = (a_2b_3-a_3b_2,\; a_3b_1-a_1b_3,\; a_1b_2-a_2b_1)$，模长 $|\mathbf{a} \times \mathbf{b}| = |\mathbf{a}||\mathbf{b}|\sin\theta$，方向垂直a,b所在平面，用于求法向量、面积。</p>
+          <div class="exam-tag">
+            <span>📝 常见题型：求夹角、单位法向量、平行四边形面积</span>
+            <span class="highlight-tag">选择题</span>
+            <span class="highlight-tag green">计算题</span>
+          </div>
+        </div>
+      </div>
+      <div class="topic-item">
+        <div class="topic-title">📌 空间直线与平面方程 <span class="badge">几何表示</span></div>
+        <div class="core-content">
+          <p><span class="text-em">直线</span>：对称式 $\frac{x-x_0}{m} = \frac{y-y_0}{n} = \frac{z-z_0}{p}$，参数式 $x=x_0+mt,\; y=y_0+nt,\; z=z_0+pt$，一般式（两平面交线）。</p>
+          <p><span class="text-em blue">平面</span>：点法式 $A(x-x_0)+B(y-y_0)+C(z-z_0)=0$，一般式 $Ax+By+Cz+D=0$，截距式 $\frac{x}{a}+\frac{y}{b}+\frac{z}{c}=1$。</p>
+          <div class="exam-tag">
+            <span>📝 常见题型：求直线/平面方程、位置关系（平行/垂直/夹角）、距离</span>
+            <span class="highlight-tag green">综合题</span>
+            <span class="highlight-tag blue">证明题</span>
+          </div>
+        </div>
+      </div>
+      <div class="topic-item">
+        <div class="topic-title">📌 二次曲面 · 柱面 · 锥面 · 旋转曲面 <span class="badge">标准方程</span></div>
+        <div class="core-content">
+          <p><span class="text-em">椭球面</span>：$\frac{x^2}{a^2}+\frac{y^2}{b^2}+\frac{z^2}{c^2}=1$；<span class="text-em blue">双曲面</span>：$\frac{x^2}{a^2}+\frac{y^2}{b^2}-\frac{z^2}{c^2}=\pm 1$；<span class="text-em pink">抛物面</span>：$z = \frac{x^2}{a^2}+\frac{y^2}{b^2}$（椭圆抛物），$z = \frac{x^2}{a^2}-\frac{y^2}{b^2}$（双曲抛物）。</p>
+          <p><span class="text-em orange">柱面</span>：方程中缺少一个变量，例如 $x^2 + y^2 = R^2$（圆柱面），$y^2 = 2px$（抛物柱面），$\frac{x^2}{a^2}+\frac{y^2}{b^2}=1$（椭圆柱面）。</p>
+          <p><span class="text-em">锥面</span>：$\frac{x^2}{a^2}+\frac{y^2}{b^2} = \frac{z^2}{c^2}$（圆锥面）。</p>
+          <p><span class="text-em blue">旋转曲面</span>：由曲线绕某轴旋转形成。如 $xOz$ 面上曲线 $z=f(x)$ 绕 $z$ 轴旋转：$z = f(\sqrt{x^2+y^2})$；绕 $x$ 轴旋转：$z = \pm f(\sqrt{y^2+z^2})$。</p>
+          <div class="exam-tag">
+            <span>📝 常见题型：由方程识别曲面类型、柱面/锥面/旋转曲面方程、截痕分析</span>
+            <span class="highlight-tag pink">填空题</span>
+            <span class="highlight-tag orange">选择题</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 多元函数微分学 -->
+  <div class="card">
+    <div class="card-header"><h2>🌀 多元函数微分学</h2><span class="tag">连续·偏导·链式法则</span></div>
+    <div class="topic-grid">
+      <div class="topic-item">
+        <div class="topic-title">📌 连续、偏导、可微的关系 <span class="badge">概念辨析</span></div>
+        <div class="core-content">
+          <p><span class="text-em">关系</span>：可微 ⇒ 连续；可微 ⇒ 偏导存在；偏导存在且连续 ⇒ 可微。反之均不成立。</p>
+          <p><span class="text-em blue">全微分</span>：$df = f_x(x_0,y_0)\,dx + f_y(x_0,y_0)\,dy$（若可微）。</p>
+          <p><span class="text-em pink">方向导数与梯度</span>：梯度 $\nabla f = (f_x, f_y, f_z)$，方向导数 $D_{\mathbf{u}} f = \nabla f \cdot \mathbf{u}$（$\mathbf{u}$为单位向量），梯度方向为函数增长最快方向。</p>
+          <div class="exam-tag">
+            <span>📝 常见题型：判定可微性、求全微分/梯度/方向导数、关系反例</span>
+            <span class="highlight-tag">证明题</span>
+            <span class="highlight-tag green">计算题</span>
+            <span class="highlight-tag blue">辨析题</span>
+          </div>
+        </div>
+      </div>
+      <div class="topic-item">
+        <div class="topic-title">📌 复合函数链式法则 <span class="badge">常见形式</span></div>
+        <div class="core-content">
+          <p><span class="text-em">形式一（一元复合）</span>：$z = f(u,v),\; u=u(t),\; v=v(t) \;\Rightarrow\; \frac{dz}{dt} = f_u \cdot u'(t) + f_v \cdot v'(t)$</p>
+          <p><span class="text-em blue">形式二（多元复合）</span>：$z = f(u,v),\; u=u(x,y),\; v=v(x,y) \;\Rightarrow\; z_x = f_u u_x + f_v v_x,\; z_y = f_u u_y + f_v v_y$</p>
+          <p><span class="text-em pink">形式三（全微分形式不变性）</span>：$dz = f_u\,du + f_v\,dv$，其中 $du = u_x dx + u_y dy$。</p>
+          <p><span class="text-em orange">隐函数求导</span>：$F(x,y)=0 \;\Rightarrow\; \frac{dy}{dx} = -\frac{F_x}{F_y}$；$F(x,y,z)=0 \;\Rightarrow\; z_x = -\frac{F_x}{F_z},\; z_y = -\frac{F_y}{F_z}$。</p>
+          <div class="exam-tag">
+            <span>📝 常见题型：复合函数求导、隐函数偏导、全微分计算</span>
+            <span class="highlight-tag green">高频考点</span>
+            <span class="highlight-tag blue">证明题</span>
+            <span class="highlight-tag">计算题</span>
+          </div>
+        </div>
+      </div>
+      <div class="topic-item">
+        <div class="topic-title">📌 切平面·法线·极值 <span class="badge">几何应用</span></div>
+        <div class="core-content">
+          <p><span class="text-em">曲面的切平面与法线</span>：曲面 $F(x,y,z)=0$ 在点 $P_0$ 处切平面 $F_x(P_0)(x-x_0)+F_y(P_0)(y-y_0)+F_z(P_0)(z-z_0)=0$，法线 $\frac{x-x_0}{F_x} = \frac{y-y_0}{F_y} = \frac{z-z_0}{F_z}$。</p>
+          <p><span class="text-em blue">无条件极值</span>：驻点 $f_x=0, f_y=0$，用 $\Delta = f_{xx}f_{yy} - (f_{xy})^2$ 判定。</p>
+          <p><span class="text-em pink">条件极值（拉格朗日乘数法）</span>：求 $f(x,y)$ 在约束 $g(x,y)=0$ 下的极值，构造 $L = f + \lambda g$，解 $L_x=0,\; L_y=0,\; g=0$。</p>
+          <div class="exam-tag">
+            <span>📝 常见题型：切平面/法线方程、极值点与极值、条件极值应用题</span>
+            <span class="highlight-tag pink">应用大题</span>
+            <span class="highlight-tag orange">最值问题</span>
+            <span class="highlight-tag blue">证明题</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 重积分 -->
+  <div class="card">
+    <div class="card-header"><h2>📦 重积分</h2><span class="tag">二重 · 三重 · 技巧</span></div>
+    <div class="topic-grid">
+      <div class="topic-item">
+        <div class="topic-title">📌 二重积分 · 两种区域与交换次序 <span class="badge">X型 · Y型</span></div>
+        <div class="core-content">
+          <p><span class="text-em">X型区域</span>：$D = \{ (x,y) \mid a \le x \le b,\; y_1(x) \le y \le y_2(x) \}$，积分 $\int_a^b dx \int_{y_1(x)}^{y_2(x)} f(x,y)\,dy$。</p>
+          <p><span class="text-em blue">Y型区域</span>：$D = \{ (x,y) \mid c \le y \le d,\; x_1(y) \le x \le x_2(y) \}$，积分 $\int_c^d dy \int_{x_1(y)}^{x_2(y)} f(x,y)\,dx$。</p>
+          <p><span class="text-em pink">交换积分次序技巧</span>：①画出区域草图；②根据区域类型重新划分积分限；③注意分段区域需要拆分。</p>
+          <p><span class="text-em orange">极坐标</span>：$x = r\cos\theta,\; y = r\sin\theta,\; d\sigma = r\,dr\,d\theta$，$\iint_D f(x,y)\,d\sigma = \int_\alpha^\beta \int_{r_1(\theta)}^{r_2(\theta)} f(r\cos\theta, r\sin\theta)\, r\,dr\,d\theta$。</p>
+          <div class="exam-tag">
+            <span>📝 常见题型：交换积分次序、极坐标化、计算面积/体积</span>
+            <span class="highlight-tag">计算题</span>
+            <span class="highlight-tag green">填空题</span>
+          </div>
+        </div>
+      </div>
+      <div class="topic-item">
+        <div class="topic-title">📌 三重积分 · 穿针法与切片法 <span class="badge">计算技巧</span></div>
+        <div class="core-content">
+          <p><span class="text-em">穿针法（先一后二）</span>：$\iiint_\Omega f\,dV = \iint_{D_{xy}} \left[ \int_{z_1(x,y)}^{z_2(x,y)} f(x,y,z)\,dz \right] dxdy$，适用于z方向有明确上下界。</p>
+          <p><span class="text-em blue">切片法（先二后一）</span>：$\iiint_\Omega f\,dV = \int_{z_1}^{z_2} \left[ \iint_{D_z} f(x,y,z)\,dxdy \right] dz$，适用于截面面积易求。</p>
+          <p><span class="text-em pink">柱坐标</span>：$x = r\cos\theta,\; y = r\sin\theta,\; z = z$，$dV = r\,dr\,d\theta\,dz$；<span class="text-em orange">球坐标</span>：$x = \rho\sin\phi\cos\theta,\; y = \rho\sin\phi\sin\theta,\; z = \rho\cos\phi$，$dV = \rho^2\sin\phi\,d\rho\,d\phi\,d\theta$。</p>
+          <div class="exam-tag">
+            <span>📝 常见题型：坐标变换、穿针法/切片法应用、计算体积/质量</span>
+            <span class="highlight-tag green">综合大题</span>
+            <span class="highlight-tag blue">应用题</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 曲线积分与曲面积分 -->
+  <div class="card">
+    <div class="card-header"><h2>🌀 曲线·曲面积分</h2><span class="tag">格林 · 高斯 · 计算方法</span></div>
+    <div class="topic-grid">
+      <div class="topic-item">
+        <div class="topic-title">📌 两类曲线积分 · 格林公式 <span class="badge">计算方法与场景</span></div>
+        <div class="core-content">
+          <div class="method-box">
+            <p><span class="text-em">第一类（对弧长）</span>：$\int_L f(x,y)\,ds$<br>
+            <span class="text-em blue">计算方法</span>：参数化 $x=x(t), y=y(t), \alpha \le t \le \beta$，则 $ds = \sqrt{[x'(t)]^2 + [y'(t)]^2}\,dt$，积分化为 $\int_\alpha^\beta f(x(t),y(t)) \sqrt{[x'(t)]^2 + [y'(t)]^2}\,dt$。</p>
+            <p><span class="text-em blue">第二类（对坐标）</span>：$\int_L P\,dx + Q\,dy$<br>
+            <span class="text-em blue">计算方法</span>：参数化 $x=x(t), y=y(t)$，则 $dx = x'(t)dt, dy = y'(t)dt$，积分化为 $\int_\alpha^\beta [P(x(t),y(t))x'(t) + Q(x(t),y(t))y'(t)]\,dt$。</p>
+          </div>
+          <p><span class="text-em pink">格林公式</span>：$\oint_C P\,dx + Q\,dy = \iint_D \left( \frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y} \right) d\sigma$（正向边界）。</p>
+          <div class="method-box">
+            <p><span class="text-em orange">📌 适用场景与做法</span><br>
+            ① 曲线积分为<strong>封闭曲线</strong> → 直接使用格林公式化为二重积分计算。<br>
+            ② 曲线积分路径<strong>不封闭</strong> → 添加辅助弧段或直线段使其封闭，应用格林公式后减去补加路径的积分。<br>
+            ③ 若 $\frac{\partial Q}{\partial x} = \frac{\partial P}{\partial y}$（积分与路径无关）→ 选取简单路径（如平行于坐标轴的折线）计算，或找出势函数 $u$ 使 $du = Pdx + Qdy$，则 $\int_L Pdx+Qdy = u(B)-u(A)$。<br>
+            ④ 求区域面积：$A = \frac12\oint_C x\,dy - y\,dx$。</p>
+          </div>
+          <div class="exam-tag">
+            <span>📝 常见题型：曲线积分计算、格林公式应用（求面积、积分与路径无关、补线法）</span>
+            <span class="highlight-tag pink">技巧型</span>
+            <span class="highlight-tag green">计算题</span>
+          </div>
+        </div>
+      </div>
+      <div class="topic-item">
+        <div class="topic-title">📌 两类曲面积分 · 高斯公式 <span class="badge">计算方法与场景</span></div>
+        <div class="core-content">
+          <div class="method-box">
+            <p><span class="text-em">第一类（对面积）</span>：$\iint_\Sigma f(x,y,z)\,dS$<br>
+            <span class="text-em blue">计算方法</span>：显式曲面 $z=z(x,y)$，$dS = \sqrt{1+z_x^2+z_y^2}\,dxdy$，积分化为 $\iint_{D_{xy}} f(x,y,z(x,y)) \sqrt{1+z_x^2+z_y^2}\,dxdy$。</p>
+            <p><span class="text-em blue">第二类（对坐标）</span>：$\iint_\Sigma P\,dy\,dz + Q\,dz\,dx + R\,dx\,dy$<br>
+            <span class="text-em blue">计算方法</span>：显式曲面 $z=z(x,y)$，取上侧时 $\iint_\Sigma R\,dx\,dy = \iint_{D_{xy}} R(x,y,z(x,y))\,dxdy$（下侧取负）。其他项类似，需根据曲面方向投影到相应坐标平面。</p>
+          </div>
+          <p><span class="text-em pink">高斯公式</span>：$\displaystyle \iint_\Sigma P\,dy\,dz + Q\,dz\,dx + R\,dx\,dy = \iiint_\Omega \left( \frac{\partial P}{\partial x} + \frac{\partial Q}{\partial y} + \frac{\partial R}{\partial z} \right) dV$（外侧）。</p>
+          <div class="method-box">
+            <p><span class="text-em orange">📌 适用场景与做法</span><br>
+            ① 曲面封闭 → 将曲面积分化为三重积分计算。<br>
+            ② 若散度 $\nabla \cdot \mathbf{F} = 0$，则通量为0。<br>
+            ③ 曲面不封闭 → 补面（添加辅助曲面）使其封闭，再应用高斯公式，最后减去补面的积分。<br>
+            ④ 注意曲面方向：外侧为正，内侧为负。</p>
+          </div>
+          <div class="exam-tag">
+            <span>📝 常见题型：曲面积分计算、高斯公式求通量、散度应用、补面技巧</span>
+            <span class="highlight-tag blue">综合应用</span>
+            <span class="highlight-tag green">证明题</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 无穷级数 -->
+  <div class="card">
+    <div class="card-header"><h2>📈 无穷级数</h2><span class="tag">收敛 · 幂级数 · 傅里叶</span></div>
+    <div class="topic-grid">
+      <div class="topic-item">
+        <div class="topic-title">📌 数项级数 <span class="badge">正项 · 交错 · 绝对收敛</span></div>
+        <div class="core-content">
+          <p><span class="text-em">正项级数</span>：比较判别法、比值（达朗贝尔）判别法 $\lim_{n\to\infty} \frac{a_{n+1}}{a_n} = \rho$（$\rho<1$收敛，$\rho>1$发散），根值判别法。</p>
+          <p><span class="text-em blue">交错级数</span>：莱布尼茨判别法（单调递减趋于0则收敛）。</p>
+          <p><span class="text-em pink">绝对收敛</span>：$\sum |a_n|$ 收敛 ⇒ 绝对收敛；若 $\sum a_n$ 收敛而 $\sum |a_n|$ 发散，则条件收敛。</p>
+          <div class="exam-tag">
+            <span>📝 常见题型：判别收敛性、绝对/条件收敛、p级数/等比级数</span>
+            <span class="highlight-tag">证明题</span>
+            <span class="highlight-tag green">选择题</span>
+            <span class="highlight-tag blue">判别题</span>
+          </div>
+        </div>
+      </div>
+      <div class="topic-item">
+        <div class="topic-title">📌 幂级数 <span class="badge">收敛域 · 和函数 · 展开</span></div>
+        <div class="core-content">
+          <p><span class="text-em">收敛半径</span>：$R = \frac{1}{\lim\limits_{n\to\infty} \sqrt[n]{|a_n|}}$ 或 $R = \lim\limits_{n\to\infty} \left| \frac{a_n}{a_{n+1}} \right|$，收敛区间 $(x_0-R,\; x_0+R)$，端点需单独判定。</p>
+          <p><span class="text-em blue">和函数</span>：在收敛域内，幂级数可逐项求导/积分，常见展开式 $e^x = \sum_{n=0}^\infty \frac{x^n}{n!}$，$\frac{1}{1-x} = \sum_{n=0}^\infty x^n$。</p>
+          <p><span class="text-em pink">间接展开</span>：利用已知展开式（如 $\sin x, \cos x, \ln(1+x)$）通过变量代换、四则运算、求导/积分得到。</p>
+          <div class="exam-tag">
+            <span>📝 常见题型：求收敛半径/收敛域、求幂级数和函数、函数展开为幂级数</span>
+            <span class="highlight-tag green">综合大题</span>
+            <span class="highlight-tag blue">证明题</span>
+            <span class="highlight-tag">计算题</span>
+          </div>
+        </div>
+      </div>
+      <div class="topic-item">
+        <div class="topic-title">📌 傅里叶级数 <span class="badge">周期 2π · 完整公式</span></div>
+        <div class="core-content">
+          <p><span class="text-em">傅里叶系数</span>：<br>
+          $a_0 = \frac{1}{\pi}\int_{-\pi}^{\pi} f(x)\,dx$，<br>
+          $a_n = \frac{1}{\pi}\int_{-\pi}^{\pi} f(x)\cos(nx)\,dx \quad (n=1,2,\dots)$，<br>
+          $b_n = \frac{1}{\pi}\int_{-\pi}^{\pi} f(x)\sin(nx)\,dx \quad (n=1,2,\dots)$。</p>
+          <p><span class="text-em blue">傅里叶级数</span>：$f(x) \sim \frac{a_0}{2} + \sum_{n=1}^\infty \left( a_n \cos(nx) + b_n \sin(nx) \right)$。</p>
+          <p><span class="text-em pink">收敛定理</span>：若f以$2\pi$为周期且分段光滑，则傅里叶级数收敛于 $\frac{f(x^+)+f(x^-)}{2}$。</p>
+          <p><span class="text-em orange">奇偶延拓</span>：奇函数展开为正弦级数（$a_n=0$），偶函数展开为余弦级数（$b_n=0$）。</p>
+          <div class="exam-tag">
+            <span>📝 常见题型：求傅里叶系数、写出级数、利用收敛定理求和、奇偶延拓</span>
+            <span class="highlight-tag pink">填空题</span>
+            <span class="highlight-tag green">选择题</span>
+            <span class="highlight-tag blue">计算题</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footnote">📚 同济八版 · 高等数学下册 深度精讲 · 公式由 MathJax 渲染</div>
+</div>
+</body>
+</html>
