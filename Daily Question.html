@@ -1284,50 +1284,181 @@
 
     // ======================= 教师后台 =======================
     async function renderMatrixTable() {
-        await loadFromCloud();
-        let studentsMap = new Map();
-        for(let [sid, name] of validStudents) studentsMap.set(sid, { name, scoresByDate: new Map() });
-        allSubmissions.forEach(sub => {
-            if(studentsMap.has(sub.studentId)) studentsMap.get(sub.studentId).scoresByDate.set(sub.dateStr, sub.score);
+    console.log('🔄 开始渲染教师后台...');
+    
+    // 1. 重新从云端加载最新数据
+    await loadFromCloud();
+    console.log('📊 总记录数:', allSubmissions.length);
+    
+    // 2. 构建学生数据映射
+    let studentsMap = new Map();
+    for (let [sid, name] of validStudents) {
+        studentsMap.set(sid, { 
+            name: name, 
+            scoresByDate: new Map()
         });
+    }
+    
+    // 3. 填充分数数据
+    let matchCount = 0;
+    allSubmissions.forEach(sub => {
+        const sid = sub.studentId || sub.student_id;
+        const dateStr = sub.dateStr || sub.date_str;
+        const score = sub.score;
         
-        let today = new Date();
-        let rows = [];
-        for(let [sid, data] of studentsMap) {
-            let scores = [];
-            for(let date of allDateColumns) {
-                let score = data.scoresByDate.get(date);
-                let dateObj = new Date(date);
-                if(dateObj > today) {
-                    scores.push("—");
-                } else if(score !== undefined) {
-                    scores.push(score);
-                } else {
-                    scores.push("未作答");
+        if (sid && studentsMap.has(sid) && dateStr) {
+            studentsMap.get(sid).scoresByDate.set(dateStr, score);
+            matchCount++;
+        }
+    });
+    console.log('✅ 匹配了', matchCount, '条记录到学生名单');
+    
+    // 4. 生成表格行
+    let today = new Date();
+    let rows = [];
+    
+    for (let [sid, data] of studentsMap) {
+        let scores = [];
+        let totalScore = 0;
+        
+        for (let date of allDateColumns) {
+            let dateObj = new Date(date);
+            let score = data.scoresByDate.get(date);
+            
+            if (dateObj > today) {
+                scores.push("—");
+            } else if (score !== undefined && score !== null) {
+                scores.push(score);
+                totalScore += score;
+            } else {
+                scores.push("未作答");
+            }
+        }
+        
+        let totalPossible = getTotalPossibleScoreForStudent(sid);
+        let rate = totalPossible > 0 ? Math.round((totalScore / totalPossible) * 100) + "%" : "0%";
+        rows.push({ 
+            name: data.name, 
+            sid: sid, 
+            scores: scores, 
+            totalScore: totalScore, 
+            rate: rate 
+        });
+    }
+    
+    // 5. 按姓名排序
+    rows.sort((a, b) => a.name.localeCompare(b.name));
+    
+    // 6. 渲染表格头
+    let headerHtml = `<tr><th>姓名</th><th>学号</th>`;
+    for (let date of allDateColumns) {
+        headerHtml += `<th>${date}</th>`;
+    }
+    headerHtml += `<th>总得分</th><th>正确率</th></tr>`;
+    document.getElementById("matrixHeader").innerHTML = headerHtml;
+    
+    // 7. 渲染表格体
+    let tbody = document.getElementById("matrixBody");
+    tbody.innerHTML = "";
+    
+    for (let row of rows) {
+        let tr = `<tr><td style="font-weight:500;">${row.name}</td><td style="font-family:monospace;">${row.sid}</td>`;
+        for (let s of row.scores) {
+            if (s === "—") {
+                tr += `<td class="future-date">${s}</td>`;
+            } else if (s === "未作答") {
+                tr += `<td class="not-submitted">${s}</td>`;
+            } else {
+                tr += `<td>${s}</td>`;
+            }
+        }
+        tr += `<td><strong>${row.totalScore}</strong></td><td><strong>${row.rate}</strong></td></tr>`;
+        tbody.innerHTML += tr;
+    }
+    
+    console.log('✅ 教师后台渲染完成，共', rows.length, '名学生');
+    
+    // 8. 添加教师修改功能（点击分数可修改）
+    addTeacherEditFunction();
+}
+
+// ============================================
+// 教师修改分数功能
+// ============================================
+function addTeacherEditFunction() {
+    document.querySelectorAll('.matrix-table tbody td').forEach(td => {
+        const val = td.innerText.trim();
+        // 只对数字（分数）添加点击修改功能
+        if (!isNaN(parseInt(val)) && td.innerText !== "—" && td.innerText !== "未作答") {
+            const row = td.parentElement;
+            const cells = row.cells;
+            if (cells.length >= 3) {
+                const studentId = cells[1].innerText.trim();
+                // 找到对应的日期
+                const headerCells = document.querySelectorAll('#matrixHeader th');
+                let dateIndex = -1;
+                for (let i = 0; i < cells.length; i++) {
+                    if (cells[i] === td) {
+                        dateIndex = i - 2; // 减去姓名和学号两列
+                        break;
+                    }
+                }
+                
+                if (dateIndex >= 0 && dateIndex < allDateColumns.length) {
+                    const date = allDateColumns[dateIndex];
+                    const originalScore = parseInt(val);
+                    
+                    td.style.cursor = "pointer";
+                    td.style.backgroundColor = "#eef2fa";
+                    td.title = "点击修改分数";
+                    
+                    td.onclick = async function() {
+                        const newScore = prompt(`请输入 ${studentId} 在 ${date} 的新得分（0-10之间的整数）：`, originalScore);
+                        if (newScore !== null && !isNaN(parseInt(newScore))) {
+                            const scoreNum = parseInt(newScore);
+                            if (scoreNum >= 0 && scoreNum <= 10) {
+                                const teacherPwd = prompt('请输入教师密码：');
+                                if (teacherPwd === 'math2026') {
+                                    // 查找记录并更新
+                                    let record = allSubmissions.find(s => 
+                                        (s.studentId === studentId || s.student_id === studentId) && 
+                                        (s.dateStr === date || s.date_str === date)
+                                    );
+                                    
+                                    if (record) {
+                                        // 更新现有记录
+                                        record.score = scoreNum;
+                                        record.evaluationText = (record.evaluationText || '') + `\n[教师修正：得分调整为${scoreNum}]`;
+                                        const { error } = await supabaseClient
+                                            .from('scores')
+                                            .update({ 
+                                                score: scoreNum,
+                                                evaluationText: record.evaluationText 
+                                            })
+                                            .eq('id', record.id);
+                                        
+                                        if (error) {
+                                            alert('修改失败：' + error.message);
+                                        } else {
+                                            alert('✅ 分数已修改并同步到云端！');
+                                            await renderMatrixTable();
+                                        }
+                                    } else {
+                                        alert('未找到该记录，请检查数据');
+                                    }
+                                } else {
+                                    alert('密码错误！');
+                                }
+                            } else {
+                                alert("分数必须在0-10之间！");
+                            }
+                        }
+                    };
                 }
             }
-            let totalScore = scores.filter(s => typeof s === 'number').reduce((a,b)=>a+b,0);
-            let totalPossible = getTotalPossibleScoreForStudent(sid);
-            let rate = totalPossible > 0 ? Math.round((totalScore / totalPossible) * 100) + "%" : "0%";
-            rows.push({ name: data.name, sid, scores, totalScore, rate });
         }
-        rows.sort((a,b)=>a.name.localeCompare(b.name));
-        
-        let headerHtml = `<tr><th>姓名</th><th>学号</th>${allDateColumns.map(d=>`<th>${d}</th>`).join('')}<th>总得分</th><th>正确率</th></tr>`;
-        document.getElementById("matrixHeader").innerHTML = headerHtml;
-        let tbody = document.getElementById("matrixBody");
-        tbody.innerHTML = "";
-        for(let row of rows) {
-            let tr = `<tr><td style="font-weight:500;">${row.name}</td><td style="font-family:monospace;">${row.sid}</td>`;
-            for(let s of row.scores) {
-                if(s === "—") tr += `<td class="future-date">${s}</td>`;
-                else if(s === "未作答") tr += `<td class="not-submitted">${s}</td>`;
-                else tr += `<td>${s}</td>`;
-            }
-            tr += `<td><strong>${row.totalScore}</strong></td><td><strong>${row.rate}</strong></td></tr>`;
-            tbody.innerHTML += tr;
-        }
-    }
+    });
+  }
     
     function exportCSV() {
         let studentsMap = new Map();
