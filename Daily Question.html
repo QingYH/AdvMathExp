@@ -838,33 +838,64 @@
     }
 
     // ======================= Supabase 操作 =======================
-    async function loadFromCloud() {
-        try {
-            console.log('🔄 从云端加载数据...');
-            const { data, error } = await supabaseClient.from('scores').select('*');
-            if (error) throw error;
-            if (data && data.length > 0) {
-                allSubmissions = data;
-                localStorage.setItem("scores_backup", JSON.stringify(data));
-                console.log('✅ 加载成功，共', data.length, '条记录');
-            } else {
-                const localData = localStorage.getItem("scores_backup");
-                if (localData) {
-                    allSubmissions = JSON.parse(localData);
-                    console.log('📱 从本地加载，共', allSubmissions.length, '条记录');
-                }
-            }
-            return true;
-        } catch(e) { 
-            console.warn("加载失败:", e);
+     async function loadFromCloud() {
+    console.log('🔄 从云端加载数据...');
+    
+    try {
+        // 直接从 Supabase 查询最新数据
+        const { data, error } = await supabaseClient
+            .from('scores')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error('❌ 云端查询失败:', error);
+            // 失败时降级到本地
             const localData = localStorage.getItem("scores_backup");
             if (localData) {
                 allSubmissions = JSON.parse(localData);
                 console.log('📱 降级到本地数据，共', allSubmissions.length, '条记录');
             }
-            return false; 
+            return false;
         }
+        
+        // ✅ 关键：只要云端有数据，就用云端的，不管本地有什么
+        if (data && data.length > 0) {
+            allSubmissions = data;
+            // 更新本地缓存
+            localStorage.setItem("scores_backup", JSON.stringify(data));
+            console.log('✅ 云端加载成功，共', data.length, '条记录');
+            
+            // 打印最新日期，便于调试
+            const latestDate = data[0]?.dateStr || '未知';
+            console.log('📊 最新记录日期:', latestDate);
+            const allDates = [...new Set(data.map(s => s.dateStr))].sort();
+            console.log('📊 所有日期:', allDates);
+            
+            return true;
+        } else {
+            // 云端返回空数据，检查本地
+            console.warn('⚠️ 云端返回空数据');
+            const localData = localStorage.getItem("scores_backup");
+            if (localData) {
+                allSubmissions = JSON.parse(localData);
+                console.log('📱 使用本地数据，共', allSubmissions.length, '条记录');
+                return true;
+            }
+            return false;
+        }
+    } catch(e) {
+        console.error('💥 加载异常:', e);
+        // 异常时尝试本地数据
+        const localData = localStorage.getItem("scores_backup");
+        if (localData) {
+            allSubmissions = JSON.parse(localData);
+            console.log('📱 异常降级到本地数据，共', allSubmissions.length, '条记录');
+            return true;
+        }
+        return false;
     }
+ }
 
     async function saveToCloud(record) {
         console.log('🔵 保存到云端...');
