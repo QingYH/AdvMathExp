@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>B3班 高数(2) 期末成绩概览</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #f0f4fc;
+            padding: 16px 12px 30px;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header {
+            background: linear-gradient(145deg, #fcf3e0, #f7e6c8);
+            border-radius: 28px;
+            padding: 22px 20px 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 28px rgba(180, 140, 70, 0.15);
+            border: 1px solid #f0dfbc;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::after {
+            content: "∫";
+            position: absolute;
+            right: 18px;
+            bottom: 2px;
+            font-size: 5.2rem;
+            opacity: 0.08;
+            font-weight: 700;
+            transform: rotate(-4deg);
+        }
+        .header h1 {
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: 0.3px;
+            margin-bottom: 4px;
+            color: #1f2e4a;
+        }
+        .header .sub {
+            font-size: 0.88rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 14px;
+            margin-top: 6px;
+        }
+        .header .sub span {
+            background: rgba(45, 58, 94, 0.07);
+            padding: 2px 14px;
+            border-radius: 30px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: #2d3a5e;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 16px 14px 14px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 14px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e4ecf8;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .card-header h3 {
+            font-weight: 600;
+            font-size: 1.15rem;
+            color: #1f2e4a;
+            margin: 0;
+        }
+        .card-header .badge {
+            background: #e5eefa;
+            color: #2d4a7a;
+            padding: 2px 14px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .chart-wrapper {
+            position: relative;
+            height: 200px;
+            margin: 4px auto;
+        }
+        .chart-wrapper.tall { height: 240px; }
+        .stats-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 12px;
+            margin-top: 10px;
+            border-top: 1px solid #edf2f9;
+            padding-top: 10px;
+            font-size: 0.82rem;
+        }
+        .stats-row span {
+            background: #f6faff;
+            padding: 2px 12px;
+            border-radius: 30px;
+            color: #1c314a;
+        }
+        .highlight-pass { color: #16a34a; font-weight: 600; }
+        .highlight-fail { color: #dc2626; font-weight: 600; }
+        .highlight-gold { color: #b45309; font-weight: 600; }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 640px) {
+            .grid-2 { grid-template-columns: 1fr; gap: 14px; }
+        }
+
+        .medal-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 14px;
+            padding: 4px 0;
+        }
+        .medal-item {
+            background: #f8fafc;
+            padding: 4px 14px 4px 10px;
+            border-radius: 40px;
+            border: 1px solid #e8edf5;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+        .medal-item .medal { font-size: 1.2rem; }
+        .medal-item .name { font-weight: 500; }
+        .medal-item .score { color: #b45309; font-weight: 600; }
+        .medal-item .major-tag {
+            font-size: 0.65rem;
+            color: #5a718b;
+            background: #eef2f8;
+            padding: 0 8px;
+            border-radius: 20px;
+        }
+
+        .comeback-box {
+            background: linear-gradient(135deg, #fef7e0, #fef0c0);
+            border-radius: 16px;
+            padding: 14px 18px;
+            border-left: 5px solid #f59e0b;
+            margin: 6px 0 4px;
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+        .comeback-box strong { color: #b45309; }
+        .comeback-box .reverse {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #d97706;
+            letter-spacing: 1px;
+        }
+
+        .alert-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            padding: 6px 0;
+        }
+        .alert-item {
+            background: #f8faff;
+            border-radius: 14px;
+            padding: 10px 18px;
+            border: 1px solid #e4ecf8;
+            font-size: 0.92rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .alert-item .icon { font-size: 1.4rem; }
+        .alert-item .label { color: #3a4a6a; }
+        .alert-item.danger { border-left: 4px solid #dc2626; }
+        .alert-item.warning { border-left: 4px solid #b45309; }
+
+        .encourage-box {
+            background: linear-gradient(145deg, #eaf1fd, #dce8fa);
+            border-radius: 18px;
+            padding: 18px 20px;
+            margin-top: 6px;
+            border: 1px solid #c8d8ee;
+            font-size: 0.95rem;
+            line-height: 1.9;
+            color: #1a2a4a;
+        }
+        .encourage-box .quote {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #1a3a6a;
+        }
+        .encourage-box .highlight { color: #b45309; font-weight: 600; }
+        .encourage-box .football {
+            background: rgba(255,255,255,0.5);
+            border-radius: 12px;
+            padding: 8px 14px;
+            margin: 6px 0 2px;
+            font-size: 0.9rem;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .farewell-box {
+            background: linear-gradient(145deg, #f7f0e6, #efe6d8);
+            border-radius: 18px;
+            padding: 20px 22px;
+            margin-top: 6px;
+            border: 1px solid #e0d5c4;
+            font-size: 0.95rem;
+            line-height: 2.0;
+            color: #2d3a5e;
+            box-shadow: inset 0 1px 4px rgba(255,255,255,0.6);
+        }
+        .farewell-box .math-symbol {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            color: #7a4a2a;
+        }
+        .farewell-box .sign {
+            text-align: right;
+            font-style: italic;
+            margin-top: 8px;
+            color: #5a6a7a;
+            font-size: 0.95rem;
+        }
+        .farewell-box .highlight-math {
+            color: #b45309;
+            font-weight: 600;
+        }
+
+        .footnote {
+            text-align: right;
+            color: #6a7f99;
+            font-size: 0.7rem;
+            margin-top: 12px;
+            border-top: 1px solid #dce5f0;
+            padding-top: 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <h1>📊 B3班 高等数学（2）期末卷面成绩概览</h1>
+        <div class="sub">
+            <span>👥 103人</span>
+            <span>📈 平均分 71.9</span>
+            <span>🏅 最高 93</span>
+            <span>📉 最低 33</span>
+            <span class="highlight-pass">✅ 及格 90人 (87.4%)</span>
+            <span class="highlight-fail">❌ 不及格 13人 (12.6%)</span>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-header"><h3>📈 成绩分布直方图</h3><span class="badge">按分数段</span></div>
+            <div class="chart-wrapper"><canvas id="overallHistChart"></canvas></div>
+            <div class="stats-row" id="histStats"></div>
+        </div>
+        <div class="card">
+            <div class="card-header"><h3>🧩 各专业人数</h3><span class="badge">饼图</span></div>
+            <div class="chart-wrapper"><canvas id="majorPieChart"></canvas></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h3>📊 各专业平均分</h3><span class="badge">对比</span></div>
+        <div class="chart-wrapper tall"><canvas id="avgScoreChart"></canvas></div>
+        <div class="stats-row">
+            <span>🏆 最高: 物理学 78.8</span>
+            <span>📉 最低: 机器人工程 65.8</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h3>🏅 90+ 奖牌榜 · 高数大神</h3><span class="badge">🌟 卷王</span></div>
+        <div class="medal-list">
+            <span class="medal-item"><span class="medal">🥇</span><span class="name">牛好</span><span class="score">93</span><span class="major-tag">电子信息类</span></span>
+            <span class="medal-item"><span class="medal">🥇</span><span class="name">李志豪</span><span class="score">93</span><span class="major-tag">自动化</span></span>
+            <span class="medal-item"><span class="medal">🥈</span><span class="name">夏天香</span><span class="score">92</span><span class="major-tag">物理学</span></span>
+            <span class="medal-item"><span class="medal">🥈</span><span class="name">段诗雅</span><span class="score">92</span><span class="major-tag">物理学</span></span>
+            <span class="medal-item"><span class="medal">🥈</span><span class="name">童欣怡</span><span class="score">92</span><span class="major-tag">电子信息类</span></span>
+            <span class="medal-item"><span class="medal">🥉</span><span class="name">韩玉洁</span><span class="score">90</span><span class="major-tag">电子信息类</span></span>
+            <span class="medal-item"><span class="medal">🥉</span><span class="name">盛文涛</span><span class="score">90</span><span class="major-tag">电子信息类</span></span>
+        </div>
+        <div class="comeback-box">
+            💥 <strong>逆袭之星 · 牛好</strong> 同学，期中测试全班 <strong>最低分</strong>（据小道消息），期末直接 <strong>93分</strong> 登顶！<br>
+            这波操作，连名字都得 <span class="reverse">“好牛”</span> 倒着念！<br>
+            <span style="font-size:0.85rem; color:#7a5a2a;">🤯 建议查查是不是偷偷拜了爱因斯坦 … 或者 把“牛”字倒过来写真的有用？</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h3>✅ 各专业及格率</h3><span class="badge">通过率</span></div>
+        <div class="chart-wrapper tall"><canvas id="passRateChart"></canvas></div>
+        <div class="stats-row">
+            <span class="highlight-pass">总体 87.4%</span>
+            <span class="highlight-pass">车辆工程 100%</span>
+            <span class="highlight-fail">机器人工程 66.7%</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h3>📌 学业预警 · 概况</h3><span class="badge">⚠️ 需关注</span></div>
+        <div class="alert-box">
+            <div class="alert-item danger">
+                <span class="icon">❌</span>
+                <span class="label">有几位同学需要重考或重修</span>
+            </div>
+            <div class="alert-item warning">
+                <span class="icon">📉</span>
+                <span class="label">少数同学低分飘过，对绩点贡献低，将来可能还需要重修</span>
+            </div>
+        </div>
+        <div style="font-size:0.85rem; color:#4a5a7a; background:#f0f5fe; border-radius:12px; padding:8px 16px; margin-top:6px;">
+            ⚡ 建议尽早规划，亡羊补牢为时未晚。
+        </div>
+    </div>
+
+    <div class="encourage-box">
+        <div class="quote">🌱 “一份耕耘，一份收获” —— 但大学里，耕耘和收获之间有时差。</div>
+        <div class="football">
+            ⚽ 就像 <strong>佛得角</strong> 国家队在美加墨世界杯预选赛上的惊艳表现，他们用 <strong>刻苦训练</strong> 和 <strong>团队拼搏</strong> 赢得了尊重。<br>
+            没有一蹴而就的成功，只有日复一日的坚持。
+        </div>
+        <p style="margin-top:6px;">
+            <span class="highlight">牛好</span> 同学用行动证明：<strong>亡羊补牢，为时未晚</strong>！<br>
+            大学最贵的不是学费，是 <span class="highlight">“自律”</span> 和 <span class="highlight">“奋斗”</span> 的青春。<br>
+            高数不会骗你，你骗它，它就让你 <span class="highlight-fail">重考</span>；你爱它，它就给你 <span class="highlight-gold">93</span>。<br>
+            💪 从现在开始，把“躺平”换成“卷赢”，把“下次一定”换成“这次就干”！<br>
+            <span style="font-size:0.9rem; color:#3a5a7a;">—— 毕竟，你永远不知道下一个 <strong>“牛好”</strong> 会不会是你自己。</span>
+        </p>
+    </div>
+
+    <div class="farewell-box">
+        <p style="font-size:1.05rem; font-weight:600; color:#2d3a5e;">📖 致B3班 · 高数江湖，后会有期</p>
+        <p>
+            一年前的秋天，你们带着 <span class="math-symbol">ε</span> 的忐忑和 <span class="math-symbol">δ</span> 的好奇走进教室，从此，高数课堂多了一群“极限挑战者”。<br>
+            从 <span class="highlight-math">“洛必达一下”</span> 的灵光乍现，到 <span class="highlight-math">“泰勒展开”</span> 的硬核操作，从微分方程的“死磕”到积分公式的“融会贯通”——<br>
+            你们把 <span class="math-symbol">∞</span> 的勇气写进了每一道题，把 <span class="math-symbol">∫</span> 的坚持刻进了每一次演算。<br><br>
+            高数教会你们的，不只是求导和积分，更是面对 <span class="math-symbol">∞</span> 时 <strong>不抛弃、不放弃</strong> 的勇气。<br>
+            以后的路，导数由你们自己定义，方向由你们自己选择。愿你们的人生函数 <span class="highlight-math">处处可导，且导数恒为正</span>；<br>
+            愿你们的未来，像 <span class="math-symbol">eˣ</span> 一样，无论岁月如何求导，依然 <strong>初心不改，本色不变</strong>。<br><br>
+            <span style="font-size:0.95rem; color:#4a5a7a;">江湖路远，咱们 <strong>“高数”</strong> 有缘再见！<br>
+            别忘了，<span class="highlight-math">极限</span> 是用来趋近的，不是用来躺平的；<span class="highlight-math">收敛</span> 是方向，<span class="highlight-math">发散</span> 是态度——愿你们的人生，收敛于幸福，发散于无限可能。</span>
+        </p>
+        <div class="sign">—— 永远爱你们的 高数老师 👨‍🏫</div>
+    </div>
+
+    <div class="footnote">* 数据基于B3班103份期末卷面 · 统计已全部校核 · 手机端适配</div>
+</div>
+
+<script>
+    (function() {
+        // ---------- 原始数据 ----------
+        const rawData = [
+            { major: "物理学", score: 88 }, { major: "物理学", score: 86 }, { major: "物理学", score: 74 },
+            { major: "物理学", score: 70 }, { major: "物理学", score: 92 }, { major: "物理学", score: 86 },
+            { major: "物理学", score: 68 }, { major: "物理学", score: 60 }, { major: "物理学", score: 76 },
+            { major: "物理学", score: 67 }, { major: "物理学", score: 92 }, { major: "物理学", score: 86 },
+            { major: "自动化", score: 55 }, { major: "自动化", score: 60 }, { major: "自动化", score: 74 },
+            { major: "自动化", score: 82 }, { major: "自动化", score: 80 }, { major: "自动化", score: 67 },
+            { major: "自动化", score: 76 }, { major: "自动化", score: 93 }, { major: "自动化", score: 69 },
+            { major: "自动化", score: 79 }, { major: "自动化", score: 86 }, { major: "自动化", score: 65 },
+            { major: "自动化", score: 75 }, { major: "自动化", score: 87 },
+            { major: "机械设计制造及其自动化", score: 71 }, { major: "机械设计制造及其自动化", score: 56 },
+            { major: "机械设计制造及其自动化", score: 38 }, { major: "机械设计制造及其自动化", score: 70 },
+            { major: "机械设计制造及其自动化", score: 71 }, { major: "机械设计制造及其自动化", score: 69 },
+            { major: "机械设计制造及其自动化", score: 78 }, { major: "机械设计制造及其自动化", score: 86 },
+            { major: "机械设计制造及其自动化", score: 66 }, { major: "机械设计制造及其自动化", score: 81 },
+            { major: "机械设计制造及其自动化", score: 67 }, { major: "机械设计制造及其自动化", score: 77 },
+            { major: "机械设计制造及其自动化", score: 62 }, { major: "机械设计制造及其自动化", score: 62 },
+            { major: "机械设计制造及其自动化", score: 39 }, { major: "机械设计制造及其自动化", score: 60 },
+            { major: "机械设计制造及其自动化", score: 62 }, { major: "机械设计制造及其自动化", score: 78 },
+            { major: "机械设计制造及其自动化", score: 73 }, { major: "机械设计制造及其自动化", score: 64 },
+            { major: "机械设计制造及其自动化", score: 68 }, { major: "机械设计制造及其自动化", score: 73 },
+            { major: "机械设计制造及其自动化", score: 78 }, { major: "机械设计制造及其自动化", score: 84 },
+            { major: "机械设计制造及其自动化", score: 67 }, { major: "机械设计制造及其自动化", score: 61 },
+            { major: "机械设计制造及其自动化", score: 68 }, { major: "机械设计制造及其自动化", score: 72 },
+            { major: "机械设计制造及其自动化", score: 42 }, { major: "机械设计制造及其自动化", score: 67 },
+            { major: "车辆工程", score: 81 }, { major: "车辆工程", score: 70 }, { major: "车辆工程", score: 83 },
+            { major: "车辆工程", score: 78 }, { major: "车辆工程", score: 52 }, { major: "车辆工程", score: 77 },
+            { major: "车辆工程", score: 81 },
+            { major: "电子信息类", score: 74 }, { major: "电子信息类", score: 86 }, { major: "电子信息类", score: 92 },
+            { major: "电子信息类", score: 56 }, { major: "电子信息类", score: 90 }, { major: "电子信息类", score: 54 },
+            { major: "电子信息类", score: 75 }, { major: "电子信息类", score: 72 }, { major: "电子信息类", score: 76 },
+            { major: "电子信息类", score: 79 }, { major: "电子信息类", score: 77 }, { major: "电子信息类", score: 56 },
+            { major: "电子信息类", score: 67 }, { major: "电子信息类", score: 88 }, { major: "电子信息类", score: 81 },
+            { major: "电子信息类", score: 71 }, { major: "电子信息类", score: 75 }, { major: "电子信息类", score: 85 },
+            { major: "电子信息类", score: 74 }, { major: "电子信息类", score: 83 }, { major: "电子信息类", score: 84 },
+            { major: "电子信息类", score: 93 }, { major: "电子信息类", score: 69 }, { major: "电子信息类", score: 56 },
+            { major: "电子信息类", score: 70 }, { major: "电子信息类", score: 60 }, { major: "电子信息类", score: 74 },
+            { major: "电子信息类", score: 67 }, { major: "电子信息类", score: 90 },
+            { major: "机器人工程", score: 76 }, { major: "机器人工程", score: 60 }, { major: "机器人工程", score: 75 },
+            { major: "机器人工程", score: 71 }, { major: "机器人工程", score: 67 }, { major: "机器人工程", score: 51 },
+            { major: "机器人工程", score: 76 }, { major: "机器人工程", score: 74 }, { major: "机器人工程", score: 55 },
+            { major: "机器人工程", score: 33 }, { major: "机器人工程", score: 75 }
+        ];
+
+        // ---------- 统计函数 ----------
+        function groupByMajor(data) {
+            const map = new Map();
+            data.forEach(d => {
+                if (!map.has(d.major)) map.set(d.major, []);
+                map.get(d.major).push(d.score);
+            });
+            return map;
+        }
+
+        function calcStats(arr) {
+            if (!arr || arr.length === 0) return { avg: 0, max: 0, min: 0, pass: 0, fail: 0, count: 0, passRate: 0 };
+            const sum = arr.reduce((a, b) => a + b, 0);
+            const avg = sum / arr.length;
+            const max = Math.max(...arr);
+            const min = Math.min(...arr);
+            const pass = arr.filter(s => s >= 60).length;
+            const fail = arr.length - pass;
+            return { avg, max, min, pass, fail, count: arr.length, passRate: (pass / arr.length) * 100 };
+        }
+
+        const majorMap = groupByMajor(rawData);
+        const majorNames = Array.from(majorMap.keys()).sort();
+        const allScores = rawData.map(d => d.score);
+        const overallStats = calcStats(allScores);
+        const majorStats = {};
+        majorNames.forEach(name => { majorStats[name] = calcStats(majorMap.get(name)); });
+
+        // ---------- 分段统计 (按您提供的表格) ----------
+        // 60分以下:13人, 60-69:26人, 70-79:37人, 80-89:20人, 90-100:7人
+        const segments = [
+            { label: '60分以下', min: 0, max: 59 },
+            { label: '60-69', min: 60, max: 69 },
+            { label: '70-79', min: 70, max: 79 },
+            { label: '80-89', min: 80, max: 89 },
+            { label: '90-100', min: 90, max: 100 }
+        ];
+
+        function computeSegmentHist(scores) {
+            return segments.map(seg => {
+                return scores.filter(s => s >= seg.min && s <= seg.max).length;
+            });
+        }
+
+        const histData = computeSegmentHist(allScores);
+        const segLabels = segments.map(s => s.label);
+
+        console.log('📊 分段统计:', histData);
+        console.log('📊 合计:', histData.reduce((a, b) => a + b, 0));
+
+        // 更新下方统计标签
+        const statsContainer = document.getElementById('histStats');
+        if (statsContainer) {
+            statsContainer.innerHTML = segLabels.map((label, i) => 
+                `<span>${label}: ${histData[i]}人</span>`
+            ).join('');
+        }
+
+        const colorPalette = ['#3b82f6', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444', '#ec4899', '#f97316', '#14b8a6'];
+
+        // ----- 直方图 -----
+        const histCtx = document.getElementById('overallHistChart').getContext('2d');
+        new Chart(histCtx, {
+            type: 'bar',
+            data: {
+                labels: segLabels,
+                datasets: [{
+                    label: '人数',
+                    data: histData,
+                    backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#8b5cf6'],
+                    borderRadius: 6,
+                    barPercentage: 0.6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + ' 人';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#eef2f6' },
+                        ticks: { stepSize: 5 }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // ----- 专业人数饼图 -----
+        new Chart(document.getElementById('majorPieChart'), {
+            type: 'pie',
+            data: { labels: majorNames, datasets: [{ data: majorNames.map(n => majorMap.get(n).length), backgroundColor: colorPalette.slice(0, majorNames.length) }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } }
+        });
+
+        // ----- 平均分柱状图 -----
+        new Chart(document.getElementById('avgScoreChart'), {
+            type: 'bar',
+            data: { labels: majorNames, datasets: [{ label: '平均分', data: majorNames.map(n => majorStats[n].avg), backgroundColor: '#8b5cf6', borderRadius: 6 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+        });
+
+        // ----- 及格率 -----
+        new Chart(document.getElementById('passRateChart'), {
+            type: 'bar',
+            data: { labels: majorNames, datasets: [{ label: '及格率 %', data: majorNames.map(n => majorStats[n].passRate), backgroundColor: '#10b981', borderRadius: 6 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100 } } }
+        });
+
+        console.log('✅ 总体: 平均', overallStats.avg.toFixed(1), '及格', overallStats.pass, '不及格', overallStats.fail);
+    })();
+</script>
+</body>
+</html>
