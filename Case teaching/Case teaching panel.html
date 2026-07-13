@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>高等数学 · 现实类比知识库</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      background: radial-gradient(circle at 20% 30%, #0b1a2e, #0a0f1a);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px 40px;
+      position: relative;
+    }
+
+    /* 高等数学特征背景 */
+    body::before {
+      content: "∫ ∮ ∂ ∇ ∑ ∏ ∞ √ ± ∆";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      font-size: 8vw;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.025);
+      letter-spacing: 0.2em;
+      line-height: 1.8;
+      text-align: center;
+      pointer-events: none;
+      z-index: 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px;
+      opacity: 0.5;
+      transform: rotate(-5deg) scale(1.2);
+      font-family: 'Times New Roman', serif;
+    }
+
+    .math-float {
+      position: fixed;
+      color: rgba(255, 215, 100, 0.04);
+      font-size: 4rem;
+      font-weight: 300;
+      pointer-events: none;
+      z-index: 0;
+      font-family: 'Times New Roman', serif;
+    }
+    .math-float:nth-child(1) { top: 8%; left: 5%; transform: rotate(10deg); }
+    .math-float:nth-child(2) { bottom: 15%; right: 3%; transform: rotate(-8deg); }
+    .math-float:nth-child(3) { top: 40%; left: 2%; font-size: 6rem; opacity: 0.03; }
+    .math-float:nth-child(4) { bottom: 30%; right: 8%; font-size: 5rem; opacity: 0.05; }
+
+    /* 主标题 */
+    .page-header {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      max-width: 1300px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .page-header h1 {
+      font-size: 2.6rem;
+      font-weight: 300;
+      letter-spacing: 4px;
+      color: #f0e9d8;
+      text-shadow: 0 0 20px rgba(200, 180, 120, 0.2), 0 4px 10px rgba(0,0,0,0.8);
+      background: rgba(10, 18, 30, 0.4);
+      backdrop-filter: blur(4px);
+      display: inline-block;
+      padding: 12px 40px;
+      border-radius: 80px 20px 80px 20px;
+      border-left: 4px solid #e8b86d;
+      border-right: 1px solid rgba(255,215,150,0.2);
+      font-family: 'Times New Roman', serif;
+    }
+    .page-header .subhead {
+      color: #adc0d6;
+      margin-top: 8px;
+      font-size: 1.05rem;
+      letter-spacing: 2px;
+      opacity: 0.8;
+      background: rgba(0,0,0,0.2);
+      display: inline-block;
+      padding: 6px 24px;
+      border-radius: 40px;
+      backdrop-filter: blur(2px);
+    }
+
+    /* 主网格 */
+    .knowledge-grid {
+      position: relative;
+      z-index: 2;
+      max-width: 1300px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 28px 22px;
+      justify-content: center;
+      background: rgba(10, 18, 30, 0.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      padding: 30px 25px;
+      border-radius: 56px 28px 56px 28px;
+      box-shadow: 0 25px 45px -12px rgba(0,0,0,0.8), inset 0 1px 2px rgba(255,255,240,0.06);
+      border: 1px solid rgba(255, 215, 150, 0.08);
+    }
+
+    /* 卡片 - 新设计：包含标题+内容+类比 */
+    .knowledge-card {
+      background: rgba(25, 35, 50, 0.7);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      border-radius: 28px 12px 28px 12px;
+      padding: 22px 16px 18px;
+      box-shadow: 0 10px 20px -8px rgba(0,0,0,0.6), inset 0 -2px 0 rgba(255,255,200,0.05);
+      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+      display: flex;
+      flex-direction: column;
+      border-left: 6px solid transparent;
+      border-right: 1px solid rgba(255,255,240,0.04);
+      cursor: pointer;
+      color: #f0f3fa;
+      min-height: 180px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .knowledge-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 20px 30px -8px rgba(0, 0, 0, 0.7), 0 0 0 2px rgba(255, 215, 120, 0.15);
+      backdrop-filter: blur(6px);
+      background: rgba(35, 50, 70, 0.85);
+    }
+
+    .knowledge-card:active {
+      transform: scale(0.96);
+      transition-duration: 0.08s;
+    }
+
+    /* 不同模块颜色 (更鲜明) */
+    .knowledge-card[data-topic="0"] { background: linear-gradient(145deg, #1e2f4a, #142433); border-left-color: #f9b84a; }
+    .knowledge-card[data-topic="1"] { background: linear-gradient(145deg, #1f3f3a, #152b27); border-left-color: #5fc1b0; }
+    .knowledge-card[data-topic="2"] { background: linear-gradient(145deg, #3f2a3e, #2c1d2b); border-left-color: #d96c9c; }
+    .knowledge-card[data-topic="3"] { background: linear-gradient(145deg, #3d3a28, #2a281c); border-left-color: #d4b86a; }
+    .knowledge-card[data-topic="4"] { background: linear-gradient(145deg, #1f3643, #14262e); border-left-color: #6a9fc7; }
+    .knowledge-card[data-topic="5"] { background: linear-gradient(145deg, #3b2e3f, #281e2b); border-left-color: #b380d0; }
+    .knowledge-card[data-topic="6"] { background: linear-gradient(145deg, #2d3f2d, #1d2b1d); border-left-color: #7ebd7e; }
+    .knowledge-card[data-topic="7"] { background: linear-gradient(145deg, #3f3028, #2c211b); border-left-color: #e5956a; }
+    .knowledge-card[data-topic="8"] { background: linear-gradient(145deg, #263545, #19222e); border-left-color: #7aa5c9; }
+    .knowledge-card[data-topic="9"] { background: linear-gradient(145deg, #3a2f44, #261e30); border-left-color: #b28bce; }
+    .knowledge-card[data-topic="10"] { background: linear-gradient(145deg, #2d3e3b, #1b2b28); border-left-color: #62b5a8; }
+    .knowledge-card[data-topic="11"] { background: linear-gradient(145deg, #3f3328, #2c2219); border-left-color: #dba56d; }
+
+    /* 卡片内部 */
+    .card-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      margin-bottom: 4px;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      color: #f4f8ff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px dashed rgba(255,215,150,0.15);
+      padding-bottom: 6px;
+    }
+    .card-title .badge {
+      font-size: 0.7rem;
+      background: rgba(0,0,0,0.3);
+      padding: 2px 12px;
+      border-radius: 30px;
+      font-weight: 400;
+      font-family: 'Times New Roman', serif;
+      color: #c9d8e8;
+      letter-spacing: 0.5px;
+    }
+
+    .card-summary {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin: 10px 0 8px;
+      opacity: 0.9;
+      color: #dde6f0;
+    }
+
+    .card-analogy {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 16px 4px 16px 4px;
+      padding: 12px 14px;
+      margin-top: 6px;
+      border-left: 3px solid rgba(255,215,120,0.3);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #d4dfec;
+      backdrop-filter: blur(2px);
+    }
+    .card-analogy strong {
+      color: #f5e3b0;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+    .card-analogy i {
+      font-style: italic;
+      opacity: 0.8;
+    }
+
+    .card-link-hint {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+      color: #bcc8dd;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: flex-end;
+      border-top: 1px solid rgba(255,255,240,0.04);
+      padding-top: 8px;
+    }
+    .knowledge-card:hover .card-link-hint {
+      opacity: 1;
+      color: #f5e9c0;
+    }
+    .card-link-hint::after {
+      content: "↗";
+      font-size: 1rem;
+      transition: transform 0.2s;
+    }
+    .knowledge-card:hover .card-link-hint::after {
+      transform: translateX(4px) rotate(-5deg);
+    }
+
+    .knowledge-card a {
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      width: 100%;
+    }
+
+    /* 手机优化 */
+    @media (max-width: 600px) {
+      .knowledge-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 18px;
+        padding: 20px 14px;
+        border-radius: 32px 16px 32px 16px;
+      }
+      .page-header h1 {
+        font-size: 1.8rem;
+        padding: 10px 20px;
+        letter-spacing: 2px;
+      }
+      .page-header .subhead {
+        font-size: 0.9rem;
+        padding: 4px 16px;
+      }
+      .knowledge-card {
+        padding: 16px 12px;
+        min-height: 160px;
+      }
+      .card-title {
+        font-size: 1.2rem;
+      }
+      .card-summary {
+        font-size: 0.85rem;
+      }
+      .card-analogy {
+        font-size: 0.8rem;
+        padding: 10px 10px;
+      }
+      body::before {
+        font-size: 12vw;
+        opacity: 0.2;
+        transform: rotate(-3deg) scale(1);
+      }
+      .math-float {
+        font-size: 2.5rem;
+        opacity: 0.03;
+      }
+    }
+    @media (max-width: 400px) {
+      .knowledge-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 14px 10px;
+      }
+      .knowledge-card {
+        min-height: 140px;
+      }
+      .card-title {
+        font-size: 1.1rem;
+      }
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      background: #0b141f;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #4a6180;
+      border-radius: 12px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #7a9ac0;
+    }
+  </style>
+</head>
+<body>
+  <div class="math-float">∫</div>
+  <div class="math-float">∂</div>
+  <div class="math-float">∑</div>
+  <div class="math-float">∞</div>
+
+  <!-- 标题区域 -->
+  <header class="page-header">
+    <h1>📐 高数·现实透镜</h1>
+    <div class="subhead">核心概念 · 类比解读 · 点击探索</div>
+  </header>
+
+  <!-- 知识网格 -->
+  <div class="knowledge-grid" id="knowledgeGrid">
+    <!-- 每个卡片：标题+摘要+类比+链接 -->
+    <div class="knowledge-card" data-topic="0">
+      <a href="https://baike.baidu.com/item/%E6%9E%81%E9%99%90" target="_blank" rel="noopener">
+        <div class="card-title">极限 <span class="badge">ε-δ</span></div>
+        <div class="card-summary">函数无限逼近某值的行为</div>
+        <div class="card-analogy"><strong>🎯 现实类比：</strong> 你不断靠近一扇门，但永远差1毫米 —— 门就是极限。</div>
+        <div class="card-link-hint">展开链接</div>
+      </a>
+    </div>
+
+    <div class="knowledge-card" data-topic="1">
+      <a href="https://baike.baidu.com/item/%E5%AF%BC%E6%95%B0" target="_blank" rel="noopener">
+        <div class="card-title">导数 <span class="badge">dy/dx</span></div>
+        <div class="card-summary">瞬时变化率 · 斜率</div>
+        <div class="card-analogy"><strong>🚗 现实类比：</strong> 车速表显示的就是位移对时间的导数——此刻的瞬时速度。</div>
+        <div class="card-link-hint">展开链接</div>
+      </a>
+    </div>
+
+    <div class="knowledge-card" data-topic="2">
+      <a href="https://baike.baidu.com/item/%E7%A7%AF%E5%88%86" target="_blank" rel="noopener">
+        <div class="card-title">不定积分 <span class="badge">∫</span></div>
+        <div class="card-summary">已知导数反求原函数</div>
+        <div class="card-analogy"><strong>🧩 现实类比：</strong> 已知速度变化规律，反推出位移公式 —— 就像拼回被打散的拼图。</div>
+        <div class="card-link-hint">展开链接</div>
+      </a>
+    </div>
+
+    <div class="knowledge-card" data-topic="3">
+      <a href="https://baike.baidu.com/item/%E5%AE%9A%E7%A7%AF%E5%88%86" target="_blank" rel="noopener">
+        <div class="card-title">定积分 <span class="badge">∫ₐᵇ</span></div>
+        <div class="card-summary">区间上的累积量</div>
+        <div class="card-analogy"><strong>📊 现实类比：</strong> 用无数小矩形逼近不规则图形面积 —— 就像用像素拼出曲线下的面积。</div>
+        <div class="card-link-hint">展开链接</div>
+      </a>
+    </div>
+
+    <div class="knowledge-card" data-topic="4">
+      <a href="https://baike.baidu.com/item/%E5%BE%AE%E5%88%86%E6%96%B9%E7%A8%8B" target="_blank" rel="noopener">
+        <div class="card-title">微分方程 <span class="badge">ODE</span></div>
+        <div class="card-summary">含未知函数及其导数的方程</div>
+        <div class="card-analogy"><strong>🌊 现实类比：</strong> 描述水池排水速度与水位的关系 —— 预测水位随时间的变化。</div>
+        <div class="card-link-hint">展开链接</div>
+      </a>
+    </div>
+
+    <div class="knowledge-card" data-topic="5">
+      <a href="https://baike.baidu.com/item/%E5%A4%9A%E5%85%83%E5%87%BD%E6%95%B0" target="_blank" rel="noopener">
+        <div class="card-title">多元函数 <span class="badge">∇</span></div>
+        <div class="card-summary">多个变量的函数 · 梯度</div>
+        <div class="card-analogy"><strong>⛰️ 现实类比：</strong> 地形图高度是经度与纬度的函数 —— 梯度指向最陡峭的上坡方向。</div>
+        <div class="card-link-hint">展开链接</div>
+      </a>
+    </div>
+
+    <div class="knowledge-card" data-topic="6">
+      <a href="https://baike.baidu.com/item/%E9%87%8D%E7%A7%AF%E5%88%86" target="_blank" rel="noopener">
+        <div class="card-title">重积分 <span class="badge">∬∭</span></div>
+        <div class="card-summary">多维空间上的累积</div>
+        <div class="card-analogy"><strong>🏔️ 现实类比：</strong> 计算不规则山体的体积 —— 将山切成小方块再累加。</div>
+        <div class="card-link-hint">展开链接</div>
+      </a>
+    </div>
+
+    <div class="knowledge-card" data-topic="7">
+      <a href="https://baike.baidu.com/item/%E6%9B%B2%E7%BA%BF%E7%A7%AF%E5%88%86" target="_blank" rel="noopener">
+        <div class="card-title">曲线积分 <span class="badge">∮</span></div>
+        <div class="card-summary">沿曲线累积场量</div>
+        <div class="card-analogy"><strong>🔄 现实类比：</strong> 计算力沿曲线做的功 —— 就像沿山路推车，每段做功累加。</div>
+        <div class="card-link-hint">展开链接</div>
+      </a>
+    </div>
+
+    <div class="knowledge-card" data-topic="8">
+      <a href="https://baike.baidu.com/item/%E6%9B%B2%E9%9D%A2%E7%A7%AF%E5%88%86" target="_blank" rel="noopener">
+        <div class="card-title">曲面积分 <span class="badge">∯</span></div>
+        <div class="card-summary">通过曲面的通量</div>
+        <div class="card-analogy"><strong>🌀 现实类比：</strong> 计算通过气球表面的气流总量 —— 高斯定理的直观体现。</div>
+        <div class="card-link-hint">展开链接</div>
+      </a>
+    </div>
+
+    <div class="knowledge-card" data-topic="9">
+      <a href="https://baike.baidu.com/item/%E7%BA%A7%E6%95%B0" target="_blank" rel="noopener">
+        <div class="card-title">级数 <span class="badge">∑</span></div>
+        <div class="card-summary">无限项求和</div>
+        <div class="card-analogy"><strong>📈 现实类比：</strong> 你每次存一半钱，无限次后总金额趋近于一个有限值 (等比级数)。</div>
+        <div class="card-link-hint">展开链接</div>
+      </a>
+    </div>
+
+    <div class="knowledge-card" data-topic="10">
+      <a href="https://baike.baidu.com/item/%E5%82%85%E9%87%8C%E5%8F%B6%E7%BA%A7%E6%95%B0" target="_blank" rel="noopener">
+        <div class="card-title">傅里叶级数 <span class="badge">🎵</span></div>
+        <div class="card-summary">用正弦波合成复杂周期信号</div>
+        <div class="card-analogy"><strong>🎶 现实类比：</strong> 音乐中的和声 —— 不同频率的音叉叠加形成独特音色。</div>
+        <div class="card-link-hint">展开链接</div>
+      </a>
+    </div>
+
+    <div class="knowledge-card" data-topic="11">
+      <a href="https://baike.baidu.com/item/%E7%9F%A9%E9%98%B5" target="_blank" rel="noopener">
+        <div class="card-title">线性代数 <span class="badge">矩阵</span></div>
+        <div class="card-summary">向量变换与特征系统</div>
+        <div class="card-analogy"><strong>🧭 现实类比：</strong> 图像旋转、缩放 —— 矩阵就是变换的“操作手册”。</div>
+        <div class="card-link-hint">展开链接</div>
+      </a>
+    </div>
+    <!-- 可继续扩展 -->
+  </div>
+
+  <script>
+    (function() {
+      console.log('📚 高等数学·现实类比知识库已加载。点击卡片查看链接。');
+      // 所有卡片已包含完整内容，无需额外逻辑
+    })();
+  </script>
+</body>
+</html>

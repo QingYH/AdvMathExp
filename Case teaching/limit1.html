@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>双案例 · 数列极限与函数极限</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: #080f1e;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+        }
+        .card {
+            max-width: 1400px;
+            width: 100%;
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(3px);
+            border-radius: 48px;
+            padding: 22px 20px 30px;
+            box-shadow: 0 28px 56px -16px #000000ee;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        h1 {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 18px;
+            color: #f0f9ff;
+            font-weight: 300;
+            font-size: 1.7rem;
+            letter-spacing: 0.8px;
+            padding: 0 4px 14px 4px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        h1 small {
+            font-size: 0.8rem;
+            font-weight: 300;
+            color: #9bbdd9;
+            background: rgba(0,20,40,0.6);
+            padding: 4px 18px;
+            border-radius: 40px;
+            border: 1px solid #2f4b66;
+            margin-left: auto;
+            white-space: nowrap;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 18px;
+        }
+        @media (max-width: 900px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+
+        .case-card {
+            background: #12273d;
+            border-radius: 36px;
+            padding: 20px 18px 22px;
+            box-shadow: inset 0 2px 8px #00000088, 0 14px 28px -14px #000000cc;
+            border: 1px solid #3a5a77;
+            display: flex;
+            flex-direction: column;
+        }
+        .case-card .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .case-card .header h2 {
+            color: #c6dcee;
+            font-weight: 300;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .case-card .header h2 .term {
+            font-weight: 600;
+            color: #f5d742;
+            background: rgba(245, 215, 66, 0.12);
+            padding: 0 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(245, 215, 66, 0.2);
+        }
+        .case-card .header h2 span {
+            background: #2a4863;
+            padding: 0 14px;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            color: #b3d6f0;
+        }
+        .case-card .header .tag {
+            background: #1d3d57;
+            padding: 4px 16px;
+            border-radius: 30px;
+            color: #b3d6f0;
+            font-size: 0.75rem;
+            border: 1px solid #3a5a77;
+            font-family: 'Courier New', monospace;
+        }
+        .canvas-wrapper {
+            background: #0b1725;
+            border-radius: 24px;
+            padding: 6px;
+            box-shadow: inset 0 4px 16px #00000088;
+        }
+        .canvas-wrapper canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: #0f1e2e;
+            border-radius: 20px;
+            touch-action: none;
+        }
+
+        .control-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            margin-top: 14px;
+        }
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1 1 180px;
+            background: #102433;
+            padding: 6px 16px 6px 18px;
+            border-radius: 60px;
+            border: 1px solid #2f4b66;
+        }
+        .slider-group label {
+            color: #c0def5;
+            font-weight: 400;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+        .slider-group label .highlight {
+            font-weight: 600;
+        }
+        .slider-group input[type="range"] {
+            flex: 1;
+            min-width: 50px;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #2e4d6b;
+            border-radius: 6px;
+            outline: none;
+        }
+        .slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #f5c542;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #f5b342bb;
+            border: 2px solid #ffd966;
+            cursor: pointer;
+        }
+        .slider-group input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: #f5c542;
+            border-radius: 50%;
+            border: 2px solid #ffd966;
+            cursor: pointer;
+        }
+        .slider-value {
+            color: #ff8a5c;
+            font-weight: 700;
+            font-size: 1rem;
+            min-width: 36px;
+            text-align: center;
+        }
+        .slider-value.machine-val {
+            color: #5fc3ff;
+        }
+
+        .badge-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .badge-item {
+            background: #0c1d2e;
+            padding: 4px 14px;
+            border-radius: 30px;
+            color: #b6d2ea;
+            font-size: 0.75rem;
+            border: 1px solid #26445e;
+        }
+        .badge-item .num {
+            font-weight: 600;
+            color: #f5e7c8;
+        }
+        .badge-item .green { color: #84d684; }
+        .badge-item .red { color: #ff7b7b; }
+        .badge-item .gold { color: #f5d742; }
+        .badge-item .cyan { color: #5fc3ff; }
+
+        .story-box {
+            background: #0c1d2e;
+            border-radius: 20px;
+            padding: 14px 18px;
+            margin-top: 12px;
+            color: #d4e6f5;
+            font-size: 0.88rem;
+            line-height: 1.7;
+            border-left: 4px solid #f5b342;
+            box-shadow: inset 0 0 0 1px #27445e;
+            flex: 1;
+        }
+        .story-box .highlight { color: #ffb86b; font-weight: 500; }
+        .story-box .eps-c { color: #ff8a5c; font-weight: 600; }
+        .story-box .delta-c { color: #5fc3ff; font-weight: 600; }
+        .story-box .cost { color: #f5d742; font-weight: 500; }
+        .story-box .machine { color: #9ac8f0; }
+        .story-box .term-highlight { color: #f5d742; font-weight: 600; background: rgba(245,215,66,0.08); padding: 0 6px; border-radius: 4px; }
+
+        .status-line {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding: 8px 14px;
+            background: #0b1d2d;
+            border-radius: 30px;
+            border: 1px solid #2c4b66;
+            color: #b8d6ef;
+            font-size: 0.85rem;
+        }
+        .status-line .status-badge {
+            padding: 2px 14px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        .status-line .status-badge.ok {
+            background: #1a4a3a;
+            color: #84d684;
+        }
+        .status-line .status-badge.fail {
+            background: #4a2a2a;
+            color: #ff7b7b;
+        }
+        .status-line .status-badge.tuning {
+            background: #4a3a1a;
+            color: #ffb86b;
+        }
+        .footnote {
+            margin-top: 10px;
+            color: #7e9eb9;
+            font-size: 0.65rem;
+            text-align: right;
+            border-top: 1px solid #1d3850;
+            padding-top: 10px;
+        }
+
+        /* 极限定义公式显示 */
+        .formula-bar {
+            background: #0a1a2a;
+            border-radius: 16px;
+            padding: 6px 14px;
+            margin-top: 8px;
+            text-align: center;
+            color: #b3d6f0;
+            font-size: 0.78rem;
+            font-family: 'Courier New', monospace;
+            border: 1px solid #1d3850;
+            letter-spacing: 0.3px;
+        }
+        .formula-bar .eps-sym { color: #ff8a5c; }
+        .formula-bar .delta-sym { color: #5fc3ff; }
+        .formula-bar .arrow { color: #f5d742; }
+
+        @media (max-width: 480px) {
+            .slider-group { padding: 4px 10px; flex-wrap: wrap; }
+            .story-box { font-size: 0.8rem; padding: 12px 14px; }
+            .case-card { padding: 14px 12px 16px; }
+            .formula-bar { font-size: 0.65rem; padding: 4px 10px; }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>
+        📐 极限定义 · 双案例精讲
+        <small>用户精度驱动 · 机器自适应</small>
+    </h1>
+    <div class="grid-2">
+        <!-- ==================== 左侧：数列极限 ==================== -->
+        <div class="case-card" id="sequenceCase">
+            <div class="header">
+                <h2>
+                    🔢 数列极限
+                    <span class="term">ε-N 定义</span>
+                    <span>离散检测</span>
+                </h2>
+                <span class="tag">aₙ → L</span>
+            </div>
+            <div class="formula-bar">
+                ∀ε > 0, ∃<span class="delta-sym">N</span> ∈ ℕ, 当 n > <span class="delta-sym">N</span> 时，|aₙ − L| < <span class="eps-sym">ε</span>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="seqCanvas" width="600" height="300"></canvas>
+            </div>
+            <div class="control-row">
+                <div class="slider-group" style="flex:1.5;">
+                    <label>📐 用户精度 <span class="eps-sym" style="color:#ff8a5c;">ε</span></label>
+                    <input type="range" id="seqEpsSlider" min="0.04" max="1.5" step="0.005" value="0.60">
+                    <span class="slider-value" id="seqEpsDisplay">0.60</span>
+                </div>
+                <div class="slider-group" style="flex:1; background:#1a2f40; border-color:#3a6a7a;">
+                    <label>⚙️ 机器阈值 <span class="delta-sym" style="color:#5fc3ff;">N</span></label>
+                    <span class="slider-value machine-val" id="seqNDisplay" style="min-width:40px;">12</span>
+                </div>
+            </div>
+            <div class="badge-row">
+                <span class="badge-item">📊 检测项 <span class="num" id="seqCurrentN">0</span></span>
+                <span class="badge-item">✅ 合格 <span class="num green" id="seqPassCount">0</span></span>
+                <span class="badge-item">❌ 超差 <span class="num red" id="seqFailCount">0</span></span>
+                <span class="badge-item">🎯 极限 L = <span class="num gold">1.500</span></span>
+            </div>
+            <div class="story-box">
+                <p><span class="highlight">🏭 车间情景：</span>质检员按顺序检测轴套，第 <span class="delta-c">n</span> 件尺寸为 <span class="eps-c">aₙ</span> 。<span class="term-highlight">数列极限</span>要求：当 <span class="delta-c">n</span> 足够大时，<span class="eps-c">aₙ</span> 无限接近 <span class="highlight">L</span>。</p>
+                <p><span class="machine">🔧 自适应策略：</span>机器根据 <span class="eps-c">ε</span> 自动计算阈值 <span class="delta-c">N</span> —— 当 <span class="delta-c">n > N</span> 时，承诺所有产品满足 <span class="eps-c">|aₙ − L| < ε</span>。当前 <span class="eps-c">ε</span> = <span id="seqEpsStory" style="color:#ff8a5c;">0.60</span> → <span class="delta-c">N</span> = <span id="seqNStory" style="color:#5fc3ff;">12</span></p>
+                <p style="font-size:0.8rem; color:#8bb3d0;">📌 机器自动调校：收紧 ε → N 增大（检测更多件），放宽 ε → N 减小（更早达标）</p>
+            </div>
+            <div class="status-line">
+                <span>🏷️ 状态</span>
+                <span class="status-badge ok" id="seqStatusBadge">✅ 已收敛</span>
+                <span id="seqStatusDetail" style="font-size:0.8rem;">n≥12 全部合格</span>
+            </div>
+            <div class="footnote">* 拖动 ε，机器自动调校 N · 红点超差，绿点合格</div>
+        </div>
+
+        <!-- ==================== 右侧：函数极限 ==================== -->
+        <div class="case-card" id="functionCase">
+            <div class="header">
+                <h2>
+                    📈 函数极限
+                    <span class="term">ε-δ 定义</span>
+                    <span>连续加工</span>
+                </h2>
+                <span class="tag">f(x) → L</span>
+            </div>
+            <div class="formula-bar">
+                ∀ε > 0, ∃<span class="delta-sym">δ</span> > 0, 当 0 < |x − c| < <span class="delta-sym">δ</span> 时，|f(x) − L| < <span class="eps-sym">ε</span>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="funcCanvas" width="600" height="300"></canvas>
+            </div>
+            <div class="control-row">
+                <div class="slider-group" style="flex:1.5;">
+                    <label>📐 用户精度 <span class="eps-sym" style="color:#ff8a5c;">ε</span></label>
+                    <input type="range" id="funcEpsSlider" min="0.04" max="1.5" step="0.005" value="0.60">
+                    <span class="slider-value" id="funcEpsDisplay">0.60</span>
+                </div>
+                <div class="slider-group" style="flex:1; background:#1a2f40; border-color:#3a6a7a;">
+                    <label>⚙️ 机器精度 <span class="delta-sym" style="color:#5fc3ff;">δ</span></label>
+                    <span class="slider-value machine-val" id="funcDeltaDisplay" style="min-width:40px;">0.50</span>
+                </div>
+            </div>
+            <div class="badge-row">
+                <span class="badge-item">📊 采样点 <span class="num" id="funcPointCount">0</span></span>
+                <span class="badge-item">✅ 合格 <span class="num green" id="funcPassCount">0</span></span>
+                <span class="badge-item">❌ 超差 <span class="num red" id="funcFailCount">0</span></span>
+                <span class="badge-item">🎯 极限 L = <span class="num gold">1.500</span></span>
+            </div>
+            <div class="story-box">
+                <p><span class="highlight">🏭 车间情景：</span>数控机床加工连续曲面，输入 <span class="delta-c">x</span> 在 <span class="delta-c">c ± δ</span> 内时，输出 <span class="eps-c">f(x)</span> 。<span class="term-highlight">函数极限</span>要求：当 <span class="delta-c">x</span> 充分接近 <span class="highlight">c</span> 时，<span class="eps-c">f(x)</span> 无限接近 <span class="highlight">L</span>。</p>
+                <p><span class="machine">🔧 自适应策略：</span>机床根据 <span class="eps-c">ε</span> 自动计算最佳加工范围 <span class="delta-c">δ</span> —— 确保邻域内所有点满足 <span class="eps-c">|f(x) − L| < ε</span>。当前 <span class="eps-c">ε</span> = <span id="funcEpsStory" style="color:#ff8a5c;">0.60</span> → <span class="delta-c">δ</span> = <span id="funcDeltaStory" style="color:#5fc3ff;">0.50</span></p>
+                <p style="font-size:0.8rem; color:#8bb3d0;">📌 机器自动调校：收紧 ε → δ 收缩（加工更精密），放宽 ε → δ 扩大（效率更高）</p>
+            </div>
+            <div class="status-line">
+                <span>🏷️ 状态</span>
+                <span class="status-badge ok" id="funcStatusBadge">✅ 全部合格</span>
+                <span id="funcStatusDetail" style="font-size:0.8rem;">δ 邻域内 100% 合格</span>
+            </div>
+            <div class="footnote">* 拖动 ε，机器自动调校 δ · 绿点合格，红点超差</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ============================================================
+        //  1. 数列极限 (左侧) — 机器自动调校 N
+        // ============================================================
+        const seqCanvas = document.getElementById('seqCanvas');
+        const seqCtx = seqCanvas.getContext('2d');
+        const seqEpsSlider = document.getElementById('seqEpsSlider');
+        const seqEpsDisplay = document.getElementById('seqEpsDisplay');
+        const seqNDisplay = document.getElementById('seqNDisplay');
+        const seqEpsStory = document.getElementById('seqEpsStory');
+        const seqNStory = document.getElementById('seqNStory');
+        const seqCurrentN = document.getElementById('seqCurrentN');
+        const seqPassCount = document.getElementById('seqPassCount');
+        const seqFailCount = document.getElementById('seqFailCount');
+        const seqStatusBadge = document.getElementById('seqStatusBadge');
+        const seqStatusDetail = document.getElementById('seqStatusDetail');
+
+        const L_seq = 1.5;
+        function seqA(n) {
+            if (n === 0) return L_seq;
+            return L_seq + 0.8 * Math.sin(n * 0.7) / (n * 0.5 + 0.3);
+        }
+
+        // 机器自适应: 根据 ε 计算最小 N，使得 n>N 时所有项都在 ε 内
+        function computeN(eps) {
+            const maxCheck = 80;
+            let n = 1;
+            while (n <= maxCheck) {
+                let allIn = true;
+                for (let k = n; k <= maxCheck; k++) {
+                    if (Math.abs(seqA(k) - L_seq) >= eps) {
+                        allIn = false;
+                        break;
+                    }
+                }
+                if (allIn) return Math.max(n, 2);
+                n++;
+            }
+            return maxCheck;
+        }
+
+        let seqAnimTime = 0;
+
+        function drawSequence() {
+            const w = seqCanvas.width, h = seqCanvas.height;
+            const eps = parseFloat(seqEpsSlider.value);
+            const N = computeN(eps);
+            seqEpsDisplay.textContent = eps.toFixed(2);
+            seqNDisplay.textContent = N;
+            seqEpsStory.textContent = eps.toFixed(2);
+            seqNStory.textContent = N;
+
+            seqCtx.clearRect(0, 0, w, h);
+
+            const pad = { top: 30, bottom: 30, left: 40, right: 30 };
+            const plotW = w - pad.left - pad.right;
+            const plotH = h - pad.top - pad.bottom;
+            const xScale = plotW / 52;
+            const yScale = plotH / 2.2;
+
+            const toX = (n) => pad.left + n * xScale;
+            const toY = (val) => pad.top + plotH - (val - 0.4) * yScale;
+
+            const yL = toY(L_seq);
+            seqCtx.strokeStyle = '#f5d742';
+            seqCtx.lineWidth = 1.5;
+            seqCtx.setLineDash([4, 6]);
+            seqCtx.beginPath();
+            seqCtx.moveTo(pad.left, yL);
+            seqCtx.lineTo(w - pad.right, yL);
+            seqCtx.stroke();
+            seqCtx.setLineDash([]);
+            seqCtx.fillStyle = '#f5d742';
+            seqCtx.font = '11px "Segoe UI"';
+            seqCtx.fillText('L = 1.500', w - pad.right - 80, yL - 8);
+
+            // ε 带
+            const yHigh = toY(L_seq + eps);
+            const yLow = toY(L_seq - eps);
+            seqCtx.fillStyle = 'rgba(255, 138, 92, 0.12)';
+            seqCtx.fillRect(pad.left, yHigh, plotW, yLow - yHigh);
+            seqCtx.strokeStyle = '#ff8a5c';
+            seqCtx.lineWidth = 1.2;
+            seqCtx.setLineDash([4, 6]);
+            seqCtx.beginPath();
+            seqCtx.moveTo(pad.left, yHigh);
+            seqCtx.lineTo(w - pad.right, yHigh);
+            seqCtx.stroke();
+            seqCtx.beginPath();
+            seqCtx.moveTo(pad.left, yLow);
+            seqCtx.lineTo(w - pad.right, yLow);
+            seqCtx.stroke();
+            seqCtx.setLineDash([]);
+            seqCtx.fillStyle = '#ff8a5c';
+            seqCtx.font = '10px "Segoe UI"';
+            seqCtx.fillText('L+ε', pad.left + 4, yHigh - 4);
+            seqCtx.fillText('L-ε', pad.left + 4, yLow + 14);
+
+            // N 竖线 (机器自适应)
+            const xN = toX(N);
+            seqCtx.strokeStyle = '#5fc3ff';
+            seqCtx.lineWidth = 2;
+            seqCtx.setLineDash([3, 5]);
+            seqCtx.beginPath();
+            seqCtx.moveTo(xN, pad.top);
+            seqCtx.lineTo(xN, h - pad.bottom);
+            seqCtx.stroke();
+            seqCtx.setLineDash([]);
+            seqCtx.fillStyle = '#5fc3ff';
+            seqCtx.font = '11px "Segoe UI"';
+            seqCtx.fillText('N = ' + N, xN + 4, pad.top + 16);
+
+            // 绘制数列点
+            const maxN = 50;
+            let passCount = 0, failCount = 0;
+            let allPassAfterN = true;
+
+            for (let n = 1; n <= maxN; n++) {
+                const val = seqA(n);
+                const dev = Math.abs(val - L_seq);
+                const inEps = dev < eps;
+                if (inEps) passCount++;
+                else failCount++;
+                if (n > N && !inEps) allPassAfterN = false;
+
+                const x = toX(n);
+                const y = toY(val);
+                const afterN = n > N;
+
+                seqCtx.beginPath();
+                seqCtx.arc(x, y, 5, 0, 2 * Math.PI);
+                if (inEps) {
+                    seqCtx.fillStyle = afterN ? '#84d684' : '#6ab06a';
+                } else {
+                    seqCtx.fillStyle = afterN ? '#ff7b7b' : '#cc6a6a';
+                }
+                seqCtx.shadowColor = inEps ? '#84d68466' : '#ff7b7b66';
+                seqCtx.shadowBlur = 10;
+                seqCtx.fill();
+                seqCtx.shadowBlur = 0;
+
+                if (n === maxN) {
+                    seqCtx.beginPath();
+                    seqCtx.arc(x, y, 8, 0, 2 * Math.PI);
+                    seqCtx.strokeStyle = '#fff';
+                    seqCtx.lineWidth = 2;
+                    seqCtx.stroke();
+                }
+            }
+
+            seqCurrentN.textContent = maxN;
+            seqPassCount.textContent = passCount;
+            seqFailCount.textContent = failCount;
+
+            if (allPassAfterN && N > 1) {
+                seqStatusBadge.className = 'status-badge ok';
+                seqStatusBadge.textContent = '✅ 已收敛';
+                seqStatusDetail.textContent = `n≥${N} 全部合格 · 机器调校完成`;
+            } else if (N <= 1) {
+                seqStatusBadge.className = 'status-badge tuning';
+                seqStatusBadge.textContent = '⏳ 调校中';
+                seqStatusDetail.textContent = '机器正在计算最优 N…';
+            } else {
+                seqStatusBadge.className = 'status-badge fail';
+                seqStatusBadge.textContent = '❌ 未收敛';
+                seqStatusDetail.textContent = `n≥${N} 仍存在超差点 · 请放宽 ε`;
+            }
+
+            seqCtx.fillStyle = '#8bb3d0';
+            seqCtx.font = '10px "Segoe UI"';
+            seqCtx.fillText('n →', w - 30, h - 6);
+            seqCtx.fillText('aₙ', 6, 18);
+        }
+
+        seqEpsSlider.addEventListener('input', drawSequence);
+
+        // ============================================================
+        //  2. 函数极限 (右侧) — 机器自动调校 δ
+        // ============================================================
+        const funcCanvas = document.getElementById('funcCanvas');
+        const funcCtx = funcCanvas.getContext('2d');
+        const funcEpsSlider = document.getElementById('funcEpsSlider');
+        const funcEpsDisplay = document.getElementById('funcEpsDisplay');
+        const funcDeltaDisplay = document.getElementById('funcDeltaDisplay');
+        const funcEpsStory = document.getElementById('funcEpsStory');
+        const funcDeltaStory = document.getElementById('funcDeltaStory');
+        const funcPointCount = document.getElementById('funcPointCount');
+        const funcPassCount = document.getElementById('funcPassCount');
+        const funcFailCount = document.getElementById('funcFailCount');
+        const funcStatusBadge = document.getElementById('funcStatusBadge');
+        const funcStatusDetail = document.getElementById('funcStatusDetail');
+
+        const c_func = 2.8;
+        const L_func = 1.5;
+
+        function f(x) {
+            const t = x - c_func;
+            const sigmoid = 0.8 * Math.atan(t * 3.5) / Math.PI * 0.9;
+            const gaussian = 0.5 * Math.exp(-t * t * 1.2);
+            const poly = 0.3 * t * t * t * Math.exp(-t * t * 0.8);
+            return L_func + sigmoid + gaussian * 0.4 + poly * 0.3;
+        }
+
+        // 机器自适应: 根据 ε 计算最大 δ，使得 δ 邻域内所有点都在 ε 内
+        function computeDelta(eps) {
+            if (eps <= 0.02) return 0.015;
+            let lo = 0.01, hi = 2.0;
+            for (let iter = 0; iter < 50; iter++) {
+                const mid = (lo + hi) / 2;
+                let maxDev = 0;
+                const steps = 200;
+                for (let i = 0; i <= steps; i++) {
+                    const x = c_func - mid + (2 * mid * i) / steps;
+                    const y = f(x);
+                    const dev = Math.abs(y - L_func);
+                    if (dev > maxDev) maxDev = dev;
+                }
+                if (maxDev < eps) lo = mid;
+                else hi = mid;
+            }
+            let delta = lo;
+            let safety = 0;
+            while (safety < 30) {
+                let maxDev = 0;
+                const steps = 200;
+                for (let i = 0; i <= steps; i++) {
+                    const x = c_func - delta + (2 * delta * i) / steps;
+                    const y = f(x);
+                    const dev = Math.abs(y - L_func);
+                    if (dev > maxDev) maxDev = dev;
+                }
+                if (maxDev < eps) break;
+                delta *= 0.985;
+                safety++;
+            }
+            delta = Math.min(Math.max(delta, 0.008), 1.8);
+            return Math.round(delta * 1000) / 1000;
+        }
+
+        let funcAnimTime = 0;
+
+        function drawFunction() {
+            const w = funcCanvas.width, h = funcCanvas.height;
+            const eps = parseFloat(funcEpsSlider.value);
+            const delta = computeDelta(eps);
+            funcEpsDisplay.textContent = eps.toFixed(2);
+            funcDeltaDisplay.textContent = delta.toFixed(3);
+            funcEpsStory.textContent = eps.toFixed(2);
+            funcDeltaStory.textContent = delta.toFixed(3);
+
+            funcCtx.clearRect(0, 0, w, h);
+
+            const pad = { top: 25, bottom: 25, left: 35, right: 25 };
+            const plotW = w - pad.left - pad.right;
+            const plotH = h - pad.top - pad.bottom;
+            const xMin = 0.5, xMax = 5.5;
+            const yMin = 0.4, yMax = 2.6;
+            const xScale = plotW / (xMax - xMin);
+            const yScale = plotH / (yMax - yMin);
+
+            const toX = (v) => pad.left + (v - xMin) * xScale;
+            const toY = (v) => pad.top + plotH - (v - yMin) * yScale;
+
+            // 函数曲线
+            funcCtx.beginPath();
+            funcCtx.strokeStyle = '#b3d9ff';
+            funcCtx.lineWidth = 2.5;
+            for (let px = 0; px <= plotW; px++) {
+                const x = xMin + px / xScale;
+                const y = f(x);
+                const py = toY(y);
+                const px2 = pad.left + px;
+                if (px === 0) funcCtx.moveTo(px2, py);
+                else funcCtx.lineTo(px2, py);
+            }
+            funcCtx.stroke();
+
+            const yL = toY(L_func);
+            funcCtx.strokeStyle = '#f5d742';
+            funcCtx.lineWidth = 1.5;
+            funcCtx.setLineDash([4, 6]);
+            funcCtx.beginPath();
+            funcCtx.moveTo(pad.left, yL);
+            funcCtx.lineTo(w - pad.right, yL);
+            funcCtx.stroke();
+            funcCtx.setLineDash([]);
+            funcCtx.fillStyle = '#f5d742';
+            funcCtx.font = '10px "Segoe UI"';
+            funcCtx.fillText('L = 1.500', w - pad.right - 75, yL - 6);
+
+            // ε 带
+            const yHigh = toY(L_func + eps);
+            const yLow = toY(L_func - eps);
+            funcCtx.fillStyle = 'rgba(255, 138, 92, 0.12)';
+            funcCtx.fillRect(pad.left, yHigh, plotW, yLow - yHigh);
+            funcCtx.strokeStyle = '#ff8a5c';
+            funcCtx.lineWidth = 1.2;
+            funcCtx.setLineDash([4, 6]);
+            funcCtx.beginPath();
+            funcCtx.moveTo(pad.left, yHigh);
+            funcCtx.lineTo(w - pad.right, yHigh);
+            funcCtx.stroke();
+            funcCtx.beginPath();
+            funcCtx.moveTo(pad.left, yLow);
+            funcCtx.lineTo(w - pad.right, yLow);
+            funcCtx.stroke();
+            funcCtx.setLineDash([]);
+            funcCtx.fillStyle = '#ff8a5c';
+            funcCtx.font = '9px "Segoe UI"';
+            funcCtx.fillText('L+ε', pad.left + 4, yHigh - 4);
+            funcCtx.fillText('L-ε', pad.left + 4, yLow + 14);
+
+            // δ 邻域 (机器自适应)
+            const cx = toX(c_func);
+            const xLeft = toX(c_func - delta);
+            const xRight = toX(c_func + delta);
+            funcCtx.fillStyle = 'rgba(95, 195, 255, 0.08)';
+            funcCtx.fillRect(xLeft, pad.top, xRight - xLeft, plotH);
+            funcCtx.strokeStyle = '#5fc3ff';
+            funcCtx.lineWidth = 2;
+            funcCtx.setLineDash([4, 6]);
+            funcCtx.beginPath();
+            funcCtx.moveTo(xLeft, pad.top);
+            funcCtx.lineTo(xLeft, h - pad.bottom);
+            funcCtx.stroke();
+            funcCtx.beginPath();
+            funcCtx.moveTo(xRight, pad.top);
+            funcCtx.lineTo(xRight, h - pad.bottom);
+            funcCtx.stroke();
+            funcCtx.setLineDash([]);
+            funcCtx.fillStyle = '#5fc3ff';
+            funcCtx.font = '10px "Segoe UI"';
+            funcCtx.fillText('c-δ', xLeft - 28, pad.top + 14);
+            funcCtx.fillText('c+δ', xRight + 4, pad.top + 14);
+            funcCtx.fillStyle = '#5fc3ff';
+            funcCtx.font = '9px "Segoe UI"';
+            funcCtx.fillText('δ = ' + delta.toFixed(3), cx - 20, pad.top + 30);
+
+            // 极限点
+            funcCtx.beginPath();
+            funcCtx.arc(cx, yL, 7, 0, 2 * Math.PI);
+            funcCtx.fillStyle = '#f5d742';
+            funcCtx.shadowColor = '#f5b342';
+            funcCtx.shadowBlur = 16;
+            funcCtx.fill();
+            funcCtx.shadowBlur = 0;
+            funcCtx.fillStyle = '#fff4d0';
+            funcCtx.font = '10px "Segoe UI"';
+            funcCtx.fillText('(c, L)', cx + 10, yL - 10);
+
+            // 采样点
+            const numPoints = 36;
+            let passCount = 0, failCount = 0;
+            const points = [];
+            for (let i = 0; i < numPoints; i++) {
+                const t = (i / numPoints) * 2 * Math.PI + funcAnimTime * 0.02;
+                const r = (Math.sin(t * 1.3) * 0.5 + 0.5) * 0.9 + 0.1;
+                const sign = (i % 2 === 0) ? 1 : -1;
+                const xOffset = r * delta * 0.92 * sign * (0.6 + 0.4 * Math.sin(i * 0.7 + funcAnimTime * 0.016));
+                const x = c_func + xOffset;
+                const y = f(x);
+                const dev = Math.abs(y - L_func);
+                const inEps = dev < eps;
+                if (inEps) passCount++;
+                else failCount++;
+                const px = toX(x);
+                const py = toY(y);
+                points.push({ px, py, inEps });
+            }
+
+            for (const p of points) {
+                funcCtx.beginPath();
+                funcCtx.arc(p.px, p.py, 5, 0, 2 * Math.PI);
+                funcCtx.fillStyle = p.inEps ? '#84d684' : '#ff7b7b';
+                funcCtx.shadowColor = p.inEps ? '#84d68477' : '#ff7b7b77';
+                funcCtx.shadowBlur = 12;
+                funcCtx.fill();
+                funcCtx.shadowBlur = 0;
+            }
+
+            funcPointCount.textContent = numPoints;
+            funcPassCount.textContent = passCount;
+            funcFailCount.textContent = failCount;
+
+            const allPass = failCount === 0;
+            if (allPass && delta > 0.01) {
+                funcStatusBadge.className = 'status-badge ok';
+                funcStatusBadge.textContent = '✅ 全部合格';
+                funcStatusDetail.textContent = `δ = ${delta.toFixed(3)} 邻域内 100% 合格 · 机器调校完成`;
+            } else if (delta <= 0.01) {
+                funcStatusBadge.className = 'status-badge tuning';
+                funcStatusBadge.textContent = '⏳ 调校中';
+                funcStatusDetail.textContent = '机器正在计算最优 δ…';
+            } else {
+                funcStatusBadge.className = 'status-badge fail';
+                funcStatusBadge.textContent = '❌ 存在超差';
+                funcStatusDetail.textContent = `${failCount} 个点超出 ε 带 · 请放宽 ε`;
+            }
+
+            funcCtx.fillStyle = '#8bb3d0';
+            funcCtx.font = '10px "Segoe UI"';
+            funcCtx.fillText('x →', w - 30, h - 6);
+            funcCtx.fillText('f(x)', 6, 18);
+        }
+
+        funcEpsSlider.addEventListener('input', drawFunction);
+
+        // ============================================================
+        //  动画循环
+        // ============================================================
+        function animate() {
+            seqAnimTime += 1;
+            funcAnimTime += 1;
+            drawSequence();
+            drawFunction();
+            requestAnimationFrame(animate);
+        }
+
+        drawSequence();
+        drawFunction();
+        animate();
+
+        window.addEventListener('resize', function() {});
+    })();
+</script>
+</body>
+</html>
