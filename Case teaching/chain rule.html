@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>链式法则 · 玩具工厂依赖图</title>
+    <!-- MathJax 渲染标准数学符号 -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0b0f1a;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 28px 16px;
+            min-height: 100vh;
+        }
+        .card {
+            max-width: 980px;
+            width: 100%;
+            background: linear-gradient(145deg, #141b2b, #0e1422);
+            border-radius: 48px;
+            padding: 32px 28px 36px;
+            box-shadow: 0 30px 50px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(66, 153, 225, 0.12);
+            border: 1px solid rgba(78, 156, 255, 0.15);
+        }
+
+        /* 主标题 */
+        .main-title {
+            text-align: center;
+            padding: 8px 0 20px 0;
+            border-bottom: 1px solid rgba(77, 138, 255, 0.15);
+            margin-bottom: 24px;
+        }
+        .main-title h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #a0d0ff, #6ab0ff, #4d8aff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'Times New Roman', 'Segoe UI', serif;
+            text-shadow: 0 0 40px rgba(77, 138, 255, 0.15);
+        }
+        .main-title .sub {
+            color: #7a9fc0;
+            font-size: 0.95rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            margin-top: 4px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* 原图预留区域 */
+        .original-image-placeholder {
+            background: rgba(18, 26, 42, 0.8);
+            border-radius: 28px;
+            padding: 20px 24px;
+            margin-bottom: 28px;
+            border: 2px dashed rgba(77, 138, 255, 0.3);
+            text-align: center;
+            color: #8ab4ff;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(2px);
+            transition: all 0.3s ease;
+        }
+        .original-image-placeholder:hover {
+            border-color: rgba(77, 138, 255, 0.6);
+            background: rgba(18, 26, 42, 0.9);
+        }
+        .original-image-placeholder .placeholder-icon {
+            font-size: 2.2rem;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .original-image-placeholder .hint {
+            color: #6a8fc0;
+            font-size: 0.85rem;
+        }
+
+        .diagram-wrap {
+            background: rgba(18, 26, 42, 0.6);
+            backdrop-filter: blur(4px);
+            border-radius: 36px;
+            padding: 24px 16px 18px;
+            margin-bottom: 32px;
+            border: 1px solid rgba(0, 180, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 20, 60, 0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+        .diagram-wrap svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: transparent;
+            border-radius: 24px;
+        }
+
+        .insight {
+            background: rgba(18, 26, 42, 0.7);
+            backdrop-filter: blur(4px);
+            border-radius: 32px;
+            padding: 28px 28px 30px;
+            border: 1px solid rgba(0, 180, 255, 0.12);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.03);
+            color: #e8edf5;
+        }
+        .insight h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #a0d0ff, #6ab0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            border-left: 5px solid #3b8cff;
+            padding-left: 20px;
+            margin-bottom: 18px;
+        }
+        .insight h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 24px 0 12px 0;
+            color: #b6d4ff;
+            letter-spacing: 0.2px;
+        }
+        .insight p, .insight li {
+            color: #d0dcee;
+            line-height: 1.7;
+            font-size: 1.02rem;
+        }
+        .insight ul {
+            padding-left: 26px;
+            margin: 10px 0 14px;
+        }
+        .insight li {
+            margin-bottom: 8px;
+        }
+        .formula-block {
+            background: rgba(10, 20, 40, 0.7);
+            backdrop-filter: blur(4px);
+            padding: 18px 20px;
+            border-radius: 48px;
+            margin: 18px 0 12px;
+            text-align: center;
+            border: 1px solid rgba(0, 150, 255, 0.2);
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
+        }
+        .formula-block mjx-container {
+            display: inline-block !important;
+            font-size: 1.5rem !important;
+            color: #c8e2ff !important;
+            font-weight: 400 !important;
+        }
+        .example-box {
+            background: rgba(12, 22, 40, 0.6);
+            backdrop-filter: blur(4px);
+            border-radius: 28px;
+            padding: 20px 24px 24px;
+            margin-top: 22px;
+            border: 1px solid rgba(0, 150, 255, 0.12);
+            box-shadow: inset 0 0 20px rgba(0, 50, 120, 0.1);
+        }
+        .example-box p {
+            margin-bottom: 10px;
+        }
+        .example-box strong {
+            color: #8fcbff;
+        }
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #1a5fb4, #0d47a1);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 20px;
+            border-radius: 40px;
+            letter-spacing: 0.5px;
+            margin-right: 8px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        @media (max-width: 480px) {
+            .card { padding: 16px 12px 20px; }
+            .insight { padding: 18px 14px 20px; }
+            .insight h2 { font-size: 1.3rem; padding-left: 14px; }
+            .formula-block mjx-container { font-size: 1.2rem !important; }
+            .main-title h1 { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+
+    <!-- ========== 主标题 ========== -->
+    <div class="main-title">
+        <h1>多元复合函数求导的链式法则：图解 · 类比 · 案例</h1>
+        <div class="sub">The Ripple Effect — Mastering the Multivariable Chain Rule</div>
+    </div>
+
+    <!-- ========== 原图预留区域 ========== -->
+    <div class="original-image-placeholder">
+        <span class="placeholder-icon">🖼️</span>
+        <div style="font-weight: 500;">原图预留区域 — 原始依赖树</div>
+        <div class="hint">此处可插入原始图片 (The Ripple Effect · 原图)</div>
+        <div style="margin-top: 8px; font-size: 0.8rem; color: #5a7fa0;">↓ 下方为优化后的科技感示意图 ↓</div>
+    </div>
+
+    <!-- ========== SVG 示意图 ========== -->
+    <div class="diagram-wrap">
+        <svg viewBox="0 0 860 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="玩具工厂依赖链">
+            <defs>
+                <linearGradient id="gradToy" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#fd79a8" />
+                    <stop offset="100%" stop-color="#e84393" />
+                </linearGradient>
+                <linearGradient id="gradPlastic" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#2c9f6e" />
+                    <stop offset="100%" stop-color="#1d7a53" />
+                </linearGradient>
+                <linearGradient id="gradElec" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#d9773a" />
+                    <stop offset="100%" stop-color="#b85e2a" />
+                </linearGradient>
+                <linearGradient id="gradOil" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#8a7bff" />
+                    <stop offset="100%" stop-color="#6250d0" />
+                </linearGradient>
+                <linearGradient id="gradEdge" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#4d8aff" stop-opacity="0.9" />
+                    <stop offset="100%" stop-color="#7fb0ff" stop-opacity="0.6" />
+                </linearGradient>
+                <filter id="glow">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+                <filter id="shadowNode">
+                    <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.5" />
+                </filter>
+                <marker id="arrowSolid" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M 2 1 L 10 6 L 2 11 Z" fill="#7fb0ff" />
+                </marker>
+                <!-- 工厂渐变 -->
+                <linearGradient id="factoryWall" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#6c8fc9" />
+                    <stop offset="100%" stop-color="#3a5a8a" />
+                </linearGradient>
+                <linearGradient id="factoryRoof" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#e74c3c" />
+                    <stop offset="100%" stop-color="#a93226" />
+                </linearGradient>
+                <!-- 塑料瓶渐变 -->
+                <linearGradient id="plasticBottle" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#66bb6a" />
+                    <stop offset="50%" stop-color="#43a047" />
+                    <stop offset="100%" stop-color="#2e7d32" />
+                </linearGradient>
+            </defs>
+
+            <rect width="860" height="600" fill="transparent" rx="28" ry="28" />
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(70, 150, 255, 0.04)" stroke-width="1" />
+            </pattern>
+            <rect width="860" height="600" fill="url(#grid)" rx="28" ry="28" />
+
+            <text x="430" y="44" text-anchor="middle" font-size="22" font-weight="600" fill="#b0d0ff" font-family="'Segoe UI', system-ui, sans-serif" letter-spacing="1" filter="url(#glow)">🏭 玩具生产 · 资源依赖链</text>
+
+            <!-- ========== 节点 ========== -->
+            <!-- 玩具 (成品) -->
+            <rect x="345" y="70" width="170" height="72" rx="22" ry="22" fill="url(#gradToy)" stroke="#ff6b9d" stroke-width="2" filter="url(#shadowNode)" opacity="0.95" />
+            <text x="430" y="100" text-anchor="middle" fill="#fff" font-size="20" font-weight="700" font-family="'Segoe UI', sans-serif">🎁 玩具</text>
+            <text x="430" y="126" text-anchor="middle" fill="#ffe0ec" font-size="15" font-family="'Times New Roman', serif" font-style="italic">z = f(x, y)</text>
+
+            <!-- 塑料 (逼真塑料瓶) -->
+            <rect x="125" y="240" width="170" height="72" rx="22" ry="22" fill="url(#gradPlastic)" stroke="#3acf8a" stroke-width="1.8" filter="url(#shadowNode)" opacity="0.95" />
+            <!-- 塑料瓶图标 -->
+            <g transform="translate(145, 248)">
+                <rect x="8" y="2" width="14" height="6" rx="2" fill="#90caf9" stroke="#64b5f6" stroke-width="1.2" />
+                <rect x="4" y="8" width="22" height="24" rx="4" fill="url(#plasticBottle)" stroke="#2e7d32" stroke-width="1.5" />
+                <rect x="6" y="16" width="18" height="8" rx="2" fill="rgba(255,255,255,0.15)" />
+                <rect x="10" y="28" width="10" height="6" rx="2" fill="rgba(255,255,255,0.10)" />
+                <text x="15" y="42" text-anchor="middle" font-size="8" fill="#d6f0e0" font-weight="500">♻️</text>
+            </g>
+            <text x="210" y="270" text-anchor="middle" fill="#fff" font-size="20" font-weight="700" font-family="'Segoe UI', sans-serif">塑料</text>
+            <text x="210" y="296" text-anchor="middle" fill="#d6f0e0" font-size="15" font-family="'Times New Roman', serif" font-style="italic">x = x(t)</text>
+
+            <!-- 电力 -->
+            <rect x="565" y="240" width="170" height="72" rx="22" ry="22" fill="url(#gradElec)" stroke="#f5a06a" stroke-width="1.8" filter="url(#shadowNode)" opacity="0.95" />
+            <text x="650" y="270" text-anchor="middle" fill="#fff" font-size="20" font-weight="700">⚡ 电力</text>
+            <text x="650" y="296" text-anchor="middle" fill="#f5e0d0" font-size="15" font-family="'Times New Roman', serif" font-style="italic">y = y(t)</text>
+
+            <!-- 石油 (根) -->
+            <rect x="345" y="430" width="170" height="72" rx="22" ry="22" fill="url(#gradOil)" stroke="#9b8aff" stroke-width="2" filter="url(#shadowNode)" opacity="0.95" />
+            <text x="430" y="460" text-anchor="middle" fill="#fff" font-size="20" font-weight="700">🛢️ 石油</text>
+            <text x="430" y="486" text-anchor="middle" fill="#ddd6ff" font-size="15" font-family="'Segoe UI', sans-serif">(根原因) t</text>
+
+            <!-- ========== 正中间：逼真3D工厂 ========== -->
+            <g transform="translate(350, 275)">
+                <!-- 工厂主体 (3D效果) -->
+                <rect x="0" y="12" width="160" height="90" rx="6" fill="url(#factoryWall)" stroke="#4a6fa5" stroke-width="2.5" />
+                <!-- 左侧面 (3D) -->
+                <polygon points="0,12 20,0 180,0 160,12" fill="#5a7fb5" stroke="#4a6fa5" stroke-width="1.5" />
+                <!-- 屋顶 -->
+                <polygon points="-6,12 80,-12 166,12" fill="url(#factoryRoof)" stroke="#a93226" stroke-width="2.5" />
+                <!-- 窗户 (发光) -->
+                <rect x="16" y="28" width="22" height="22" rx="3" fill="#ffd93d" stroke="#f5a623" stroke-width="1.5" opacity="0.9" />
+                <rect x="50" y="28" width="22" height="22" rx="3" fill="#ffd93d" stroke="#f5a623" stroke-width="1.5" opacity="0.9" />
+                <rect x="84" y="28" width="22" height="22" rx="3" fill="#ffd93d" stroke="#f5a623" stroke-width="1.5" opacity="0.9" />
+                <rect x="118" y="28" width="22" height="22" rx="3" fill="#ffd93d" stroke="#f5a623" stroke-width="1.5" opacity="0.9" />
+                <!-- 门 -->
+                <rect x="64" y="66" width="32" height="36" rx="4" fill="#2c3e50" stroke="#1a2a3a" stroke-width="2" />
+                <circle cx="88" cy="84" r="3" fill="#f1c40f" />
+                <!-- 烟囱 -->
+                <rect x="124" y="-6" width="18" height="24" rx="3" fill="#7f8c8d" stroke="#5a6a7a" stroke-width="2" />
+                <rect x="126" y="-10" width="14" height="6" rx="2" fill="#95a5a6" stroke="#7f8c8d" stroke-width="1.5" />
+                <!-- 烟雾 -->
+                <circle cx="133" cy="-20" r="8" fill="rgba(200,200,220,0.25)" />
+                <circle cx="140" cy="-32" r="11" fill="rgba(200,200,220,0.15)" />
+                <circle cx="148" cy="-46" r="14" fill="rgba(200,200,220,0.10)" />
+                <!-- 地面 -->
+                <rect x="-10" y="102" width="180" height="6" rx="3" fill="#2c3e50" opacity="0.5" />
+                <!-- 标签 -->
+                <text x="80" y="126" text-anchor="middle" font-size="12" fill="#8ab4ff" font-weight="500" font-family="'Segoe UI', sans-serif">🏭 玩具工厂</text>
+            </g>
+
+            <!-- ========== 连线 ========== -->
+            <line x1="380" y1="142" x2="210" y2="240" stroke="url(#gradEdge)" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#arrowSolid)" opacity="0.9" />
+            <line x1="480" y1="142" x2="650" y2="240" stroke="url(#gradEdge)" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#arrowSolid)" opacity="0.9" />
+            <line x1="210" y1="312" x2="380" y2="430" stroke="url(#gradEdge)" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#arrowSolid)" opacity="0.9" />
+            <line x1="650" y1="312" x2="480" y2="430" stroke="url(#gradEdge)" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#arrowSolid)" opacity="0.9" />
+
+            <!-- ========== 导数标签 (标准分式) ========== -->
+            <foreignObject x="185" y="150" width="110" height="42">
+                <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(10,30,60,0.8);border-radius:20px;border:1px solid rgba(77,138,255,0.35);">
+                    <span style="color:#7fc8ff;font-size:1.1rem;font-family:'Times New Roman',serif;">\(\frac{\partial z}{\partial x}\)</span>
+                </div>
+            </foreignObject>
+
+            <foreignObject x="525" y="150" width="110" height="42">
+                <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(10,30,60,0.8);border-radius:20px;border:1px solid rgba(77,138,255,0.35);">
+                    <span style="color:#7fc8ff;font-size:1.1rem;font-family:'Times New Roman',serif;">\(\frac{\partial z}{\partial y}\)</span>
+                </div>
+            </foreignObject>
+
+            <foreignObject x="155" y="360" width="100" height="42">
+                <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(10,30,60,0.8);border-radius:20px;border:1px solid rgba(77,138,255,0.35);">
+                    <span style="color:#7fc8ff;font-size:1.1rem;font-family:'Times New Roman',serif;">\(\frac{dx}{dt}\)</span>
+                </div>
+            </foreignObject>
+
+            <foreignObject x="565" y="360" width="100" height="42">
+                <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(10,30,60,0.8);border-radius:20px;border:1px solid rgba(77,138,255,0.35);">
+                    <span style="color:#7fc8ff;font-size:1.1rem;font-family:'Times New Roman',serif;">\(\frac{dy}{dt}\)</span>
+                </div>
+            </foreignObject>
+
+            <!-- ========== 分支指示 ========== -->
+            <circle cx="430" cy="152" r="12" fill="rgba(30, 100, 255, 0.25)" stroke="#4d8aff" stroke-width="2" />
+            <text x="430" y="157" text-anchor="middle" font-size="18" fill="#7fb0ff" font-weight="600">⤵</text>
+
+            <!-- 乘法标记 -->
+            <rect x="155" y="210" width="70" height="26" rx="30" fill="rgba(0, 180, 255, 0.12)" stroke="rgba(0, 180, 255, 0.3)" stroke-width="1.2" />
+            <text x="190" y="228" text-anchor="middle" font-size="13" fill="#7fc8ff" font-weight="500">✕ 乘</text>
+
+            <rect x="585" y="210" width="70" height="26" rx="30" fill="rgba(0, 180, 255, 0.12)" stroke="rgba(0, 180, 255, 0.3)" stroke-width="1.2" />
+            <text x="620" y="228" text-anchor="middle" font-size="13" fill="#7fc8ff" font-weight="500">✕ 乘</text>
+
+            <!-- 相加标记 -->
+            <rect x="360" y="520" width="140" height="30" rx="30" fill="rgba(0, 200, 255, 0.1)" stroke="rgba(0, 200, 255, 0.25)" stroke-width="1.5" />
+            <text x="430" y="541" text-anchor="middle" font-size="16" fill="#7fc8ff" font-weight="600">➕ 路径相加</text>
+
+            <!-- 主公式 -->
+            <foreignObject x="160" y="554" width="540" height="44">
+                <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(10,30,60,0.7);border-radius:30px;border:1px solid rgba(77,138,255,0.2);">
+                    <span style="color:#c8e2ff;font-size:1.15rem;font-family:'Times New Roman',serif;font-weight:500;">
+                        \(\displaystyle \frac{dz}{dt} = \frac{\partial z}{\partial x}\frac{dx}{dt} + \frac{\partial z}{\partial y}\frac{dy}{dt}\)
+                    </span>
+                </div>
+            </foreignObject>
+
+            <!-- 单路径/多路径标注 -->
+            <text x="30" y="130" font-size="14" fill="#8ab4ff" font-family="'Segoe UI', sans-serif" font-weight="400">单路径: d</text>
+            <text x="30" y="155" font-size="14" fill="#8ab4ff" font-family="'Segoe UI', sans-serif" font-weight="400">多路径: ∂</text>
+
+            <!-- 右下角标注 -->
+            <text x="740" y="558" font-size="12" fill="rgba(100, 150, 255, 0.4)" font-family="'Segoe UI', sans-serif">链式法则 · 涟漪效应</text>
+        </svg>
+    </div>
+
+    <!-- ========== 下方解读 ========== -->
+    <div class="insight">
+        <h2>📘 多元链式法则 · 解读与实例</h2>
+
+        <p style="font-weight: 450; margin-bottom: 14px;">
+            <span class="badge">玩具工厂</span> 
+            玩具成本 \( z \) 依赖 <strong>塑料 \( x \)</strong> 和 <strong>电力 \( y \)</strong>，而这两者都源自 <strong>石油 \( t \)</strong>。
+            油价波动会通过两条路径影响最终成本：
+        </p>
+
+        <ul>
+            <li><strong>路径 ①</strong>：石油 → 塑料 → 玩具 &nbsp; \( \left( \frac{\partial z}{\partial x} \cdot \frac{dx}{dt} \right) \)</li>
+            <li><strong>路径 ②</strong>：石油 → 电力 → 玩具 &nbsp; \( \left( \frac{\partial z}{\partial y} \cdot \frac{dy}{dt} \right) \)</li>
+        </ul>
+
+        <div class="formula-block">
+            \[
+            \frac{dz}{dt} = \frac{\partial z}{\partial x} \cdot \frac{dx}{dt} + \frac{\partial z}{\partial y} \cdot \frac{dy}{dt}
+            \]
+        </div>
+
+        <!-- 实例 -->
+        <h3>📦 实例：玩具工厂成本模型</h3>
+        <div class="example-box">
+            <p><strong>背景：</strong> 玩具厂总成本 \( z \) (美元) 与塑料 \( x \) (吨) 和电力 \( y \) (千度) 的关系：</p>
+            <p style="font-size: 1.2rem; background: rgba(0, 80, 200, 0.15); padding: 8px 20px; border-radius: 40px; display: inline-block; margin: 6px 0 14px; border: 1px solid rgba(0, 150, 255, 0.2);">
+                \( z = 1.4x^2 + 1.0xy + 1.2y^2 \)
+            </p>
+            <p>且塑料和电力成本随油价 \( t \) (美元/桶) 变化：</p>
+            <ul style="margin-top: 6px;">
+                <li>\( x(t) = 2 + 0.15t \)  (油价每涨1美元，塑料用量增加0.15吨)</li>
+                <li>\( y(t) = 3 + 0.20t \)  (油价每涨1美元，电力用量增加0.20千度)</li>
+            </ul>
+            <p style="margin-top: 16px;"><strong>求当 \( t = 10 \) 时，总成本对油价的敏感度 \( \frac{dz}{dt} \)。</strong></p>
+
+            <p style="margin-top: 14px;"><strong>✅ 链式法则计算：</strong></p>
+            <ul style="margin-bottom: 8px;">
+                <li>\( \frac{\partial z}{\partial x} = 2.8x + 1.0y \)  →  \( t=10,\ x=3.5,\ y=5.0 \)  →  \( \frac{\partial z}{\partial x} = 9.8 + 5.0 = \mathbf{14.8} \)</li>
+                <li>\( \frac{\partial z}{\partial y} = 1.0x + 2.4y \)  →  \( 1.0 \cdot 3.5 + 2.4 \cdot 5.0 = 3.5 + 12.0 = \mathbf{15.5} \)</li>
+                <li>\( \frac{dx}{dt} = 0.15 \),  \( \frac{dy}{dt} = 0.20 \)</li>
+            </ul>
+            <p style="background: rgba(0, 100, 200, 0.2); padding: 14px 20px; border-radius: 48px; margin-top: 14px; border: 1px solid rgba(0, 150, 255, 0.15);">
+                \( \frac{dz}{dt} = (14.8 \times 0.15) + (15.5 \times 0.20) = 2.22 + 3.10 = \mathbf{5.32} \)
+            </p>
+            <p style="margin-top: 14px; font-size: 1rem; color: #b8d0e8;">
+                💡 油价上涨 1 美元/桶，总成本增加约 <strong>5.32 美元</strong>。 
+                塑料路径贡献 2.22，电力路径贡献 3.10，完美验证 “相乘再相加”。
+            </p>
+        </div>
+
+        <p style="margin-top: 22px; color: #9ab0d0; font-size: 0.98rem; border-top: 1px solid rgba(0, 150, 255, 0.15); padding-top: 20px;">
+            ⚡ <strong>核心思想：</strong> 多元链式法则将复杂依赖拆解为“路径乘积 + 总和”，是经济学、工程学中敏感性分析的基础。
+        </p>
+    </div>
+
+</div>
+</body>
+</html>
