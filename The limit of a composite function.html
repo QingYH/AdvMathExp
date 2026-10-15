@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>复合函数极限运算法则 · 去心邻域与定义域条件</title>
+<script>
+  MathJax = {
+    tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+    chtml: { scale: 1.1 },
+    options: { enableMenu: false }
+  };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{
+    --ink:#1e293b;
+    --ink-soft:#5b6b80;
+    --line:#e6ecf5;
+    --indigo:#4f46e5;
+    --g:#0891b2;
+    --f:#d97706;
+    --l:#7c3aed;
+    --bad:#dc2626;
+    --card:rgba(255,255,255,.93);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    color:var(--ink);
+    font-size:17.5px;
+    line-height:1.85;
+    padding:18px 13px 60px;
+    min-height:100vh;
+    background:
+      radial-gradient(900px 480px at 8% -8%, #e0e7ff 0%, rgba(224,231,255,0) 62%),
+      radial-gradient(820px 420px at 106% 4%, #cffafe 0%, rgba(207,250,254,0) 58%),
+      linear-gradient(180deg,#f8fafc 0%, #edf1f7 100%);
+    -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1060px;margin:0 auto}
+
+  .hero{text-align:center;padding:8px 4px 20px}
+  .hero h1{
+    margin:0 0 8px;
+    font-size:clamp(23px,5.6vw,34px);
+    letter-spacing:.5px;
+    background:linear-gradient(100deg,#4f46e5,#0891b2 55%,#d97706);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    font-weight:800;
+  }
+  .hero p{margin:0;color:var(--ink-soft);font-size:15.5px;letter-spacing:.4px}
+
+  .card{
+    background:var(--card);
+    border:1px solid rgba(255,255,255,.9);
+    border-radius:20px;
+    padding:18px 17px 20px;
+    margin-bottom:18px;
+    box-shadow:0 8px 28px rgba(79,70,229,.07), 0 1px 2px rgba(15,23,42,.04);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+  }
+  .card h2{
+    margin:0 0 14px;
+    font-size:20px;
+    font-weight:800;
+    display:flex;align-items:center;gap:9px;
+    color:#312e81;
+  }
+  .card h2::before{
+    content:'';width:7px;height:21px;border-radius:4px;
+    background:linear-gradient(180deg,#6366f1,#22d3ee);
+    flex:none;
+  }
+  .card h3{
+    font-size:17.5px;margin:20px 0 8px;color:#334155;font-weight:700;
+    display:flex;align-items:center;gap:8px;
+  }
+  .card h3::before{
+    content:'';width:6px;height:6px;border-radius:50%;
+    background:#94a3b8;flex:none;
+  }
+
+  .theorem{
+    background:linear-gradient(180deg,#f5f7ff,#fbfdff);
+    border:1px solid #e0e7ff;
+    border-left:5px solid #6366f1;
+    border-radius:14px;
+    padding:12px 16px;
+    margin:12px 0;
+    overflow-x:auto;
+  }
+  .theorem.key{
+    border-left-color:#d97706;
+    background:linear-gradient(180deg,#fffbf3,#fffdf9);
+    border-color:#fde8c8;
+  }
+  .theorem.bad{
+    border-left-color:#dc2626;
+    background:linear-gradient(180deg,#fff5f5,#fffafa);
+    border-color:#fecaca;
+  }
+  .theorem.cond{
+    border-left-color:#0891b2;
+    background:linear-gradient(180deg,#f0fdff,#fafffe);
+    border-color:#cffafe;
+  }
+  .theorem.def{
+    border-left-color:#7c3aed;
+    background:linear-gradient(180deg,#faf5ff,#fdfcff);
+    border-color:#e9d5ff;
+  }
+  .hl-g{color:#0e7490;font-weight:700}
+  .hl-f{color:#b45309;font-weight:700}
+  .hl-l{color:#6d28d9;font-weight:700}
+  .hl-r{color:#b91c1c;font-weight:700}
+  .hl-b{color:#4338ca;font-weight:700}
+
+  /* 案例切换 */
+  .case-tabs{
+    display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px;
+  }
+  .case-tabs button{
+    flex:1 1 auto;
+    font-family:inherit;font-size:15.5px;font-weight:700;
+    padding:12px 18px;border-radius:13px;
+    border:2px solid #dfe6f2;background:#fff;color:#334155;
+    cursor:pointer;transition:.18s;
+    box-shadow:0 1px 3px rgba(15,23,42,.05);
+  }
+  .case-tabs button:active{transform:scale(.97)}
+  .case-tabs button.active{
+    border-color:var(--indigo);
+    background:linear-gradient(135deg,#eef2ff,#f5f3ff);
+    color:#3730a3;
+    box-shadow:0 4px 12px rgba(79,70,229,.15);
+  }
+  .case-tabs button.active.bad{
+    border-color:var(--bad);
+    background:linear-gradient(135deg,#fef2f2,#fff5f5);
+    color:#991b1b;
+    box-shadow:0 4px 12px rgba(220,38,38,.15);
+  }
+
+  .case-desc{
+    background:#f8fafc;
+    border:1px solid #e6ecf5;
+    border-radius:14px;
+    padding:13px 16px;
+    font-size:16px;
+    line-height:1.8;
+    margin-bottom:16px;
+    color:#334155;
+  }
+  .case-desc b{color:#1e293b}
+
+  /* 绘图区 */
+  .plots{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+  @media (max-width:700px){ .plots{grid-template-columns:1fr} }
+
+  .plot-box{
+    border-radius:16px;
+    border:1px solid var(--line);
+    background:#fbfdff;
+    overflow:hidden;
+    box-shadow:0 2px 10px rgba(15,23,42,.045);
+  }
+  .plot-title{
+    font-size:14.5px;
+    font-weight:800;
+    padding:9px 14px;
+    letter-spacing:.3px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .plot-title i{
+    width:10px;height:10px;border-radius:50%;flex:none;
+  }
+  .g-title{color:#0e7490;background:linear-gradient(90deg,#ecfeff,#f8fdff)}
+  .g-title i{background:var(--g)}
+  .f-title{color:#b45309;background:linear-gradient(90deg,#fffbeb,#fffdf8)}
+  .f-title i{background:var(--f)}
+  .c-title{color:#6d28d9;background:linear-gradient(90deg,#f5f3ff,#fdfcff)}
+  .c-title i{background:var(--l)}
+
+  .plot{width:100%;height:240px;display:block}
+  .plot-wide{height:270px}
+  @media (max-width:700px){
+    .plot{height:215px}
+    .plot-wide{height:235px}
+  }
+
+  /* 读数条 */
+  .readout{
+    display:flex;align-items:center;justify-content:center;
+    gap:7px;flex-wrap:wrap;margin:16px 0 6px;
+  }
+  .ro-chip{
+    display:flex;flex-direction:column;align-items:center;
+    padding:7px 16px;border-radius:13px;min-width:98px;
+    background:#f1f5f9;border:1px solid #e6ecf5;
+  }
+  .ro-chip .k{font-size:13px;color:#8494a8;letter-spacing:.3px;font-weight:600}
+  .ro-chip .v{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;color:#334155}
+  .ro-chip.g{background:#ecfeff;border-color:#cffafe}
+  .ro-chip.g .v{color:#0e7490}
+  .ro-chip.f{background:#fffbeb;border-color:#fef3c7}
+  .ro-chip.f .v{color:#b45309}
+  .ro-chip.bad{background:#fef2f2;border-color:#fecaca}
+  .ro-chip.bad .v{color:#b91c1c}
+  .ro-arrow{color:#cbd5e1;font-size:19px;font-weight:800}
+
+  /* 控件 */
+  .controls{margin-top:16px}
+  .ctl-group{margin-bottom:14px}
+  .ctl-label{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-size:15px;color:var(--ink-soft);margin-bottom:2px;font-weight:600;
+  }
+  .ctl-label b{color:var(--indigo);font-variant-numeric:tabular-nums;font-size:16px}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;
+    width:100%;height:30px;background:transparent;margin:0;display:block;
+  }
+  input[type=range]::-webkit-slider-runnable-track{
+    height:8px;border-radius:8px;
+    background:linear-gradient(90deg,#c7d2fe,#a5f3fc);
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;
+    width:26px;height:26px;border-radius:50%;
+    background:#fff;border:5px solid var(--indigo);
+    margin-top:-9px;box-shadow:0 2px 8px rgba(79,70,229,.35);
+    cursor:pointer;
+  }
+  input[type=range].eps::-webkit-slider-thumb{border-color:#7c3aed}
+  input[type=range]::-moz-range-track{
+    height:8px;border-radius:8px;background:linear-gradient(90deg,#c7d2fe,#a5f3fc);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:18px;height:18px;border-radius:50%;
+    background:#fff;border:5px solid var(--indigo);cursor:pointer;
+  }
+  input[type=range].eps::-moz-range-thumb{border-color:#7c3aed}
+
+  .btn-row{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+  button{
+    font-family:inherit;font-size:15.5px;font-weight:700;
+    padding:11px 18px;border-radius:13px;
+    border:1px solid #dfe6f2;background:#fff;color:#334155;
+    cursor:pointer;transition:.18s;
+    box-shadow:0 1px 3px rgba(15,23,42,.05);
+  }
+  button:active{transform:scale(.96)}
+  button.primary{
+    background:linear-gradient(135deg,#4f46e5,#6366f1);
+    color:#fff;border-color:transparent;
+    box-shadow:0 5px 14px rgba(79,70,229,.32);
+  }
+  button.active{
+    background:linear-gradient(135deg,#0e7490,#0891b2);
+    color:#fff;border-color:transparent;
+    box-shadow:0 5px 14px rgba(8,145,178,.3);
+  }
+  .switch{
+    display:inline-flex;align-items:center;gap:9px;
+    font-size:15px;color:var(--ink-soft);font-weight:600;
+    padding:11px 16px;border-radius:13px;
+    background:#f8fafc;border:1px solid #e6ecf5;
+    cursor:pointer;user-select:none;
+  }
+  .switch input{accent-color:#4f46e5;width:19px;height:19px;margin:0}
+
+  /* 状态 */
+  .status{
+    margin-top:14px;padding:13px 16px;border-radius:13px;
+    font-size:15.5px;line-height:1.8;
+    background:#f8fafc;border:1px solid #e6ecf5;color:#475569;
+    transition:.2s;
+  }
+  .status.ok{background:#f0fdfa;border-color:#ccfbf1;color:#0f766e}
+  .status.warn{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
+  .status.bad{background:#fef2f2;border-color:#fecaca;color:#b91c1c}
+
+  /* 要点 */
+  .keypoints{list-style:none;padding:0;margin:8px 0 0}
+  .keypoints li{
+    position:relative;padding-left:28px;margin-bottom:11px;
+    font-size:16.5px;color:#334155;
+  }
+  .keypoints li::before{
+    content:'✓';position:absolute;left:0;top:6px;
+    width:20px;height:20px;line-height:20px;text-align:center;
+    border-radius:50%;font-size:12px;font-weight:800;
+    background:#e0e7ff;color:#4f46e5;
+  }
+  .keypoints li.no::before{content:'✕';background:#fee2e2;color:#dc2626}
+  .keypoints li.warn::before{content:'!';background:#fef3c7;color:#b45309}
+
+  .tag{
+    display:inline-block;font-size:13px;font-weight:800;
+    padding:1px 9px;border-radius:8px;letter-spacing:.3px;
+    background:#eef2ff;color:#4338ca;vertical-align:1.5px;
+  }
+  .tag.g{background:#ecfeff;color:#0e7490}
+  .tag.f{background:#fffbeb;color:#b45309}
+  .tag.r{background:#fef2f2;color:#b91c1c}
+  .tag.l{background:#f5f3ff;color:#6d28d9}
+
+  .note{font-size:16px;color:#5b6b80;margin:10px 0}
+  .divider{height:1px;background:#eef2f7;margin:16px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>复合函数极限运算法则</h1>
+    <p>去心邻域有定义 · 内外联动 · 反例解读</p>
+  </header>
+
+  <!-- ============ 法则陈述 ============ -->
+  <section class="card">
+    <h2>法则陈述</h2>
+
+    <p style="margin-top:0">
+      设 <span class="hl-g">$\displaystyle\lim_{x\to x_0} g(x)=u_0$</span>，
+      且存在 $\delta_0>0$，使当 $0<|x-x_0|<\delta_0$ 时：
+    </p>
+    <div class="theorem cond">
+      <b>(i)</b> <span class="hl-b">$f(g(x))$ 有定义</span>，即 $x\in D_g$ 且 $g(x)\in D_f$；<br>
+      <b>(ii)</b> <span class="hl-g">$g(x)\neq u_0$</span>。
+    </div>
+    <p>
+      若 <span class="hl-f">$\displaystyle\lim_{u\to u_0} f(u)=L$</span>，则
+    </p>
+
+    <div class="theorem">
+      $$\lim_{x\to x_0} f\big(g(x)\big)=\lim_{u\to u_0} f(u)=L$$
+    </div>
+
+    <p>
+      特别地，若外函数 $f$ 在 $u_0$ 处<b>连续</b>，条件 (ii) 自动可去，
+      但条件 (i) <b>仍不可省</b>：
+    </p>
+
+    <div class="theorem key">
+      $$\lim_{x\to x_0} f\big(g(x)\big)=f\Big(\lim_{x\to x_0} g(x)\Big)=f(u_0)$$
+    </div>
+
+    <p class="note" style="margin-bottom:0">
+      直觉：$x\to x_0$ ⟹ 中间变量 $u=g(x)\to u_0$ ⟹ 外层值 $f(u)\to L$。
+      但前提是复合函数在 $x_0$ 的某个<b>去心邻域内有定义</b>，
+      否则极限的定义式 $\forall\varepsilon>0,\exists\delta>0,\ldots$ 中的
+      $|f(g(x))-L|<\varepsilon$ 根本无从写起。
+    </p>
+  </section>
+
+  <!-- ============ 交互演示 ============ -->
+  <section class="card">
+    <h2>交互演示</h2>
+
+    <div class="case-tabs" id="caseTabs">
+      <button data-case="A" class="active">案例 A：标准情形</button>
+      <button data-case="B" class="bad">案例 B：复合后无定义</button>
+      <button data-case="C" class="bad">案例 C：振荡破坏邻域</button>
+    </div>
+
+    <div class="case-desc" id="caseDesc"></div>
+
+    <div class="plots">
+      <div class="plot-box">
+        <div class="plot-title g-title"><i></i>内函数 u = g(x)</div>
+        <canvas id="canvasG" class="plot"></canvas>
+      </div>
+      <div class="plot-box">
+        <div class="plot-title f-title"><i></i>外函数 y = f(u)</div>
+        <canvas id="canvasF" class="plot"></canvas>
+      </div>
+    </div>
+
+    <div class="plot-box" style="margin-top:13px">
+      <div class="plot-title c-title"><i></i>复合函数 y = f(g(x))</div>
+      <canvas id="canvasC" class="plot plot-wide"></canvas>
+    </div>
+
+    <div class="readout">
+      <div class="ro-chip"><span class="k">x</span><span class="v" id="valX">0.90</span></div>
+      <div class="ro-arrow">→</div>
+      <div class="ro-chip g"><span class="k">u = g(x)</span><span class="v" id="valU">1.595</span></div>
+      <div class="ro-arrow">→</div>
+      <div class="ro-chip f" id="chipY"><span class="k">y = f(u)</span><span class="v" id="valY">3.595</span></div>
+    </div>
+
+    <div class="controls">
+      <div class="ctl-group">
+        <div class="ctl-label"><span>拖动 x（考察极限过程）</span><b id="lblX">x = 0.90</b></div>
+        <input type="range" id="xSlider" min="-1.6" max="1.6" step="0.005" value="0.9">
+      </div>
+      <div class="ctl-group">
+        <div class="ctl-label"><span>调节 ε（邻域带实时变化）</span><b id="lblEps">ε = 0.50</b></div>
+        <input type="range" id="epsSlider" class="eps" min="0.10" max="0.90" step="0.02" value="0.5">
+      </div>
+
+      <div class="btn-row">
+        <button id="btnPlay" class="primary">▶ 自动演示 x→x₀</button>
+        <label class="switch"><input type="checkbox" id="chkBands" checked> 显示 ε-δ 邻域带</label>
+      </div>
+    </div>
+
+    <div class="status ok" id="status"></div>
+  </section>
+
+  <!-- ============ 定义域条件 ============ -->
+  <section class="card">
+    <h2>复合函数的定义域与去心邻域</h2>
+
+    <p style="margin-top:0">
+      设 $y=f(u)$，$u=g(x)$，复合函数 $y=f(g(x))$ 的定义域为
+    </p>
+
+    <div class="theorem def">
+      $$D_{f\circ g}=\{\,x\in D_g \;\big|\; g(x)\in D_f\,\}$$
+    </div>
+
+    <p>
+      考察 $\displaystyle\lim_{x\to x_0} f(g(x))$ 时，极限定义要求
+      $x_0$ 的某个<b>去心邻域</b>整体包含在 $D_{f\circ g}$ 中。
+      这正是法则陈述中条件 (i) 的含义：
+    </p>
+
+    <div class="theorem key">
+      <b>去心邻域条件 (i)</b>：存在 $\delta_1>0$，使当 $0<|x-x_0|<\delta_1$ 时，
+      <br>&nbsp;&nbsp;&nbsp;&nbsp;$x\in D_g$ 且 $g(x)\in D_f$，
+      <br>即 $x_0$ 的某个去心邻域<b>整体包含在</b> $D_{f\circ g}$ 中。
+    </div>
+
+    <p>
+      为什么强调“整体包含”而不只是“聚点”？因为极限定义里的
+      $0<|x-x_0|<\delta$ 是<b>对邻域内每一个点</b>都要求 $|f(g(x))-L|<\varepsilon$ 有意义。
+      如果邻域里有无定义的点，那么这句话对这些点根本没有真假可言，极限也就无从谈起。
+    </p>
+
+    <div class="divider"></div>
+
+    <h3>三种典型情形对比</h3>
+
+    <ul class="keypoints">
+      <li>
+        <span class="tag g">良态</span>
+        $x_0$ 是 $D_g$ 的聚点，$u_0$ 是 $D_f$ 的聚点，
+        且 $g$ 在 $x_0$ 附近的值域落于 $D_f$ 内 → 去心邻域存在，法则可用。
+        <b>（案例 A）</b>
+      </li>
+      <li class="no">
+        <span class="tag r">全无定义</span>
+        $x_0$ 是 $D_g$ 的聚点，$u_0$ 是 $D_f$ 的聚点，内层极限也存在，
+        但 $x\neq x_0$ 时 $g(x)$ 全都落在 $D_f$ 之外 →
+        <b>不存在任何去心邻域使复合函数有定义</b>。
+        <b>（案例 B）</b>
+      </li>
+      <li class="warn">
+        <span class="tag l">振荡破坏</span>
+        $x_0$ 是 $D_g$ 的聚点，$u_0$ 是 $D_f$ 的聚点，内层极限也存在，
+        但 $g(x)$ 在 $x_0$ 附近<b>无限次取到 $u_0$</b>，而 $u_0\notin D_f$ →
+        去心邻域内有无定义点，复合函数极限不存在。
+        <b>（案例 C）</b>
+      </li>
+    </ul>
+
+    <div class="theorem bad">
+      <b>案例 B 的具体数据</b>：$g(x)=-x^2$，$D_g=\mathbb{R}$，$x_0=0$，$u_0=0$；
+      $f(u)=\sqrt{u}$，$D_f=[0,+\infty)$。
+      <br>• $\displaystyle\lim_{x\to0}g(x)=0$ ✓
+      <br>• $\displaystyle\lim_{u\to0}f(u)=0$ ✓
+      <br>• 但 $x\neq0$ 时 $g(x)=-x^2<0\notin D_f$，复合函数 $\sqrt{-x^2}$ <b>在 $x=0$ 的任何去心邻域内都无定义</b> ✗
+      <br>所以 $\displaystyle\lim_{x\to0}f(g(x))$ <b>不存在（无意义）</b>。
+    </div>
+
+    <div class="theorem bad" style="margin-top:16px">
+      <b>案例 C 的具体数据（图片案例）</b>：$g(x)=x^2\sin\dfrac{1}{x}$，$D_g=\mathbb{R}$，$x_0=0$，$u_0=0$；
+      $f(u)=\dfrac{\sin u}{u}$，$D_f=\mathbb{R}\setminus\{0\}$。
+      <br>• $\displaystyle\lim_{x\to0}g(x)=0$ ✓
+      <br>• $\displaystyle\lim_{u\to0}f(u)=1$ ✓
+      <br>• 当 $x=\dfrac{1}{n\pi}$ 或 $-\dfrac{1}{n\pi}$（$n\in\mathbb{Z}\setminus\{0\}$）时，
+      $g(x)=0\notin D_f$，复合函数 $f(g(x))$ <b>无定义</b>。
+      <br>• 这些点 $x=\pm\dfrac{1}{n\pi}$ 在 $x_0=0$ 附近<b>无限稠密</b>，所以
+      $x_0=0$ 的<b>任何去心邻域内都包含无定义点</b> ✗
+      <br>所以 $\displaystyle\lim_{x\to0}f(g(x))$ <b>不存在（无意义）</b>。
+    </div>
+
+    <p class="note" style="margin-bottom:0">
+      条件 (i) 与 (ii) 是两个独立的坑：
+      (i) 保证复合函数<b>有定义</b>，(ii) 保证复合过程真正取到外函数<b>去心极限</b>的行为。
+      两条都满足，运算法则才成立。
+    </p>
+  </section>
+
+  <!-- ============ 前提解读 ============ -->
+  <section class="card">
+    <h2>三条适用前提</h2>
+
+    <ul class="keypoints">
+      <li>
+        <span class="tag g">内层</span> $\displaystyle\lim_{x\to x_0}g(x)=u_0$ 存在（有限）。
+      </li>
+      <li>
+        <span class="tag f">外层</span> $\displaystyle\lim_{u\to u_0}f(u)=L$ 存在（有限）。
+      </li>
+      <li class="warn">
+        <span class="tag l">邻域</span>
+        存在 $\delta_0>0$，使 $0<|x-x_0|<\delta_0$ 时，
+        <b>(i) $f(g(x))$ 有定义</b>；<b>(ii) $g(x)\neq u_0$</b>。
+        两条缺一不可。
+      </li>
+    </ul>
+
+    <h3>ε-δ 视角下的传递</h3>
+    <p style="margin-top:0;margin-bottom:0">
+      拖动 ε 滑块，可以看到邻域带实时变化：
+      外函数图中紫色横带 $y\in(L-\varepsilon,L+\varepsilon)$ 对应青色竖带 $u\in(u_0-\delta_u,u_0+\delta_u)$；
+      再回到内函数图，该青色横带对应靛蓝竖带 $|x-x_0|<\delta_x$。
+      <b>两个 δ 一层层向前传递，这正是法则的证明思路。</b>
+      若在某个环节上邻域内出现无定义的点，传递就断了。
+    </p>
+  </section>
+
+  <!-- ============ 小结 ============ -->
+  <section class="card">
+    <h2>小结</h2>
+    <ul class="keypoints">
+      <li>复合函数求极限 = <b>先求内层极限，再代入外层极限</b>：$\lim f(g(x))=\lim_{u\to u_0}f(u)$。</li>
+      <li>适用三前提：内层极限存在 + 外层极限存在 + 存在去心邻域使 $f(g(x))$ 有定义且 $g(x)\neq u_0$。</li>
+      <li>若外函数 $f$ 在 $u_0$ 处连续，则 $g(x)\neq u_0$ 可省，但“去心邻域有定义”仍不可省。</li>
+      <li class="no">仅 $x_0$ 是 $D_g$ 聚点、$u_0$ 是 $D_f$ 聚点，<b>不足以</b>保证复合函数在去心邻域内有定义（案例 B、C）。</li>
+      <li class="no">内层函数值落在外函数定义域之外时，复合函数无定义，极限不存在。</li>
+      <li class="no">内层极限不存在（如振荡）时，整个法则失效，需另想办法。</li>
+    </ul>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ================= DOM ================= */
+  var el = {
+    canvasG: document.getElementById('canvasG'),
+    canvasF: document.getElementById('canvasF'),
+    canvasC: document.getElementById('canvasC'),
+    valX: document.getElementById('valX'),
+    valU: document.getElementById('valU'),
+    valY: document.getElementById('valY'),
+    chipY: document.getElementById('chipY'),
+    lblX: document.getElementById('lblX'),
+    lblEps: document.getElementById('lblEps'),
+    xSlider: document.getElementById('xSlider'),
+    epsSlider: document.getElementById('epsSlider'),
+    btnPlay: document.getElementById('btnPlay'),
+    chkBands: document.getElementById('chkBands'),
+    status: document.getElementById('status'),
+    caseTabs: document.getElementById('caseTabs'),
+    caseDesc: document.getElementById('caseDesc')
+  };
+
+  /* ================= 案例定义 ================= */
+  var CASES = {
+    A: {
+      id: 'A',
+      x0: 0, u0: 2, L: 4,
+      g: function (x) { return 2 - x * x / 2; },
+      gTex: 'g(x)=2-\\dfrac{x^2}{2}',
+      f: function (u) { return Math.abs(u - 2) < 1e-9 ? 5 : u + 2; },
+      fTex: 'f(u)=u+2\\;(u\\neq 2),\\; f(2)=5',
+      fDomainTex: '\\mathbb{R}',
+      uInDf: function (u) { return true; },
+      compDefinedAt: function (x) { return true; },
+      gView: { xmin: -1.8, xmax: 1.8, ymin: 0.1, ymax: 2.55 },
+      fView: { xmin: 0.2, xmax: 3.1, ymin: 2.1, ymax: 5.35 },
+      cView: { xmin: -1.8, xmax: 1.8, ymin: 1.4, ymax: 5.45 },
+      desc: '内函数 $g(x)=2-\\dfrac{x^2}{2}$，外函数 $f(u)=u+2\\,(u\\neq 2)$，$f(2)=5$。' +
+            '$x_0=0,\\;u_0=2,\\;L=4$。' +
+            '当 $x\\to 0$ 时 $u\\to 2$ 且 $u\\neq 2$，' +
+            '同时 $g(x)$ 的值域落在 $D_f=\\mathbb{R}$ 内，复合函数在去心邻域内有定义。' +
+            '<b>去心邻域条件 (i) 满足 ✓</b>'
+    },
+    B: {
+      id: 'B',
+      x0: 0, u0: 0, L: 0,
+      g: function (x) { return -x * x; },
+      gTex: 'g(x)=-x^2',
+      f: function (u) { return u >= 0 ? Math.sqrt(u) : NaN; },
+      fTex: 'f(u)=\\sqrt{u}',
+      fDomainTex: '[0,+\\infty)',
+      uInDf: function (u) { return u >= 0; },
+      compDefinedAt: function (x) { return Math.abs(x) < 1e-9; },
+      gView: { xmin: -1.8, xmax: 1.8, ymin: -3.2, ymax: 0.55 },
+      fView: { xmin: -0.35, xmax: 2.7, ymin: -0.35, ymax: 1.85 },
+      cView: { xmin: -1.8, xmax: 1.8, ymin: -0.35, ymax: 1.85 },
+      desc: '内函数 $g(x)=-x^2$，外层 $f(u)=\\sqrt{u}$（$D_f=[0,+\\infty)$）。' +
+            '$x_0=0,\\;u_0=0$。' +
+            '$x\\neq 0$ 时 $g(x)<0\\notin D_f$，复合函数 $\\sqrt{-x^2}$ 在 $x_0=0$ 的' +
+            '<b>任何去心邻域内都无定义</b>，极限不存在。' +
+            '<b>去心邻域条件 (i) 不满足 ✗</b>'
+    },
+    C: {
+      id: 'C',
+      x0: 0, u0: 0, L: 1,
+      g: function (x) { return Math.abs(x) < 1e-9 ? 0 : x * x * Math.sin(1 / x); },
+      gTex: 'g(x)=x^2\\sin\\dfrac{1}{x}',
+      f: function (u) { return Math.abs(u) < 1e-9 ? 1 : Math.sin(u) / u; },
+      fTex: 'f(u)=\\dfrac{\\sin u}{u}',
+      fDomainTex: '\\mathbb{R}\\setminus\\{0\\}',
+      uInDf: function (u) { return Math.abs(u) > 1e-9; },
+      compDefinedAt: function (x) {
+        if (Math.abs(x) < 1e-9) return false; // x0 本身无定义
+        var u = this.g(x);
+        return Math.abs(u) > 1e-9; // g(x) !== 0
+      },
+      gView: { xmin: -0.25, xmax: 0.25, ymin: -0.02, ymax: 0.02 },
+      fView: { xmin: -0.6, xmax: 0.6, ymin: -0.2, ymax: 1.2 },
+      cView: { xmin: -0.25, xmax: 0.25, ymin: -0.2, ymax: 1.2 },
+      desc: '内函数 $g(x)=x^2\\sin\\dfrac{1}{x}$，外函数 $f(u)=\\dfrac{\\sin u}{u}$（$D_f=\\mathbb{R}\\setminus\\{0\\}$）。' +
+            '$x_0=0,\\;u_0=0$。' +
+            '$x\\neq 0$ 时 $g(x)$ 在 $0$ 附近无限次取到 $0$，' +
+            '使复合函数 $f(g(x))$ 在 $x_0=0$ 的<b>任何去心邻域内都无定义</b>，' +
+            '故极限不存在。' +
+            '<b>去心邻域条件 (i) 不满足 ✗</b>'
+    }
+  };
+
+  /* ================= 状态 ================= */
+  var state = {
+    caseId: 'A',
+    x: 0.9,
+    eps: 0.5,
+    showBands: true,
+    playing: false
+  };
+
+  function C() { return CASES[state.caseId]; }
+
+  /* ================= 画布尺寸 ================= */
+  var cv = {
+    G: { el: el.canvasG, ctx: null, w: 0, h: 0 },
+    F: { el: el.canvasF, ctx: null, w: 0, h: 0 },
+    C: { el: el.canvasC, ctx: null, w: 0, h: 0 }
+  };
+
+  function fitAll() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    ['G', 'F', 'C'].forEach(function (k) {
+      var c = cv[k];
+      var rect = c.el.getBoundingClientRect();
+      c.w = Math.max(1, Math.round(rect.width));
+      c.h = Math.max(1, Math.round(rect.height));
+      c.el.width = Math.round(c.w * dpr);
+      c.el.height = Math.round(c.h * dpr);
+      c.ctx = c.el.getContext('2d');
+      c.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    });
+  }
+
+  function makeMap(w, h, pad, view) {
+    var pw = w - pad.l - pad.r;
+    var ph = h - pad.t - pad.b;
+    return {
+      X: function (v) { return pad.l + (v - view.xmin) / (view.xmax - view.xmin) * pw; },
+      Y: function (v) { return (h - pad.b) - (v - view.ymin) / (view.ymax - view.ymin) * ph; },
+      pw: pw, ph: ph, pad: pad
+    };
+  }
+
+  var FONT = '-apple-system, "PingFang SC", "Microsoft YaHei", sans-serif';
+
+  /* ================= 内函数图 ================= */
+  function drawG() {
+    var c = cv.G;
+    if (!c.ctx || c.w < 2) return;
+    var ctx = c.ctx, w = c.w, h = c.h;
+    var cs = C();
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#fbfdff';
+    ctx.fillRect(0, 0, w, h);
+
+    var pad = { l: 50, r: 18, t: 22, b: 38 };
+    var m = makeMap(w, h, pad, cs.gView);
+    var X = m.X, Y = m.Y;
+
+    var x0 = cs.x0, u0 = cs.u0, eps = state.eps;
+    var g = cs.g, uInDf = cs.uInDf;
+
+    /* 无定义区域 */
+    var N = 800;
+    var undefSegs = [];
+    var inSeg = false, segStart = null;
+    for (var i = 0; i <= N; i++) {
+      var xv = cs.gView.xmin + (cs.gView.xmax - cs.gView.xmin) * i / N;
+      var uv = g(xv);
+      var undef = !uInDf(uv);
+      if (undef && !inSeg) { inSeg = true; segStart = xv; }
+      if ((!undef || i === N) && inSeg) {
+        undefSegs.push([segStart, xv]);
+        inSeg = false;
+      }
+    }
+    ctx.fillStyle = 'rgba(148,163,184,0.18)';
+    for (var s = 0; s < undefSegs.length; s++) {
+      var a = Math.max(undefSegs[s][0], cs.gView.xmin);
+      var b = Math.min(undefSegs[s][1], cs.gView.xmax);
+      if (b > a) {
+        ctx.fillRect(X(a), pad.t, X(b) - X(a), m.ph);
+      }
+    }
+
+    /* 网格 */
+    ctx.strokeStyle = '#eef3f9';
+    ctx.lineWidth = 1;
+    var gv = cs.gView;
+    var stepX = niceStep(gv.xmax - gv.xmin, 6);
+    var stepY = niceStep(gv.ymax - gv.ymin, 5);
+    for (var gx = Math.ceil(gv.xmin / stepX) * stepX; gx <= gv.xmax; gx += stepX) {
+      if (Math.abs(gx) < 1e-9) continue;
+      ctx.beginPath();
+      ctx.moveTo(X(gx), pad.t);
+      ctx.lineTo(X(gx), h - pad.b);
+      ctx.stroke();
+    }
+    for (var gy = Math.ceil(gv.ymin / stepY) * stepY; gy <= gv.ymax; gy += stepY) {
+      if (Math.abs(gy) < 1e-9) continue;
+      ctx.beginPath();
+      ctx.moveTo(pad.l, Y(gy));
+      ctx.lineTo(w - pad.r, Y(gy));
+      ctx.stroke();
+    }
+
+    /* 邻域带 */
+    if (state.showBands) {
+      var uLow = Math.max(u0 - eps, gv.ymin);
+      var uHigh = Math.min(u0 + eps, gv.ymax);
+      if (uHigh > uLow) {
+        ctx.fillStyle = 'rgba(8,145,178,0.13)';
+        ctx.fillRect(pad.l, Y(uHigh), m.pw, Y(uLow) - Y(uHigh));
+      }
+      var xSegs = [];
+      var inSeg2 = false, segStart2 = null;
+      for (var i2 = 0; i2 <= N; i2++) {
+        var xv2 = gv.xmin + (gv.xmax - gv.xmin) * i2 / N;
+        var uv2 = g(xv2);
+        var inBand = Math.abs(uv2 - u0) < eps && uInDf(uv2);
+        if (inBand && !inSeg2) { inSeg2 = true; segStart2 = xv2; }
+        if ((!inBand || i2 === N) && inSeg2) {
+          xSegs.push([segStart2, xv2]);
+          inSeg2 = false;
+        }
+      }
+      ctx.fillStyle = 'rgba(79,70,229,0.13)';
+      for (var s2 = 0; s2 < xSegs.length; s2++) {
+        var a2 = Math.max(xSegs[s2][0], gv.xmin);
+        var b2 = Math.min(xSegs[s2][1], gv.xmax);
+        if (b2 > a2) {
+          ctx.fillRect(X(a2), pad.t, X(b2) - X(a2), m.ph);
+        }
+      }
+    }
+
+    /* 参考线 */
+    if (u0 >= gv.ymin && u0 <= gv.ymax) {
+      ctx.save();
+      ctx.setLineDash([6, 6]);
+      ctx.strokeStyle = 'rgba(124,58,237,0.65)';
+      ctx.lineWidth = 1.7;
+      ctx.beginPath();
+      ctx.moveTo(pad.l, Y(u0));
+      ctx.lineTo(w - pad.r, Y(u0));
+      ctx.stroke();
+      ctx.restore();
+    }
+    if (x0 >= gv.xmin && x0 <= gv.xmax) {
+      ctx.save();
+      ctx.setLineDash([6, 6]);
+      ctx.strokeStyle = 'rgba(79,70,229,0.55)';
+      ctx.lineWidth = 1.7;
+      ctx.beginPath();
+      ctx.moveTo(X(x0), pad.t);
+      ctx.lineTo(X(x0), h - pad.b);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    /* 曲线：无定义段 */
+    ctx.save();
+    ctx.setLineDash([5, 5]);
+    ctx.strokeStyle = 'rgba(148,163,184,0.55)';
+    ctx.lineWidth = 2.2;
+    for (var s3 = 0; s3 < undefSegs.length; s3++) {
+      var a3 = Math.max(undefSegs[s3][0], gv.xmin);
+      var b3 = Math.min(undefSegs[s3][1], gv.xmax);
+      if (b3 <= a3) continue;
+      ctx.beginPath();
+      var M = 120;
+      for (var k = 0; k <= M; k++) {
+        var xx = a3 + (b3 - a3) * k / M;
+        var yy = g(xx);
+        var px = X(xx), py = Y(yy);
+        if (k === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    /* 曲线：有定义段 */
+    ctx.beginPath();
+    ctx.strokeStyle = '#0891b2';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    var started = false;
+    for (var i3 = 0; i3 <= N; i3++) {
+      var xv3 = gv.xmin + (gv.xmax - gv.xmin) * i3 / N;
+      var uv3 = g(xv3);
+      if (uInDf(uv3)) {
+        var px3 = X(xv3), py3 = Y(uv3);
+        if (!started) { ctx.moveTo(px3, py3); started = true; }
+        else ctx.lineTo(px3, py3);
+      } else {
+        started = false;
+      }
+    }
+    ctx.stroke();
+
+    /* 目标点 */
+    if (x0 >= gv.xmin && x0 <= gv.xmax && u0 >= gv.ymin && u0 <= gv.ymax) {
+      ctx.beginPath();
+      ctx.arc(X(x0), Y(u0), 5, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(124,58,237,0.9)';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2.2;
+      ctx.stroke();
+    }
+
+    /* 当前点 */
+    var xc = state.x;
+    var uc = g(xc);
+    if (xc >= gv.xmin && xc <= gv.xmax && uc >= gv.ymin && uc <= gv.ymax) {
+      var mx = X(xc), my = Y(uc);
+      ctx.save();
+      ctx.setLineDash([5, 5]);
+      ctx.strokeStyle = 'rgba(8,145,178,0.6)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(mx, my); ctx.lineTo(mx, h - pad.b); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(mx, my); ctx.lineTo(pad.l, my); ctx.stroke();
+      ctx.restore();
+
+      ctx.beginPath();
+      ctx.arc(mx, my, 7, 0, Math.PI * 2);
+      ctx.fillStyle = uInDf(uc) ? '#0891b2' : '#94a3b8';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2.8;
+      ctx.stroke();
+    }
+
+    /* 刻度 */
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '13px ' + FONT;
+    ctx.textAlign = 'center';
+    for (var gx2 = Math.ceil(gv.xmin / stepX) * stepX; gx2 <= gv.xmax; gx2 += stepX) {
+      if (Math.abs(gx2) < 1e-9) {
+        ctx.fillText('0', X(gx2), h - pad.b + 19);
+      } else {
+        ctx.fillText(fmtNum(gx2), X(gx2), h - pad.b + 19);
+      }
+    }
+    ctx.textAlign = 'right';
+    for (var gy2 = Math.ceil(gv.ymin / stepY) * stepY; gy2 <= gv.ymax; gy2 += stepY) {
+      if (Math.abs(gy2) < 1e-9) continue;
+      ctx.fillText(fmtNum(gy2), pad.l - 7, Y(gy2) + 5);
+    }
+
+    /* 轴标签 */
+    ctx.textAlign = 'right';
+    ctx.font = 'bold 14px ' + FONT;
+    ctx.fillStyle = '#64748b';
+    ctx.fillText('x', w - pad.r, h - pad.b + 19);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#0e7490';
+    ctx.fillText('u', 10, pad.t + 14);
+
+    /* 标注 */
+    if (u0 >= gv.ymin && u0 <= gv.ymax) {
+      ctx.textAlign = 'left';
+      ctx.font = 'bold 13.5px ' + FONT;
+      ctx.fillStyle = 'rgba(124,58,237,0.95)';
+      ctx.fillText('u₀=' + fmtNum(u0), X(x0) + 8, Y(u0) - 9);
+    }
+  }
+
+  /* ================= 外函数图 ================= */
+  function drawF() {
+    var c = cv.F;
+    if (!c.ctx || c.w < 2) return;
+    var ctx = c.ctx, w = c.w, h = c.h;
+    var cs = C();
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#fffdf9';
+    ctx.fillRect(0, 0, w, h);
+
+    var pad = { l: 50, r: 18, t: 22, b: 38 };
+    var m = makeMap(w, h, pad, cs.fView);
+    var X = m.X, Y = m.Y;
+
+    var u0 = cs.u0, L = cs.L, eps = state.eps;
+    var f = cs.f, uInDf = cs.uInDf;
+
+    /* 无定义区域 */
+    var N = 400;
+    var undefSegs = [];
+    var inSeg = false, segStart = null;
+    for (var i = 0; i <= N; i++) {
+      var uv = cs.fView.xmin + (cs.fView.xmax - cs.fView.xmin) * i / N;
+      var undef = !uInDf(uv);
+      if (undef && !inSeg) { inSeg = true; segStart = uv; }
+      if ((!undef || i === N) && inSeg) {
+        undefSegs.push([segStart, uv]);
+        inSeg = false;
+      }
+    }
+    ctx.fillStyle = 'rgba(148,163,184,0.18)';
+    for (var s = 0; s < undefSegs.length; s++) {
+      var a = Math.max(undefSegs[s][0], cs.fView.xmin);
+      var b = Math.min(undefSegs[s][1], cs.fView.xmax);
+      if (b > a) {
+        ctx.fillRect(X(a), pad.t, X(b) - X(a), m.ph);
+      }
+    }
+
+    /* 网格 */
+    ctx.strokeStyle = '#fdf6ec';
+    ctx.lineWidth = 1;
+    var fv = cs.fView;
+    var stepX = niceStep(fv.xmax - fv.xmin, 6);
+    var stepY = niceStep(fv.ymax - fv.ymin, 5);
+    for (var fx = Math.ceil(fv.xmin / stepX) * stepX; fx <= fv.xmax; fx += stepX) {
+      if (Math.abs(fx) < 1e-9) continue;
+      ctx.beginPath();
+      ctx.moveTo(X(fx), pad.t);
+      ctx.lineTo(X(fx), h - pad.b);
+      ctx.stroke();
+    }
+    for (var fy = Math.ceil(fv.ymin / stepY) * stepY; fy <= fv.ymax; fy += stepY) {
+      if (Math.abs(fy) < 1e-9) continue;
+      ctx.beginPath();
+      ctx.moveTo(pad.l, Y(fy));
+      ctx.lineTo(w - pad.r, Y(fy));
+      ctx.stroke();
+    }
+
+    /* 邻域带 */
+    if (state.showBands) {
+      if (L >= fv.ymin && L <= fv.ymax) {
+        var yLow = Math.max(L - eps, fv.ymin);
+        var yHigh = Math.min(L + eps, fv.ymax);
+        if (yHigh > yLow) {
+          ctx.fillStyle = 'rgba(124,58,237,0.13)';
+          ctx.fillRect(pad.l, Y(yHigh), m.pw, Y(yLow) - Y(yHigh));
+        }
+      }
+      var uLowB = Math.max(u0 - eps, fv.xmin);
+      var uHighB = Math.min(u0 + eps, fv.xmax);
+      if (uHighB > uLowB) {
+        ctx.fillStyle = 'rgba(8,145,178,0.13)';
+        var segs = intersectDf(uLowB, uHighB, uInDf, 60);
+        for (var ss = 0; ss < segs.length; ss++) {
+          ctx.fillRect(X(segs[ss][0]), pad.t, X(segs[ss][1]) - X(segs[ss][0]), m.ph);
+        }
+      }
+    }
+
+    /* 参考线 */
+    if (L >= fv.ymin && L <= fv.ymax) {
+      ctx.save();
+      ctx.setLineDash([6, 6]);
+      ctx.strokeStyle = 'rgba(124,58,237,0.7)';
+      ctx.lineWidth = 1.7;
+      ctx.beginPath();
+      ctx.moveTo(pad.l, Y(L));
+      ctx.lineTo(w - pad.r, Y(L));
+      ctx.stroke();
+      ctx.restore();
+    }
+    if (u0 >= fv.xmin && u0 <= fv.xmax) {
+      ctx.save();
+      ctx.setLineDash([6, 6]);
+      ctx.strokeStyle = 'rgba(8,145,178,0.6)';
+      ctx.lineWidth = 1.7;
+      ctx.beginPath();
+      ctx.moveTo(X(u0), pad.t);
+      ctx.lineTo(X(u0), h - pad.b);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    /* 曲线：无定义段 */
+    ctx.save();
+    ctx.setLineDash([5, 5]);
+    ctx.strokeStyle = 'rgba(148,163,184,0.55)';
+    ctx.lineWidth = 2.2;
+    for (var s4 = 0; s4 < undefSegs.length; s4++) {
+      var a4 = Math.max(undefSegs[s4][0], fv.xmin);
+      var b4 = Math.min(undefSegs[s4][1], fv.xmax);
+      if (b4 <= a4) continue;
+      ctx.beginPath();
+      var M = 80;
+      for (var k = 0; k <= M; k++) {
+        var uu = a4 + (b4 - a4) * k / M;
+        var yy = f(uu);
+        if (isNaN(yy) || !isFinite(yy)) continue;
+        var px = X(uu), py = Y(yy);
+        if (k === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    /* 曲线：有定义段 */
+    ctx.beginPath();
+    ctx.strokeStyle = '#d97706';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    var started = false;
+    for (var i5 = 0; i5 <= N; i5++) {
+      var uu5 = fv.xmin + (fv.xmax - fv.xmin) * i5 / N;
+      var yy5 = f(uu5);
+      if (!isNaN(yy5) && isFinite(yy5) && uInDf(uu5)) {
+        var px5 = X(uu5), py5 = Y(yy5);
+        if (!started) { ctx.moveTo(px5, py5); started = true; }
+        else ctx.lineTo(px5, py5);
+      } else {
+        started = false;
+      }
+    }
+    ctx.stroke();
+
+    /* 空心洞与实心点 */
+    var hasHole = false;
+    var hasSolid = false;
+    var fU0, fU0Lim;
+    if (u0 >= fv.xmin && u0 <= fv.xmax) {
+      var epsProbe = 0.005;
+      var left = f(u0 - epsProbe);
+      var right = f(u0 + epsProbe);
+      fU0 = f(u0);
+      if (Math.abs(left - right) < 0.01 && Math.abs(left - L) < 0.01) {
+        if (Math.abs(fU0 - L) > 0.01 && !isNaN(fU0)) {
+          hasHole = true;
+          hasSolid = true;
+        } else if (isNaN(fU0)) {
+          hasHole = true;
+        }
+      }
+    }
+
+    if (hasHole && L >= fv.ymin && L <= fv.ymax) {
+      ctx.beginPath();
+      ctx.arc(X(u0), Y(L), 6.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#fffdf9';
+      ctx.fill();
+      ctx.strokeStyle = '#d97706';
+      ctx.lineWidth = 2.8;
+      ctx.stroke();
+    }
+    if (hasSolid && fU0 >= fv.ymin && fU0 <= fv.ymax) {
+      ctx.beginPath();
+      ctx.arc(X(u0), Y(fU0), 6.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#d97706';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2.4;
+      ctx.stroke();
+    }
+
+    /* 当前点 */
+    var xc = state.x;
+    var uc = cs.g(xc);
+    var yc = f(uc);
+    if (uc >= fv.xmin && uc <= fv.xmax && !isNaN(yc) && isFinite(yc) && yc >= fv.ymin && yc <= fv.ymax) {
+      var mx = X(uc), my = Y(yc);
+      ctx.save();
+      ctx.setLineDash([5, 5]);
+      ctx.strokeStyle = 'rgba(217,119,6,0.65)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(mx, my); ctx.lineTo(mx, h - pad.b); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(mx, my); ctx.lineTo(pad.l, my); ctx.stroke();
+      ctx.restore();
+
+      ctx.beginPath();
+      ctx.arc(mx, my, 7, 0, Math.PI * 2);
+      ctx.fillStyle = '#d97706';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2.8;
+      ctx.stroke();
+    }
+
+    /* 刻度 */
+    ctx.fillStyle = '#b8a99a';
+    ctx.font = '13px ' + FONT;
+    ctx.textAlign = 'center';
+    for (var fx2 = Math.ceil(fv.xmin / stepX) * stepX; fx2 <= fv.xmax; fx2 += stepX) {
+      if (Math.abs(fx2) < 1e-9) {
+        ctx.fillText('0', X(fx2), h - pad.b + 19);
+      } else {
+        ctx.fillText(fmtNum(fx2), X(fx2), h - pad.b + 19);
+      }
+    }
+    ctx.textAlign = 'right';
+    for (var fy2 = Math.ceil(fv.ymin / stepY) * stepY; fy2 <= fv.ymax; fy2 += stepY) {
+      if (Math.abs(fy2) < 1e-9) continue;
+      ctx.fillText(fmtNum(fy2), pad.l - 7, Y(fy2) + 5);
+    }
+
+    /* 轴标签 */
+    ctx.textAlign = 'right';
+    ctx.font = 'bold 14px ' + FONT;
+    ctx.fillStyle = '#a16207';
+    ctx.fillText('u', w - pad.r, h - pad.b + 19);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#b45309';
+    ctx.fillText('y', 10, pad.t + 14);
+
+    /* 标注 */
+    if (L >= fv.ymin && L <= fv.ymax) {
+      ctx.textAlign = 'left';
+      ctx.font = 'bold 13.5px ' + FONT;
+      ctx.fillStyle = 'rgba(124,58,237,0.95)';
+      ctx.fillText('L=' + fmtNum(L), pad.l + 8, Y(L) - 9);
+    }
+    if (u0 >= fv.xmin && u0 <= fv.xmax) {
+      ctx.fillStyle = 'rgba(8,145,178,0.95)';
+      ctx.font = 'bold 13px ' + FONT;
+      ctx.fillText('u₀=' + fmtNum(u0), X(u0) + 8, pad.t + 16);
+    }
+    if (hasSolid && fU0 >= fv.ymin && fU0 <= fv.ymax) {
+      ctx.fillStyle = 'rgba(217,119,6,0.98)';
+      ctx.font = 'bold 13px ' + FONT;
+      ctx.fillText('f(u₀)=' + fmtNum(fU0), X(u0) + 10, Y(fU0) - 8);
+    }
+  }
+
+  /* ================= 复合函数图 ================= */
+  function drawC() {
+    var c = cv.C;
+    if (!c.ctx || c.w < 2) return;
+    var ctx = c.ctx, w = c.w, h = c.h;
+    var cs = C();
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#fdfcff';
+    ctx.fillRect(0, 0, w, h);
+
+    var pad = { l: 50, r: 18, t: 22, b: 38 };
+    var m = makeMap(w, h, pad, cs.cView);
+    var X = m.X, Y = m.Y;
+
+    var x0 = cs.x0, L = cs.L, eps = state.eps;
+    var g = cs.g, f = cs.f, uInDf = cs.uInDf;
+
+    /* 无定义区域 */
+    var N = 800;
+    var undefSegs = [];
+    var inSeg = false, segStart = null;
+    for (var i = 0; i <= N; i++) {
+      var xv = cs.cView.xmin + (cs.cView.xmax - cs.cView.xmin) * i / N;
+      var defined = cs.compDefinedAt(xv);
+      if (!defined && !inSeg) { inSeg = true; segStart = xv; }
+      if ((defined || i === N) && inSeg) {
+        undefSegs.push([segStart, xv]);
+        inSeg = false;
+      }
+    }
+    ctx.fillStyle = 'rgba(148,163,184,0.18)';
+    for (var s = 0; s < undefSegs.length; s++) {
+      var a = Math.max(undefSegs[s][0], cs.cView.xmin);
+      var b = Math.min(undefSegs[s][1], cs.cView.xmax);
+      if (b > a) {
+        ctx.fillRect(X(a), pad.t, X(b) - X(a), m.ph);
+      }
+    }
+
+    /* 网格 */
+    ctx.strokeStyle = '#f1effc';
+    ctx.lineWidth = 1;
+    var cvw = cs.cView;
+    var stepX = niceStep(cvw.xmax - cvw.xmin, 6);
+    var stepY = niceStep(cvw.ymax - cvw.ymin, 5);
+    for (var cx = Math.ceil(cvw.xmin / stepX) * stepX; cx <= cvw.xmax; cx += stepX) {
+      if (Math.abs(cx) < 1e-9) continue;
+      ctx.beginPath();
+      ctx.moveTo(X(cx), pad.t);
+      ctx.lineTo(X(cx), h - pad.b);
+      ctx.stroke();
+    }
+    for (var cy = Math.ceil(cvw.ymin / stepY) * stepY; cy <= cvw.ymax; cy += stepY) {
+      if (Math.abs(cy) < 1e-9) continue;
+      ctx.beginPath();
+      ctx.moveTo(pad.l, Y(cy));
+      ctx.lineTo(w - pad.r, Y(cy));
+      ctx.stroke();
+    }
+
+    /* 邻域带 */
+    if (state.showBands) {
+      var xSegs = [];
+      var inSeg2 = false, segStart2 = null;
+      for (var i2 = 0; i2 <= N; i2++) {
+        var xv2 = cvw.xmin + (cvw.xmax - cvw.xmin) * i2 / N;
+        var uu = g(xv2);
+        var inBand = Math.abs(uu - cs.u0) < eps && uInDf(uu);
+        if (inBand && !inSeg2) { inSeg2 = true; segStart2 = xv2; }
+        if ((!inBand || i2 === N) && inSeg2) {
+          xSegs.push([segStart2, xv2]);
+          inSeg2 = false;
+        }
+      }
+      ctx.fillStyle = 'rgba(79,70,229,0.14)';
+      for (var s2 = 0; s2 < xSegs.length; s2++) {
+        var a2 = Math.max(xSegs[s2][0], cvw.xmin);
+        var b2 = Math.min(xSegs[s2][1], cvw.xmax);
+        if (b2 > a2) {
+          ctx.fillRect(X(a2), pad.t, X(b2) - X(a2), m.ph);
+        }
+      }
+      if (L >= cvw.ymin && L <= cvw.ymax) {
+        var yLow = Math.max(L - eps, cvw.ymin);
+        var yHigh = Math.min(L + eps, cvw.ymax);
+        if (yHigh > yLow) {
+          ctx.fillStyle = 'rgba(124,58,237,0.13)';
+          ctx.fillRect(pad.l, Y(yHigh), m.pw, Y(yLow) - Y(yHigh));
+        }
+      }
+    }
+
+    /* 参考线 */
+    if (L >= cvw.ymin && L <= cvw.ymax) {
+      ctx.save();
+      ctx.setLineDash([6, 6]);
+      ctx.strokeStyle = 'rgba(124,58,237,0.7)';
+      ctx.lineWidth = 1.7;
+      ctx.beginPath();
+      ctx.moveTo(pad.l, Y(L));
+      ctx.lineTo(w - pad.r, Y(L));
+      ctx.stroke();
+      ctx.restore();
+    }
+    if (x0 >= cvw.xmin && x0 <= cvw.xmax) {
+      ctx.save();
+      ctx.setLineDash([6, 6]);
+      ctx.strokeStyle = 'rgba(79,70,229,0.55)';
+      ctx.lineWidth = 1.7;
+      ctx.beginPath();
+      ctx.moveTo(X(x0), pad.t);
+      ctx.lineTo(X(x0), h - pad.b);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    /* 复合函数曲线 */
+    ctx.beginPath();
+    ctx.strokeStyle = '#7c3aed';
+    ctx.lineWidth = 3.2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    var started = false;
+    for (var i3 = 0; i3 <= N; i3++) {
+      var xv3 = cvw.xmin + (cvw.xmax - cvw.xmin) * i3 / N;
+      if (!cs.compDefinedAt(xv3)) { started = false; continue; }
+      if (Math.abs(xv3 - x0) < 0.004) { started = false; continue; }
+      var uu3 = g(xv3);
+      var yy3 = f(uu3);
+      if (isNaN(yy3) || !isFinite(yy3)) { started = false; continue; }
+      var px3 = X(xv3), py3 = Y(yy3);
+      if (!started) { ctx.moveTo(px3, py3); started = true; }
+      else ctx.lineTo(px3, py3);
+    }
+    ctx.stroke();
+
+    /* x0 处的点 */
+    if (cs.compDefinedAt(x0)) {
+      var yAtX0 = f(g(x0));
+      if (!isNaN(yAtX0) && isFinite(yAtX0) && yAtX0 >= cvw.ymin && yAtX0 <= cvw.ymax) {
+        var limExists = (cs.id === 'A');
+        if (limExists && Math.abs(yAtX0 - L) > 0.01) {
+          if (L >= cvw.ymin && L <= cvw.ymax) {
+            ctx.beginPath();
+            ctx.arc(X(x0), Y(L), 6.5, 0, Math.PI * 2);
+            ctx.fillStyle = '#fdfcff';
+            ctx.fill();
+            ctx.strokeStyle = '#7c3aed';
+            ctx.lineWidth = 2.8;
+            ctx.stroke();
+          }
+          ctx.beginPath();
+          ctx.arc(X(x0), Y(yAtX0), 6.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#7c3aed';
+          ctx.fill();
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 2.4;
+          ctx.stroke();
+        } else {
+          ctx.beginPath();
+          ctx.arc(X(x0), Y(yAtX0), 6.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#7c3aed';
+          ctx.fill();
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 2.4;
+          ctx.stroke();
+        }
+      }
+    }
+
+    /* 当前点 */
+    var xc = state.x;
+    if (cs.compDefinedAt(xc) && Math.abs(xc - x0) > 1e-6) {
+      var ucc = g(xc);
+      var ycc = f(ucc);
+      if (!isNaN(ycc) && isFinite(ycc) && ycc >= cvw.ymin && ycc <= cvw.ymax) {
+        var mx = X(xc), my = Y(ycc);
+        ctx.save();
+        ctx.setLineDash([5, 5]);
+        ctx.strokeStyle = 'rgba(124,58,237,0.6)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(mx, my); ctx.lineTo(mx, h - pad.b); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(mx, my); ctx.lineTo(pad.l, my); ctx.stroke();
+        ctx.restore();
+
+        ctx.beginPath();
+        ctx.arc(mx, my, 7, 0, Math.PI * 2);
+        ctx.fillStyle = '#7c3aed';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2.8;
+        ctx.stroke();
+      }
+    }
+
+    /* 刻度 */
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '13px ' + FONT;
+    ctx.textAlign = 'center';
+    for (var cx2 = Math.ceil(cvw.xmin / stepX) * stepX; cx2 <= cvw.xmax; cx2 += stepX) {
+      if (Math.abs(cx2) < 1e-9) {
+        ctx.fillText('0', X(cx2), h - pad.b + 19);
+      } else {
+        ctx.fillText(fmtNum(cx2), X(cx2), h - pad.b + 19);
+      }
+    }
+    ctx.textAlign = 'right';
+    for (var cy2 = Math.ceil(cvw.ymin / stepY) * stepY; cy2 <= cvw.ymax; cy2 += stepY) {
+      if (Math.abs(cy2) < 1e-9) continue;
+      ctx.fillText(fmtNum(cy2), pad.l - 7, Y(cy2) + 5);
+    }
+
+    /* 轴标签 */
+    ctx.textAlign = 'right';
+    ctx.font = 'bold 14px ' + FONT;
+    ctx.fillStyle = '#64748b';
+    ctx.fillText('x', w - pad.r, h - pad.b + 19);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#6d28d9';
+    ctx.fillText('y', 10, pad.t + 14);
+
+    /* 标注 */
+    if (L >= cvw.ymin && L <= cvw.ymax) {
+      ctx.textAlign = 'left';
+      ctx.font = 'bold 13.5px ' + FONT;
+      ctx.fillStyle = 'rgba(124,58,237,0.95)';
+      ctx.fillText('y=' + fmtNum(L), pad.l + 8, Y(L) - 9);
+    }
+
+    /* 案例 B、C 特殊提示 */
+    if (cs.id === 'B') {
+      ctx.fillStyle = 'rgba(185,28,28,0.9)';
+      ctx.font = 'bold 14px ' + FONT;
+      ctx.textAlign = 'center';
+      ctx.fillText('复合函数在 x₀=0 的', (pad.l + w - pad.r) / 2, (pad.t + h - pad.b) / 2 - 12);
+      ctx.fillText('任何去心邻域内都无定义', (pad.l + w - pad.r) / 2, (pad.t + h - pad.b) / 2 + 12);
+      ctx.font = '13px ' + FONT;
+      ctx.fillStyle = 'rgba(100,116,139,0.9)';
+      ctx.fillText('（仅 x=0 处有一个孤立点）', (pad.l + w - pad.r) / 2, (pad.t + h - pad.b) / 2 + 38);
+    } else if (cs.id === 'C') {
+      ctx.fillStyle = 'rgba(185,28,28,0.9)';
+      ctx.font = 'bold 14px ' + FONT;
+      ctx.textAlign = 'center';
+      ctx.fillText('在 x = ±1/(nπ) 处无定义', (pad.l + w - pad.r) / 2, pad.t + 32);
+      ctx.font = '13px ' + FONT;
+      ctx.fillStyle = 'rgba(100,116,139,0.9)';
+      ctx.fillText('这些点无限稠密，导致去心邻域内无定义', (pad.l + w - pad.r) / 2, pad.t + 52);
+    }
+  }
+
+  /* ================= 工具 ================= */
+  function niceStep(range, count) {
+    var raw = range / count;
+    var mag = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+    var norm = raw / mag;
+    var step;
+    if (norm < 1.5) step = 1;
+    else if (norm < 3.5) step = 2;
+    else if (norm < 7.5) step = 5;
+    else step = 10;
+    return step * mag;
+  }
+
+  function fmtNum(v) {
+    if (Math.abs(v) < 1e-9) return '0';
+    var s = v.toFixed(2);
+    if (s.indexOf('.') >= 0) {
+      s = s.replace(/0+$/, '').replace(/\.$/, '');
+    }
+    return s;
+  }
+
+  function intersectDf(a, b, uInDf, N) {
+    var segs = [];
+    var inSeg = false, start = null;
+    for (var i = 0; i <= N; i++) {
+      var u = a + (b - a) * i / N;
+      var ok = uInDf(u);
+      if (ok && !inSeg) { inSeg = true; start = u; }
+      if ((!ok || i === N) && inSeg) {
+        segs.push([start, u]);
+        inSeg = false;
+      }
+    }
+    return segs;
+  }
+
+  /* ================= 状态刷新 ================= */
+  function update() {
+    var cs = C();
+    var x = state.x;
+    var u = cs.g(x);
+    var y = cs.f(u);
+    var hasDef = cs.compDefinedAt(x);
+
+    el.valX.textContent = x.toFixed(2);
+    el.valU.textContent = isNaN(u) ? '—' : u.toFixed(3);
+    el.valY.textContent = (isNaN(y) || !isFinite(y)) ? '无定义' : y.toFixed(3);
+
+    el.lblX.textContent = 'x = ' + x.toFixed(2);
+    el.lblEps.textContent = 'ε = ' + state.eps.toFixed(2);
+
+    el.chipY.className = 'ro-chip' + (hasDef && !isNaN(y) ? '' : ' bad');
+
+    var st = el.status;
+    st.className = 'status';
+
+    if (cs.id === 'A') {
+      if (Math.abs(x) < 0.004) {
+        st.classList.add('warn');
+        st.innerHTML = '⚠️ 当前 $x=x_0=0$。极限考察 $x\\to x_0$ 且 $x\\neq x_0$ 的过程，' +
+          '此点本身不参与极限。把 $x$ 拖离 $0$ 观察趋势。';
+      } else {
+        st.classList.add('ok');
+        st.innerHTML = '✔️ <b>前提成立</b>：$|x|$ 越小，$u=g(x)$ 越接近 $2$（且 $u\\neq 2$），' +
+          '同时 $g(x)$ 落在 $D_f=\\mathbb{R}$ 内，' +
+          '<b>复合函数在 $x_0=0$ 的去心邻域内有定义</b>。' +
+          '于是 $f(u)$ 沿橙色直线滑向洞口的极限值 $L=4$。' +
+          '即 $\\lim\\limits_{x\\to0}f(g(x))=4$。';
+      }
+    } else if (cs.id === 'B') {
+      st.classList.add('bad');
+      st.innerHTML = '⚠️ <b>关键问题</b>：$x_0=0$ 是 $D_g=\\mathbb{R}$ 的聚点，' +
+        '$u_0=0$ 也是 $D_f=[0,+\\infty)$ 的聚点，' +
+        '内层极限 $\\lim\\limits_{x\\to0}g(x)=0$ 存在。' +
+        '<br>但 $x\\neq 0$ 时 $g(x)=-x^2<0\\notin D_f$，' +
+        '所以复合函数 $\\sqrt{-x^2}$ 在 $x_0=0$ 的<b>任何去心邻域内都无定义</b>！' +
+        '<br>极限 $\\lim\\limits_{x\\to0}f(g(x))$ <b>不存在（无意义）</b>。';
+    } else if (cs.id === 'C') {
+      st.classList.add('bad');
+      st.innerHTML = '⚠️ <b>图片案例关键问题</b>：$x_0=0$ 是 $D_g=\\mathbb{R}$ 的聚点，' +
+        '$u_0=0$ 是 $D_f=\\mathbb{R}\\setminus\\{0\\}$ 的聚点，' +
+        '内层极限 $\\lim\\limits_{x\\to0}g(x)=0$ 存在，外层极限 $\\lim\\limits_{u\\to0}f(u)=1$ 也存在。' +
+        '<br>但当 $x=\\pm\\dfrac{1}{n\\pi}$ 时 $g(x)=0\\notin D_f$，复合函数无定义。' +
+        '这些点在 $x_0=0$ 附近<b>无限稠密</b>，所以' +
+        '$x_0=0$ 的<b>任何去心邻域内都包含无定义点</b>。' +
+        '<br>极限 $\\lim\\limits_{x\\to0}f(g(x))$ <b>不存在（无意义）</b>。';
+    }
+
+    drawG();
+    drawF();
+    drawC();
+
+    if (window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise([st]).catch(function () {});
+    }
+  }
+
+  /* ================= 案例描述更新 ================= */
+  function updateCaseDesc() {
+    var cs = C();
+    var d = el.caseDesc;
+    d.innerHTML = cs.desc;
+    if (window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise([d]).catch(function () {});
+    }
+  }
+
+  /* ================= 自动演示 ================= */
+  var rafId = null, lastTs = 0, animDir = -1;
+
+  function tick(ts) {
+    if (!state.playing) { rafId = null; return; }
+    if (!lastTs) lastTs = ts;
+    var dt = Math.min((ts - lastTs) / 1000, 0.05);
+    lastTs = ts;
+
+    var x = state.x + animDir * dt * 0.85;
+    if (x <= 0.03) { x = 0.03; animDir = 1; }
+    if (x >= 1.5) { x = 1.5; animDir = -1; }
+
+    state.x = x;
+    el.xSlider.value = x;
+    update();
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function startPlay() {
+    state.playing = true;
+    lastTs = 0;
+    animDir = -1;
+    el.btnPlay.textContent = '⏸ 暂停演示';
+    el.btnPlay.classList.add('active');
+    if (rafId === null) rafId = requestAnimationFrame(tick);
+  }
+
+  function stopPlay() {
+    state.playing = false;
+    el.btnPlay.textContent = '▶ 自动演示 x→x₀';
+    el.btnPlay.classList.remove('active');
+    if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+  }
+
+  /* ================= 事件 ================= */
+  el.xSlider.addEventListener('input', function () {
+    state.x = parseFloat(this.value);
+    if (state.playing) stopPlay();
+    update();
+  });
+
+  el.epsSlider.addEventListener('input', function () {
+    state.eps = parseFloat(this.value);
+    update();
+  });
+
+  el.btnPlay.addEventListener('click', function () {
+    if (state.playing) stopPlay(); else startPlay();
+  });
+
+  el.chkBands.addEventListener('change', function () {
+    state.showBands = this.checked;
+    update();
+  });
+
+  el.caseTabs.addEventListener('click', function (e) {
+    var btn = e.target.closest('button');
+    if (!btn) return;
+    var id = btn.getAttribute('data-case');
+    if (!id || id === state.caseId) return;
+    if (state.playing) stopPlay();
+    state.caseId = id;
+    var all = this.querySelectorAll('button');
+    for (var i = 0; i < all.length; i++) {
+      all[i].classList.remove('active', 'bad');
+    }
+    btn.classList.add('active');
+    if (id === 'B' || id === 'C') btn.classList.add('bad');
+    state.x = 0.9;
+    if (id === 'C') state.x = 0.15;
+    el.xSlider.value = state.x;
+    updateCaseDesc();
+    update();
+    if (window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise().catch(function () {});
+    }
+  });
+
+  /* ================= 初始化 ================= */
+  function init() {
+    requestAnimationFrame(function () {
+      fitAll();
+      updateCaseDesc();
+      update();
+      setTimeout(function () { fitAll(); update(); }, 260);
+      setTimeout(function () { fitAll(); update(); }, 800);
+    });
+
+    if (window.MathJax && MathJax.startup && MathJax.startup.promise) {
+      MathJax.startup.promise.then(function () {
+        setTimeout(function () { fitAll(); updateCaseDesc(); update(); }, 80);
+      });
+    }
+  }
+
+  window.addEventListener('resize', function () {
+    fitAll();
+    update();
+  });
+
+  window.addEventListener('orientationchange', function () {
+    setTimeout(function () { fitAll(); update(); }, 280);
+  });
+
+  if (window.ResizeObserver) {
+    var ro = new ResizeObserver(function () {
+      fitAll();
+      update();
+    });
+    ro.observe(document.querySelector('.plots'));
+    ro.observe(document.getElementById('canvasC').parentNode);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+})();
+</script>
+</body>
+</html>
