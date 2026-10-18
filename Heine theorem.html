@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>海涅定理 · 归结原则 · 动态演示</title>
+    <!-- MathJax 配置 -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                enableMenu: false
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(145deg, #1a1e2b 0%, #2a2f42 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 16px;
+        }
+
+        .card {
+            background: rgba(22, 26, 35, 0.95);
+            backdrop-filter: blur(8px);
+            border-radius: 48px 48px 36px 36px;
+            box-shadow: 0 25px 40px -10px rgba(0, 0, 0, 0.7), 0 0 0 2px rgba(255, 215, 100, 0.2) inset;
+            max-width: 900px;
+            width: 100%;
+            padding: 28px 24px 32px;
+        }
+
+        h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-align: center;
+            background: linear-gradient(120deg, #ffe6a7, #ffb347, #ff8c5a);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 4px 15px rgba(255, 150, 0, 0.4);
+            margin-bottom: 8px;
+        }
+
+        /* 定理模块 */
+        .theorem-module {
+            background: linear-gradient(135deg, rgba(30, 38, 58, 0.95), rgba(22, 28, 42, 0.95));
+            border-radius: 28px;
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            border: 2px solid rgba(255, 180, 60, 0.6);
+            box-shadow: 0 0 30px rgba(255, 180, 60, 0.15), 0 10px 20px -5px black;
+            position: relative;
+        }
+
+        .theorem-module::before {
+            content: "⚡ 归结原则";
+            position: absolute;
+            top: -14px;
+            left: 28px;
+            background: #ffb347;
+            color: #111;
+            font-weight: 800;
+            font-size: 1.1rem;
+            padding: 4px 22px;
+            border-radius: 40px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+
+        .theorem-text {
+            font-size: 1.35rem;
+            line-height: 1.7;
+            color: #eef3ff;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .theorem-text .math {
+            font-size: 1.4rem;
+            color: #ffd966;
+        }
+
+        .theorem-text .highlight {
+            color: #ffb86b;
+            font-weight: 700;
+            background: rgba(255, 180, 60, 0.2);
+            padding: 2px 12px;
+            border-radius: 30px;
+        }
+
+        /* 画布容器 */
+        .canvas-wrapper {
+            position: relative;
+            background: #0b0e14;
+            border-radius: 32px;
+            padding: 10px;
+            box-shadow: 0 0 0 2px rgba(255, 200, 50, 0.4), 0 18px 30px -8px black;
+            margin-bottom: 24px;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: #0f131c;
+            border-radius: 26px;
+            cursor: pointer;
+            touch-action: pan-y;
+        }
+
+        /* 画布工具条（放大/还原） */
+        .canvas-toolbar {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .canvas-toolbar button {
+            background: rgba(20, 26, 38, 0.85);
+            backdrop-filter: blur(4px);
+            border: 2px solid #ffb347;
+            color: #ffd966;
+            font-weight: 700;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 4px 0 #0b0e14;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.3px;
+        }
+
+        .canvas-toolbar button:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #0b0e14;
+        }
+
+        .canvas-toolbar button i {
+            font-style: normal;
+            font-size: 1.1rem;
+        }
+
+        .canvas-toolbar .btn-zoom-out {
+            border-color: #6b7b9a;
+            color: #b0c0e0;
+            box-shadow: 0 4px 0 #0b0e14;
+        }
+
+        /* 控制条 */
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .slider-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px 20px;
+            background: rgba(255, 255, 255, 0.07);
+            padding: 14px 24px;
+            border-radius: 60px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+        }
+
+        .slider-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #e8eefc;
+            font-size: 1.2rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .slider-label i {
+            font-style: normal;
+            color: #ffb347;
+            font-size: 1.4rem;
+        }
+
+        input[type=range] {
+            flex: 1;
+            min-width: 160px;
+            height: 8px;
+            -webkit-appearance: none;
+            background: linear-gradient(90deg, #ffb347, #ff7b5c, #b583ff);
+            border-radius: 10px;
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 28px;
+            height: 28px;
+            background: white;
+            border-radius: 50%;
+            border: 3px solid #ffa726;
+            box-shadow: 0 0 18px #ffb347;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: #ffe082;
+        }
+
+        .n-value {
+            background: #1e2433;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: #ffd966;
+            border: 2px solid #ffb347;
+            font-size: 1.3rem;
+            min-width: 110px;
+            text-align: center;
+            box-shadow: 0 0 12px rgba(255, 180, 60, 0.5);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: rgba(30, 36, 51, 0.95);
+            border: 2px solid #ffb347;
+            color: #ffd966;
+            font-weight: 700;
+            padding: 14px 32px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 6px 0 #0b0e14;
+            letter-spacing: 0.5px;
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 1px 0 #0b0e14;
+        }
+
+        .btn i {
+            font-style: normal;
+            font-size: 1.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(145deg, #ff9f4b, #ff7e3f);
+            color: #1a1e2b;
+            border: none;
+            box-shadow: 0 6px 0 #b35100;
+        }
+
+        .btn-primary:active {
+            box-shadow: 0 1px 0 #b35100;
+        }
+
+        .btn-secondary {
+            background: rgba(50, 60, 85, 0.95);
+            border-color: #b583ff;
+            color: #d4b0ff;
+            box-shadow: 0 6px 0 #2a1b3d;
+        }
+
+        .btn-secondary:active {
+            box-shadow: 0 1px 0 #2a1b3d;
+        }
+
+        .btn-purple {
+            background: linear-gradient(145deg, #a06be0, #7e4bc9);
+            border: none;
+            color: #111;
+            box-shadow: 0 6px 0 #4a2b7a;
+        }
+
+        .btn-purple:active {
+            box-shadow: 0 1px 0 #4a2b7a;
+        }
+
+        /* 反例模块 */
+        .counter-module {
+            background: rgba(40, 28, 48, 0.9);
+            border-radius: 32px;
+            padding: 24px 26px 20px;
+            margin-bottom: 24px;
+            border-left: 8px solid #b583ff;
+            box-shadow: 0 8px 25px -8px black;
+            color: #e8d8ff;
+            font-size: 1.2rem;
+            line-height: 1.8;
+        }
+
+        .counter-module .label {
+            font-weight: 700;
+            color: #d4b0ff;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .counter-module .label .badge {
+            background: #b583ff;
+            color: #111;
+            padding: 3px 16px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 800;
+        }
+
+        .counter-canvas-wrapper {
+            position: relative;
+            background: #0b0e14;
+            border-radius: 24px;
+            padding: 8px;
+            box-shadow: 0 0 0 2px rgba(181, 131, 255, 0.4), 0 12px 20px -8px black;
+            margin: 16px 0 12px;
+        }
+
+        .counter-canvas-wrapper canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: #0f131c;
+            border-radius: 20px;
+            cursor: pointer;
+            touch-action: pan-y;
+        }
+
+        .counter-canvas-wrapper .canvas-toolbar {
+            top: 14px;
+            right: 14px;
+        }
+
+        .counter-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 16px 0 8px;
+        }
+
+        .counter-slider-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px 20px;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 12px 22px;
+            border-radius: 60px;
+            border: 1px solid rgba(181, 131, 255, 0.45);
+        }
+
+        .counter-slider-container .slider-label i {
+            color: #b583ff;
+        }
+
+        .counter-n-value {
+            background: #1e2433;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: #d4b0ff;
+            border: 2px solid #b583ff;
+            font-size: 1.3rem;
+            min-width: 110px;
+            text-align: center;
+            box-shadow: 0 0 12px rgba(181, 131, 255, 0.5);
+        }
+
+        .counter-controls input[type=range] {
+            background: linear-gradient(90deg, #b583ff, #d4a0ff, #ff8c9f);
+        }
+
+        .counter-controls input[type=range]::-webkit-slider-thumb {
+            border-color: #b583ff;
+            box-shadow: 0 0 18px #b583ff;
+        }
+
+        /* 解读区域 */
+        .explain {
+            background: rgba(38, 44, 60, 0.85);
+            border-radius: 32px;
+            padding: 26px 26px 20px;
+            border-left: 8px solid #ffb347;
+            box-shadow: 0 8px 25px -8px black;
+            color: #d6e0f0;
+            font-size: 1.2rem;
+            line-height: 1.8;
+        }
+
+        .explain .theorem-label {
+            font-weight: 700;
+            color: #ffd966;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .explain .theorem-label .badge {
+            background: #ffb347;
+            color: #111;
+            padding: 3px 16px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 800;
+        }
+
+        .math-inline {
+            background: #0e121c;
+            padding: 4px 16px;
+            border-radius: 40px;
+            display: inline-block;
+            font-size: 1.15rem;
+            margin: 6px 0;
+            color: #ffe6a7;
+            border: 1px solid #ffb34755;
+        }
+
+        .highlight {
+            color: #ffb86b;
+            font-weight: 700;
+        }
+
+        /* 手机端微调 */
+        @media (max-width: 600px) {
+            .card {
+                padding: 18px 14px 24px;
+                border-radius: 36px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .theorem-text {
+                font-size: 1.1rem;
+            }
+
+            .theorem-text .math {
+                font-size: 1.1rem;
+            }
+
+            .slider-container {
+                padding: 10px 16px;
+                gap: 8px 12px;
+            }
+
+            .slider-label {
+                font-size: 1rem;
+            }
+
+            .n-value, .counter-n-value {
+                font-size: 1rem;
+                padding: 5px 10px;
+                min-width: 80px;
+            }
+
+            .btn {
+                padding: 10px 16px;
+                font-size: 1rem;
+                min-width: 120px;
+            }
+
+            .btn i {
+                font-size: 1.2rem;
+            }
+
+            .explain, .counter-module {
+                padding: 18px 16px 14px;
+                font-size: 1rem;
+            }
+
+            .explain .theorem-label, .counter-module .label {
+                font-size: 1.1rem;
+            }
+
+            .math-inline {
+                font-size: 1rem;
+            }
+
+            .canvas-toolbar button {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>海涅定理 · 归结原则</h1>
+
+        <!-- 定理独立模块 -->
+        <div class="theorem-module">
+            <div class="theorem-text">
+                <span class="math">\( \lim_{x \to a} f(x) = L \)</span> 
+                <span class="highlight">当且仅当</span> 
+                对任意满足 <span class="math">\( x_n \to a \;\; (x_n \neq a) \)</span> 的数列，都有 
+                <span class="math">\( f(x_n) \to L \)</span>。
+            </div>
+        </div>
+
+        <!-- 主画布区域（正面案例） -->
+        <div class="canvas-wrapper">
+            <canvas id="heineCanvas" width="700" height="400"></canvas>
+            <div class="canvas-toolbar">
+                <button id="zoomInMain" title="放大"><i>🔍</i> 放大</button>
+                <button id="zoomOutMain" class="btn-zoom-out" title="还原"><i>↺</i> 还原</button>
+            </div>
+        </div>
+
+        <!-- 主控制区 -->
+        <div class="control-panel">
+            <div class="slider-container">
+                <div class="slider-label"><i>📐</i> 数列项 \( n \) </div>
+                <input type="range" id="nSlider" min="1" max="500" value="10" step="1">
+                <div class="n-value" id="nDisplay">n = 10</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn" id="resetBtn"><i>⟲</i> 重置</button>
+                <button class="btn btn-primary" id="animBtn"><i>▶</i> 动画</button>
+            </div>
+        </div>
+
+        <!-- 解读卡片（主案例） -->
+        <div class="explain">
+            <div class="theorem-label">
+                <span class="badge">案例 1</span> 函数 \( f(x) = \frac{\sin x}{x} + 0.2 \) 在 \( x=0 \) 处的极限
+            </div>
+            <p>
+                📍 <strong>动态展示：</strong> 取数列 \( x_n = \frac{(-1)^n}{\ln(n+1)} \)（\( n \ge 2 \)），它在 \( 0 \) 的两侧交替取值并趋于 \( 0 \)。
+                滑动滑块或播放动画，观察绿色点列 \( (x_n, f(x_n)) \) 随着 \( n \) 增大如何向极限点 \( (0, 1.2) \) 靠拢。
+                <strong>点击「放大」按钮</strong>可放大原点附近区域，更清楚地观察逼近细节。
+            </p>
+            <p style="margin-top: 10px;">
+                ⚡ <strong>直观理解：</strong> 无论从正方向还是负方向趋近于 0，对应的函数值都趋于同一个值 \( L = 1.2 \)。
+                若存在某个数列使函数值不趋近于 \( L \)，则函数极限不存在。
+            </p>
+            <div class="math-inline">
+                \( x_n = \frac{(-1)^n}{\ln(n+1)} \to 0 \)，\( f(x_n) \to 1.2 \)
+            </div>
+        </div>
+
+        <!-- 反例模块（可交互） -->
+        <div class="counter-module">
+            <div class="label">
+                <span class="badge">反例</span> 函数极限不存在的典型情形
+            </div>
+            <p>
+                📍 <strong>函数：</strong> \( g(x) = \sin\left(\frac{1}{x}\right) \) 在 \( x=0 \) 处极限不存在。
+                取数列 \( x_n = \frac{(-1)^n}{n\pi + \pi/2} \to 0 \)，它在 \( 0 \) 的两侧交替取值，
+                则 \( g(x_n) \) 在 \( 1 \) 和 \( -1 \) 之间震荡，不趋于任何值。
+            </p>
+            <div class="counter-canvas-wrapper">
+                <canvas id="counterCanvas" width="700" height="400"></canvas>
+                <div class="canvas-toolbar">
+                    <button id="zoomInCounter" title="放大"><i>🔍</i> 放大</button>
+                    <button id="zoomOutCounter" class="btn-zoom-out" title="还原"><i>↺</i> 还原</button>
+                </div>
+            </div>
+            <!-- 反例专属控制区 -->
+            <div class="counter-controls">
+                <div class="counter-slider-container">
+                    <div class="slider-label"><i>🔢</i> 数列项 \( n \) </div>
+                    <input type="range" id="counterSlider" min="1" max="30" value="6" step="1">
+                    <div class="counter-n-value" id="counterNDisplay">n = 6</div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" id="counterResetBtn"><i>⟲</i> 重置</button>
+                    <button class="btn btn-purple" id="counterAnimBtn"><i>▶</i> 动画</button>
+                </div>
+            </div>
+            <p style="margin-top: 12px; font-size: 1.1rem;">
+                🔴 <strong>观察：</strong> 随着 \( n \) 增大，红色点列 \( (x_n, g(x_n)) \) 在正负两侧交替出现，
+                始终在两个水平线 \( y = \pm 1 \) 之间跳跃，没有唯一的极限点。点击「放大」可观察原点附近。
+            </p>
+            <div class="math-inline" style="border-color: #b583ff; color: #d4b0ff;">
+                \( x_n = \frac{(-1)^n}{n\pi + \pi/2} \to 0 \)，但 \( g(x_n) \) 不收敛
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ==================== 主画布（正面案例） ====================
+            const canvas = document.getElementById('heineCanvas');
+            const ctx = canvas.getContext('2d');
+
+            function setupCanvas(cvs, ctx) {
+                const dpr = window.devicePixelRatio || 1;
+                const width = 700;
+                const height = 400;
+                cvs.width = width * dpr;
+                cvs.height = height * dpr;
+                cvs.style.width = '100%';
+                cvs.style.height = 'auto';
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            const W = 700, H = 400;
+            // 基础坐标变换参数（可变，用于缩放）
+            let mainCx = W / 2, mainCy = H * 0.75;
+            let mainScaleX = 100, mainScaleY = 100;
+            const baseMainScaleX = 100, baseMainScaleY = 100;
+            const baseMainCx = W / 2, baseMainCy = H * 0.75;
+
+            function toCanvasX(x) { return mainCx + mainScaleX * x; }
+            function toCanvasY(y) { return mainCy - mainScaleY * y; }
+
+            function f(x) {
+                if (Math.abs(x) < 1e-9) return 1.2;
+                return Math.sin(x) / x + 0.2;
+            }
+
+            const nSlider = document.getElementById('nSlider');
+            const nDisplay = document.getElementById('nDisplay');
+            const animBtn = document.getElementById('animBtn');
+
+            let currentN = 10;
+            let animationId = null;
+
+            function updateN(value) {
+                currentN = parseInt(value, 10);
+                nDisplay.textContent = `n = ${currentN}`;
+                drawScene(currentN);
+            }
+
+            // 放大主画布
+            document.getElementById('zoomInMain').addEventListener('click', () => {
+                mainScaleX = baseMainScaleX * 5;
+                mainScaleY = baseMainScaleY * 5;
+                // 保持原点位置不变（其实移动中心）
+                mainCx = W / 2;
+                mainCy = H * 0.75; // 保持y=0位置
+                drawScene(currentN);
+            });
+
+            document.getElementById('zoomOutMain').addEventListener('click', () => {
+                mainScaleX = baseMainScaleX;
+                mainScaleY = baseMainScaleY;
+                mainCx = baseMainCx;
+                mainCy = baseMainCy;
+                drawScene(currentN);
+            });
+
+            function drawScene(n) {
+                ctx.clearRect(0, 0, W, H);
+                ctx.fillStyle = '#0f131c';
+                ctx.fillRect(0, 0, W, H);
+
+                // 网格
+                ctx.strokeStyle = '#252b3a';
+                ctx.lineWidth = 0.6;
+                for (let x = -3.5; x <= 3.5; x += 0.5) {
+                    if (Math.abs(x) < 1e-9) continue;
+                    const px = toCanvasX(x);
+                    if (px < 0 || px > W) continue;
+                    ctx.beginPath();
+                    ctx.moveTo(px, 0);
+                    ctx.lineTo(px, H);
+                    ctx.stroke();
+                }
+                for (let y = 0; y <= 2.8; y += 0.5) {
+                    const py = toCanvasY(y);
+                    if (py < 0 || py > H) continue;
+                    ctx.beginPath();
+                    ctx.moveTo(0, py);
+                    ctx.lineTo(W, py);
+                    ctx.stroke();
+                }
+
+                // 坐标轴
+                ctx.beginPath();
+                ctx.strokeStyle = '#5b6b8a';
+                ctx.lineWidth = 1.8;
+                ctx.moveTo(0, toCanvasY(0));
+                ctx.lineTo(W, toCanvasY(0));
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(toCanvasX(0), H);
+                ctx.lineTo(toCanvasX(0), 0);
+                ctx.stroke();
+
+                // 轴标签
+                ctx.font = 'bold 16px "Segoe UI", Roboto, sans-serif';
+                ctx.fillStyle = '#b0c0e0';
+                ctx.fillText('x', W - 25, toCanvasY(0) - 10);
+                ctx.fillText('y', toCanvasX(0) + 12, 24);
+
+                // 刻度 (根据当前缩放调整步长)
+                ctx.font = '14px "Courier New", monospace';
+                ctx.fillStyle = '#8a9bb8';
+                const xStep = mainScaleX > 300 ? 0.1 : (mainScaleX > 200 ? 0.2 : 0.5);
+                for (let x = -3; x <= 3; x += xStep) {
+                    if (Math.abs(x) < 1e-9) continue;
+                    const px = toCanvasX(x);
+                    if (px < -20 || px > W+20) continue;
+                    ctx.beginPath();
+                    ctx.moveTo(px, toCanvasY(0) - 6);
+                    ctx.lineTo(px, toCanvasY(0) + 6);
+                    ctx.strokeStyle = '#6b7b9a';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                    ctx.fillText(x.toFixed(1), px - 10, toCanvasY(0) + 26);
+                }
+                const yStep = mainScaleY > 300 ? 0.1 : (mainScaleY > 200 ? 0.2 : 0.5);
+                for (let y = 0; y <= 2.5; y += yStep) {
+                    const py = toCanvasY(y);
+                    if (py < -20 || py > H+20) continue;
+                    ctx.beginPath();
+                    ctx.moveTo(toCanvasX(0) - 6, py);
+                    ctx.lineTo(toCanvasX(0) + 6, py);
+                    ctx.strokeStyle = '#6b7b9a';
+                    ctx.stroke();
+                    ctx.fillText(y.toFixed(1), toCanvasX(0) - 48, py + 5);
+                }
+
+                // 函数曲线 (只画可见部分)
+                ctx.beginPath();
+                ctx.strokeStyle = '#ffb347';
+                ctx.lineWidth = 3.6;
+                ctx.shadowColor = '#ffb347';
+                ctx.shadowBlur = 12;
+                let first = true;
+                for (let px = 0; px <= W; px += 1) {
+                    const xMath = (px - mainCx) / mainScaleX;
+                    if (xMath < -3.5 || xMath > 3.5) continue;
+                    const yMath = f(xMath);
+                    const py = toCanvasY(yMath);
+                    if (py < -50 || py > H+50) continue;
+                    if (first) {
+                        ctx.moveTo(px, py);
+                        first = false;
+                    } else {
+                        ctx.lineTo(px, py);
+                    }
+                }
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                // 极限点
+                const limitX = toCanvasX(0);
+                const limitY = toCanvasY(1.2);
+                if (limitX > -20 && limitX < W+20 && limitY > -20 && limitY < H+20) {
+                    ctx.beginPath();
+                    ctx.fillStyle = '#ff5e7c';
+                    ctx.shadowColor = '#ff5e7c';
+                    ctx.shadowBlur = 20;
+                    ctx.arc(limitX, limitY, 8, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.font = 'bold 16px "Segoe UI", Roboto, sans-serif';
+                    ctx.fillStyle = '#ff8c9f';
+                    ctx.fillText('L', limitX + 15, limitY - 10);
+                    ctx.font = 'italic 15px "Times New Roman", serif';
+                    ctx.fillStyle = '#ffb3c0';
+                    ctx.fillText('(0, 1.2)', limitX + 26, limitY - 26);
+                }
+
+                // 数列点：x_n = (-1)^n / ln(n+1)
+                const x_n = (k) => {
+                    if (k < 2) return null;
+                    return Math.pow(-1, k) / Math.log(k + 1);
+                };
+                const points = [];
+                // 限制数量避免过多影响性能，但为了让n=500也能显示，我们只绘制部分点，但为了保证逼近效果，至少绘制最后若干个
+                // 但我们需要看到趋势，所以绘制所有点但控制总数？对于n=500，点太多。可以绘制间隔采样，但要保证最后一个点可见。
+                // 改进：绘制所有点，但可能数量很多。性能可以接受，但点太密可能看不清。我们限制绘制最多100个点，均匀采样。
+                const step = Math.max(1, Math.floor(n / 100));
+                for (let k = 2; k <= n + 1; k += step) {
+                    const xn = x_n(k);
+                    if (xn === null || Math.abs(xn) > 3.0) continue;
+                    const yn = f(xn);
+                    points.push({ k: k - 1, xn, yn });
+                }
+                // 确保最后一个点被加入
+                const lastK = n + 1;
+                const lastXn = x_n(lastK);
+                if (lastXn !== null && Math.abs(lastXn) <= 3.0) {
+                    const lastYn = f(lastXn);
+                    if (!points.some(p => p.k === lastK - 1)) {
+                        points.push({ k: lastK - 1, xn: lastXn, yn: lastYn });
+                    }
+                }
+
+                // 垂直线
+                points.forEach(p => {
+                    const px = toCanvasX(p.xn);
+                    const pyPoint = toCanvasY(p.yn);
+                    const pyZero = toCanvasY(0);
+                    if (px < -20 || px > W+20) return;
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#4d5f8a';
+                    ctx.lineWidth = 1.0;
+                    ctx.setLineDash([4, 5]);
+                    ctx.moveTo(px, pyZero);
+                    ctx.lineTo(px, pyPoint);
+                    ctx.stroke();
+                });
+                ctx.setLineDash([]);
+
+                // 绘制点
+                points.forEach(p => {
+                    const px = toCanvasX(p.xn);
+                    const py = toCanvasY(p.yn);
+                    if (px < -20 || px > W+20 || py < -20 || py > H+20) return;
+                    const radius = Math.max(3.5, 8 - p.k * 0.04);
+                    const hue = 260 + (p.k / Math.max(n,1)) * 60;
+                    const color = `hsl(${hue % 360}, 85%, 70%)`;
+                    ctx.beginPath();
+                    ctx.fillStyle = color;
+                    ctx.shadowColor = color;
+                    ctx.shadowBlur = 14;
+                    ctx.arc(px, py, radius, 0, 2 * Math.PI);
+                    ctx.fill();
+                });
+                ctx.shadowBlur = 0;
+
+                // 高亮最后一个点
+                if (points.length > 0) {
+                    const last = points[points.length - 1];
+                    const pxLast = toCanvasX(last.xn);
+                    const pyLast = toCanvasY(last.yn);
+                    if (pxLast > -20 && pxLast < W+20 && pyLast > -20 && pyLast < H+20) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = '#ffffff';
+                        ctx.lineWidth = 2.8;
+                        ctx.arc(pxLast, pyLast, 11, 0, 2 * Math.PI);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+                        ctx.arc(pxLast, pyLast, 17, 0, 2 * Math.PI);
+                        ctx.fill();
+                        ctx.font = 'bold 15px "Segoe UI", monospace';
+                        ctx.fillStyle = '#f0f9ff';
+                        ctx.fillText(`n=${last.k}`, pxLast + 18, pyLast - 16);
+                    }
+                }
+
+                // 函数表达式
+                ctx.font = 'italic 17px "Times New Roman", serif';
+                ctx.fillStyle = '#d4e0ff';
+                ctx.fillText('f(x) = sin(x)/x + 0.2', 30, 55);
+
+                // 左右两个箭头指向0
+                ctx.font = 'bold 16px "Segoe UI", sans-serif';
+                ctx.fillStyle = '#8fa3c9';
+                ctx.fillText('x → 0', toCanvasX(0.8), toCanvasY(0) - 22);
+                // 右侧箭头
+                ctx.beginPath();
+                ctx.strokeStyle = '#8fa3c9';
+                ctx.lineWidth = 2;
+                ctx.moveTo(toCanvasX(1.8), toCanvasY(0) - 28);
+                ctx.lineTo(toCanvasX(0.3), toCanvasY(0) - 28);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(toCanvasX(0.3), toCanvasY(0) - 34);
+                ctx.lineTo(toCanvasX(0.3), toCanvasY(0) - 22);
+                ctx.lineTo(toCanvasX(-0.2), toCanvasY(0) - 28);
+                ctx.closePath();
+                ctx.fillStyle = '#8fa3c9';
+                ctx.fill();
+                // 左侧箭头
+                ctx.beginPath();
+                ctx.strokeStyle = '#8fa3c9';
+                ctx.lineWidth = 2;
+                ctx.moveTo(toCanvasX(-1.8), toCanvasY(0) - 28);
+                ctx.lineTo(toCanvasX(-0.3), toCanvasY(0) - 28);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(toCanvasX(-0.3), toCanvasY(0) - 34);
+                ctx.lineTo(toCanvasX(-0.3), toCanvasY(0) - 22);
+                ctx.lineTo(toCanvasX(0.2), toCanvasY(0) - 28);
+                ctx.closePath();
+                ctx.fillStyle = '#8fa3c9';
+                ctx.fill();
+            }
+
+            // 主动画控制
+            function stopAnimation() {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+                animBtn.innerHTML = '<i>▶</i> 动画';
+            }
+
+            function startAnimation() {
+                if (animationId) return;
+                animBtn.innerHTML = '<i>⏸</i> 暂停';
+
+                let startTime = null;
+                const duration = 10000; // 10秒完整循环，慢速
+                const minN = 1;
+                const maxN = 500;
+
+                function animateStep(timestamp) {
+                    if (!startTime) startTime = timestamp;
+                    const elapsed = timestamp - startTime;
+                    const progress = (elapsed % duration) / duration;
+
+                    const sineVal = Math.sin(progress * 2 * Math.PI - Math.PI / 2);
+                    const normalized = (sineVal + 1) / 2;
+                    const nVal = Math.round(minN + normalized * (maxN - minN));
+
+                    nSlider.value = nVal;
+                    updateN(nVal);
+
+                    animationId = requestAnimationFrame(animateStep);
+                }
+
+                animationId = requestAnimationFrame(animateStep);
+            }
+
+            nSlider.addEventListener('input', (e) => {
+                stopAnimation();
+                updateN(e.target.value);
+            });
+
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                stopAnimation();
+                nSlider.value = 10;
+                updateN(10);
+            });
+
+            animBtn.addEventListener('click', () => {
+                if (animationId) {
+                    stopAnimation();
+                } else {
+                    startAnimation();
+                }
+            });
+
+            // ==================== 反例画布（可交互） ====================
+            const counterCanvas = document.getElementById('counterCanvas');
+            const counterCtx = counterCanvas.getContext('2d');
+
+            const counterSlider = document.getElementById('counterSlider');
+            const counterNDisplay = document.getElementById('counterNDisplay');
+            const counterAnimBtn = document.getElementById('counterAnimBtn');
+
+            let currentCounterN = 6;
+            let counterAnimationId = null;
+
+            // 反例坐标变换参数（可变）
+            let counterCxC = W / 2, counterCyC = H * 0.55;
+            let counterScaleXC = 900, counterScaleYC = 100;
+            const baseCounterCxC = W / 2, baseCounterCyC = H * 0.55;
+            const baseCounterScaleXC = 900, baseCounterScaleYC = 100;
+
+            function toCX(x) { return counterCxC + counterScaleXC * x; }
+            function toCY(y) { return counterCyC - counterScaleYC * y; }
+
+            // 放大反例画布
+            document.getElementById('zoomInCounter').addEventListener('click', () => {
+                counterScaleXC = baseCounterScaleXC * 4;
+                counterScaleYC = baseCounterScaleYC * 4;
+                counterCxC = W / 2;
+                counterCyC = H * 0.55;
+                drawCounterScene(currentCounterN);
+            });
+
+            document.getElementById('zoomOutCounter').addEventListener('click', () => {
+                counterScaleXC = baseCounterScaleXC;
+                counterScaleYC = baseCounterScaleYC;
+                counterCxC = baseCounterCxC;
+                counterCyC = baseCounterCyC;
+                drawCounterScene(currentCounterN);
+            });
+
+            // 反例绘图函数
+            function drawCounterScene(n) {
+                const Wc = 700, Hc = 400;
+
+                counterCtx.clearRect(0, 0, Wc, Hc);
+                counterCtx.fillStyle = '#0f131c';
+                counterCtx.fillRect(0, 0, Wc, Hc);
+
+                // 网格
+                counterCtx.strokeStyle = '#252b3a';
+                counterCtx.lineWidth = 0.6;
+                const xStepC = counterScaleXC > 3000 ? 0.02 : (counterScaleXC > 2000 ? 0.05 : 0.1);
+                for (let x = -0.4; x <= 0.4; x += xStepC) {
+                    if (Math.abs(x) < 1e-9) continue;
+                    const px = toCX(x);
+                    if (px < -20 || px > Wc+20) continue;
+                    counterCtx.beginPath();
+                    counterCtx.moveTo(px, 0);
+                    counterCtx.lineTo(px, Hc);
+                    counterCtx.stroke();
+                }
+                for (let y = -1.5; y <= 1.5; y += 0.5) {
+                    const py = toCY(y);
+                    if (py < -20 || py > Hc+20) continue;
+                    counterCtx.beginPath();
+                    counterCtx.moveTo(0, py);
+                    counterCtx.lineTo(Wc, py);
+                    counterCtx.stroke();
+                }
+
+                // 坐标轴
+                counterCtx.beginPath();
+                counterCtx.strokeStyle = '#5b6b8a';
+                counterCtx.lineWidth = 1.8;
+                counterCtx.moveTo(0, toCY(0));
+                counterCtx.lineTo(Wc, toCY(0));
+                counterCtx.stroke();
+                counterCtx.beginPath();
+                counterCtx.moveTo(toCX(0), Hc);
+                counterCtx.lineTo(toCX(0), 0);
+                counterCtx.stroke();
+
+                // 轴标签
+                counterCtx.font = 'bold 16px "Segoe UI", Roboto, sans-serif';
+                counterCtx.fillStyle = '#b0c0e0';
+                counterCtx.fillText('x', Wc - 25, toCY(0) - 10);
+                counterCtx.fillText('y', toCX(0) + 12, 24);
+
+                // y轴刻度
+                counterCtx.font = '14px "Courier New", monospace';
+                counterCtx.fillStyle = '#8a9bb8';
+                [-1, 0, 1].forEach(y => {
+                    const py = toCY(y);
+                    if (py < -20 || py > Hc+20) return;
+                    counterCtx.beginPath();
+                    counterCtx.moveTo(toCX(0) - 6, py);
+                    counterCtx.lineTo(toCX(0) + 6, py);
+                    counterCtx.strokeStyle = '#6b7b9a';
+                    counterCtx.lineWidth = 1.5;
+                    counterCtx.stroke();
+                    counterCtx.fillText(y.toFixed(1), toCX(0) - 48, py + 5);
+                });
+
+                // x轴刻度
+                const xStepLabelC = counterScaleXC > 3000 ? 0.05 : (counterScaleXC > 2000 ? 0.1 : 0.2);
+                for (let x = -0.4; x <= 0.4; x += xStepLabelC) {
+                    if (Math.abs(x) < 1e-9) continue;
+                    const px = toCX(x);
+                    if (px < -20 || px > Wc+20) continue;
+                    counterCtx.beginPath();
+                    counterCtx.moveTo(px, toCY(0) - 6);
+                    counterCtx.lineTo(px, toCY(0) + 6);
+                    counterCtx.strokeStyle = '#6b7b9a';
+                    counterCtx.stroke();
+                    counterCtx.fillText(x.toFixed(2), px - 18, toCY(0) + 26);
+                }
+
+                // 绘制函数 g(x) = sin(1/x) (可见部分)
+                counterCtx.beginPath();
+                counterCtx.strokeStyle = '#b583ff';
+                counterCtx.lineWidth = 3.0;
+                counterCtx.shadowColor = '#b583ff';
+                counterCtx.shadowBlur = 12;
+                let firstPoint = true;
+                for (let px = 0; px <= Wc; px += 0.5) {
+                    const xMath = (px - counterCxC) / counterScaleXC;
+                    if (Math.abs(xMath) < 1e-6) {
+                        firstPoint = true;
+                        continue;
+                    }
+                    const yMath = Math.sin(1 / xMath);
+                    const py = toCY(yMath);
+                    if (py < -50 || py > Hc+50) continue;
+                    if (firstPoint) {
+                        counterCtx.moveTo(px, py);
+                        firstPoint = false;
+                    } else {
+                        counterCtx.lineTo(px, py);
+                    }
+                }
+                counterCtx.stroke();
+                counterCtx.shadowBlur = 0;
+
+                // 红色点列：x_n 正负交替，函数值在 ±1 振荡
+                const points = [];
+                for (let k = 1; k <= n; k++) {
+                    const xn = Math.pow(-1, k) * (1 / (k * Math.PI + Math.PI / 2));
+                    const yn = Math.pow(-1, k);
+                    if (Math.abs(xn) > 0.45) continue;
+                    points.push({ k, xn, yn });
+                }
+
+                points.forEach(p => {
+                    const px = toCX(p.xn);
+                    const py = toCY(p.yn);
+                    const pyZero = toCY(0);
+                    if (px < -30 || px > Wc+30) return;
+                    // 垂直线
+                    counterCtx.beginPath();
+                    counterCtx.strokeStyle = '#7a4d9e';
+                    counterCtx.lineWidth = 1.2;
+                    counterCtx.setLineDash([4, 5]);
+                    counterCtx.moveTo(px, pyZero);
+                    counterCtx.lineTo(px, py);
+                    counterCtx.stroke();
+                    counterCtx.setLineDash([]);
+                    // 点
+                    counterCtx.beginPath();
+                    counterCtx.fillStyle = '#ff5e7c';
+                    counterCtx.shadowColor = '#ff5e7c';
+                    counterCtx.shadowBlur = 15;
+                    counterCtx.arc(px, py, 6.5, 0, 2 * Math.PI);
+                    counterCtx.fill();
+                    // 标注 n
+                    counterCtx.font = 'bold 12px "Segoe UI", monospace';
+                    counterCtx.fillStyle = '#ffb3c0';
+                    counterCtx.fillText(`n=${p.k}`, px + (p.xn > 0 ? 12 : -38), py + (p.yn > 0 ? -10 : 18));
+                });
+                counterCtx.shadowBlur = 0;
+
+                // 高亮最后一个点
+                if (points.length > 0) {
+                    const last = points[points.length - 1];
+                    const pxLast = toCX(last.xn);
+                    const pyLast = toCY(last.yn);
+                    if (pxLast > -30 && pxLast < Wc+30) {
+                        counterCtx.beginPath();
+                        counterCtx.strokeStyle = '#ffffff';
+                        counterCtx.lineWidth = 2.5;
+                        counterCtx.arc(pxLast, pyLast, 10, 0, 2 * Math.PI);
+                        counterCtx.stroke();
+                        counterCtx.beginPath();
+                        counterCtx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                        counterCtx.arc(pxLast, pyLast, 16, 0, 2 * Math.PI);
+                        counterCtx.fill();
+                    }
+                }
+
+                // 绘制两条水平虚线 y = ±1
+                counterCtx.beginPath();
+                counterCtx.strokeStyle = '#a06be0';
+                counterCtx.lineWidth = 1.8;
+                counterCtx.setLineDash([8, 6]);
+                counterCtx.moveTo(0, toCY(1));
+                counterCtx.lineTo(Wc, toCY(1));
+                counterCtx.stroke();
+                counterCtx.beginPath();
+                counterCtx.moveTo(0, toCY(-1));
+                counterCtx.lineTo(Wc, toCY(-1));
+                counterCtx.stroke();
+                counterCtx.setLineDash([]);
+
+                // 标注文字
+                counterCtx.font = 'italic 16px "Times New Roman", serif';
+                counterCtx.fillStyle = '#e0d0ff';
+                counterCtx.fillText('g(x) = sin(1/x)', 30, 55);
+                counterCtx.font = 'bold 15px "Segoe UI", sans-serif';
+                counterCtx.fillStyle = '#b583ff';
+                counterCtx.fillText('y = 1', Wc - 90, toCY(1) - 10);
+                counterCtx.fillText('y = -1', Wc - 90, toCY(-1) + 25);
+
+                // 标注极限不存在
+                counterCtx.font = 'bold 18px "Segoe UI", sans-serif';
+                counterCtx.fillStyle = '#ff8c9f';
+                counterCtx.fillText('极限不存在', toCX(0.08), toCY(0) - 80);
+            }
+
+            function updateCounterN(value) {
+                currentCounterN = parseInt(value, 10);
+                counterNDisplay.textContent = `n = ${currentCounterN}`;
+                drawCounterScene(currentCounterN);
+            }
+
+            // 反例动画控制
+            function stopCounterAnimation() {
+                if (counterAnimationId) {
+                    cancelAnimationFrame(counterAnimationId);
+                    counterAnimationId = null;
+                }
+                counterAnimBtn.innerHTML = '<i>▶</i> 动画';
+            }
+
+            function startCounterAnimation() {
+                if (counterAnimationId) return;
+                counterAnimBtn.innerHTML = '<i>⏸</i> 暂停';
+
+                let startTime = null;
+                const duration = 5000;
+                const minN = 1;
+                const maxN = 30;
+
+                function animateStep(timestamp) {
+                    if (!startTime) startTime = timestamp;
+                    const elapsed = timestamp - startTime;
+                    const progress = (elapsed % duration) / duration;
+
+                    const sineVal = Math.sin(progress * 2 * Math.PI - Math.PI / 2);
+                    const normalized = (sineVal + 1) / 2;
+                    const nVal = Math.round(minN + normalized * (maxN - minN));
+
+                    counterSlider.value = nVal;
+                    updateCounterN(nVal);
+
+                    counterAnimationId = requestAnimationFrame(animateStep);
+                }
+
+                counterAnimationId = requestAnimationFrame(animateStep);
+            }
+
+            counterSlider.addEventListener('input', (e) => {
+                stopCounterAnimation();
+                updateCounterN(e.target.value);
+            });
+
+            document.getElementById('counterResetBtn').addEventListener('click', () => {
+                stopCounterAnimation();
+                counterSlider.value = 6;
+                updateCounterN(6);
+            });
+
+            counterAnimBtn.addEventListener('click', () => {
+                if (counterAnimationId) {
+                    stopCounterAnimation();
+                } else {
+                    startCounterAnimation();
+                }
+            });
+
+            // ==================== 初始化 ====================
+            setupCanvas(canvas, ctx);
+            setupCanvas(counterCanvas, counterCtx);
+
+            setTimeout(() => {
+                drawScene(10);
+                drawCounterScene(6);
+            }, 50);
+
+            window.addEventListener('load', () => {
+                drawScene(10);
+                drawCounterScene(6);
+            });
+
+            window.addEventListener('resize', () => {
+                setupCanvas(canvas, ctx);
+                setupCanvas(counterCanvas, counterCtx);
+                drawScene(currentN);
+                drawCounterScene(currentCounterN);
+            });
+        })();
+    </script>
+</body>
+</html>
