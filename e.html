@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>e · 自然对数的底 —— 前世今生</title>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      displayMath: [['$$','$$'], ['\\[','\\]']]
+    },
+    svg: { fontCache: 'global' },
+    options: { enableMenu: false }
+  };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  *,*::before,*::after{ box-sizing: border-box; }
+  html{ -webkit-text-size-adjust: 100%; }
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 18px;
+    line-height: 1.85;
+    color: #ece8ff;
+    background-color: #0b0718;
+    background-image:
+      radial-gradient(1000px 620px at 5% -5%, rgba(160,60,255,.38), transparent 60%),
+      radial-gradient(820px 520px at 105% 4%, rgba(76,201,240,.30), transparent 58%),
+      radial-gradient(900px 700px at 50% 118%, rgba(247,37,133,.24), transparent 62%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    padding: 0 14px 70px;
+    overflow-x: hidden;
+  }
+  main{ max-width: 860px; margin: 0 auto; }
+
+  /* ---------- 头部 ---------- */
+  .hero{ text-align:center; padding: 26px 6px 6px; }
+  .hero-e{
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: clamp(96px, 34vw, 180px);
+    line-height: .92;
+    background: linear-gradient(120deg,#4cc9f0 0%,#b388ff 38%,#f72585 68%,#ffd166 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 28px rgba(179,136,255,.55));
+    animation: floaty 6s ease-in-out infinite;
+    user-select: none;
+  }
+  @keyframes floaty{
+    0%,100%{ transform: translateY(0); }
+    50%{ transform: translateY(-12px); }
+  }
+  .hero h1{
+    font-size: clamp(21px, 5.6vw, 30px);
+    margin: 4px 0 6px;
+    letter-spacing: .06em;
+    font-weight: 800;
+  }
+  .hero .digits{
+    font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+    font-size: clamp(13px, 3.4vw, 16px);
+    color: #a99fd6;
+    word-break: break-all;
+    letter-spacing: .06em;
+    margin: 8px auto 0;
+    max-width: 640px;
+  }
+
+  /* ---------- 卡片 ---------- */
+  .card{
+    background: rgba(255,255,255,.055);
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 22px;
+    padding: 20px 18px 22px;
+    margin: 20px 0;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 12px 34px rgba(0,0,0,.30);
+  }
+  .card h2{
+    font-size: clamp(20px, 5.2vw, 24px);
+    margin: 0 0 14px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    font-weight: 800;
+    letter-spacing: .02em;
+  }
+  .card h2::before{
+    content:'';
+    flex: 0 0 auto;
+    width: 9px; height: 26px;
+    border-radius: 6px;
+    background: linear-gradient(180deg,#4cc9f0,#f72585);
+    box-shadow: 0 0 14px rgba(247,37,133,.6);
+  }
+  .card h3{
+    font-size: clamp(17px, 4.6vw, 20px);
+    margin: 22px 0 8px;
+    color: #ffd166;
+  }
+  p{ margin: 10px 0; }
+  b{ color: #ffd166; font-weight: 800; }
+
+  .formula{
+    margin: 14px 0;
+    padding: 12px 10px;
+    overflow-x: auto;
+    background: rgba(76,201,240,.075);
+    border-left: 3px solid rgba(76,201,240,.65);
+    border-radius: 12px;
+  }
+  .formula::-webkit-scrollbar{ height: 6px; }
+  .formula::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.2); border-radius: 6px; }
+
+  /* ---------- 时间线 ---------- */
+  .timeline{ position: relative; padding-left: 30px; margin-top: 6px; }
+  .timeline::before{
+    content:'';
+    position: absolute;
+    left: 9px; top: 8px; bottom: 8px;
+    width: 3px; border-radius: 3px;
+    background: linear-gradient(180deg,#4cc9f0,#b388ff,#f72585,#ffd166);
+    box-shadow: 0 0 14px rgba(179,136,255,.5);
+  }
+  .tl-item{ position: relative; margin: 0 0 20px; }
+  .tl-item:last-child{ margin-bottom: 4px; }
+  .tl-item::before{
+    content:'';
+    position: absolute;
+    left: -26px; top: 8px;
+    width: 15px; height: 15px;
+    border-radius: 50%;
+    background: #10082a;
+    border: 3px solid #b388ff;
+    box-shadow: 0 0 12px rgba(179,136,255,.9);
+  }
+  .tl-year{
+    font-weight: 900;
+    color: #4cc9f0;
+    font-size: 1.06em;
+    letter-spacing: .04em;
+  }
+  .tl-item p{ margin: 2px 0 0; }
+
+  /* ---------- 演示区 ---------- */
+  .viz{ margin-top: 14px; }
+  canvas.cv{
+    display: block;
+    width: 100%;
+    height: 250px;
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(0,0,0,.38), rgba(0,0,0,.20));
+    border: 1px solid rgba(255,255,255,.09);
+    touch-action: pan-y;
+  }
+  canvas.cv.tall{ height: 280px; }
+
+  .slider-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    margin-top: 12px;
+    font-size: .96em;
+    color: #bdb5e6;
+  }
+  .slider-row b{ color: #4cc9f0; }
+
+  input[type="range"]{
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    width: 100%;
+    height: 40px;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+    touch-action: pan-y;
+  }
+  input[type="range"]::-webkit-slider-runnable-track{
+    height: 10px;
+    border-radius: 99px;
+    background: linear-gradient(90deg,#4cc9f0,#b388ff,#f72585);
+    box-shadow: inset 0 0 8px rgba(0,0,0,.45);
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 26px; height: 26px;
+    margin-top: -8px;
+    border-radius: 50%;
+    background: #fff;
+    border: 4px solid #4cc9f0;
+    box-shadow: 0 0 18px rgba(76,201,240,.95);
+  }
+  input[type="range"]::-moz-range-track{
+    height: 10px;
+    border-radius: 99px;
+    background: linear-gradient(90deg,#4cc9f0,#b388ff,#f72585);
+  }
+  input[type="range"]::-moz-range-thumb{
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    border: 4px solid #4cc9f0;
+    box-shadow: 0 0 18px rgba(76,201,240,.95);
+  }
+
+  .readout{
+    margin-top: 10px;
+    padding: 11px 14px;
+    border-radius: 13px;
+    background: rgba(255,209,102,.10);
+    border: 1px solid rgba(255,209,102,.30);
+    font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+    font-size: .95em;
+    line-height: 1.7;
+    font-variant-numeric: tabular-nums;
+    overflow-x: auto;
+    white-space: nowrap;
+    color: #ffe9b0;
+  }
+  .readout b{ color: #fff; }
+
+  /* ---------- 小卡片网格 ---------- */
+  .grid2{ display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 12px; }
+  .mini{
+    padding: 14px 16px;
+    border-radius: 15px;
+    background: rgba(179,136,255,.10);
+    border: 1px solid rgba(179,136,255,.26);
+  }
+  .mini .mini-t{
+    font-weight: 800;
+    color: #b388ff;
+    margin-bottom: 4px;
+    font-size: 1.02em;
+  }
+  .mini p{ margin: 0; font-size: .97em; color: #d9d3f6; }
+
+  footer{
+    text-align: center;
+    color: #7c72a8;
+    font-size: .86em;
+    margin-top: 34px;
+    letter-spacing: .05em;
+  }
+  @media (max-width: 420px){
+    body{ font-size: 17px; padding-left: 12px; padding-right: 12px; }
+    .card{ padding: 17px 14px 19px; border-radius: 19px; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <!-- ============ 头部 ============ -->
+  <header class="hero">
+    <div class="hero-e">e</div>
+    <h1>自然对数的底 · 前世今生</h1>
+    <div class="digits">2.71828 18284 59045 23536 02874 71352 66249 …</div>
+  </header>
+
+  <!-- ============ 是什么 ============ -->
+  <section class="card">
+    <h2>它究竟是什么？</h2>
+    <p>有一类函数的导数恰好等于它自己——这样的函数只有指数函数 $e^x$（差一个常数倍）。让这件事成立的底数，就是 $e$。</p>
+    <div class="formula">$$\frac{\mathrm{d}}{\mathrm{d}x}\,e^{x} = e^{x}$$</div>
+    <p>它同时由两个著名的极限与级数刻画：</p>
+    <div class="formula">$$e=\lim_{n\to\infty}\left(1+\frac{1}{n}\right)^{n}$$</div>
+    <div class="formula">$$e=\sum_{k=0}^{\infty}\frac{1}{k!}=1+1+\frac{1}{2!}+\frac{1}{3!}+\frac{1}{4!}+\cdots$$</div>
+    <p>$e$ 是<b>无理数</b>，更是<b>超越数</b>——它不是任何整系数多项式方程的根（埃尔米特，1873）。</p>
+  </section>
+
+  <!-- ============ 前世 ============ -->
+  <section class="card">
+    <h2>前世 · 三百年的相遇</h2>
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-year">1618</div>
+        <p>苏格兰数学家<b>纳皮尔</b>（John Napier）发表对数著作。他的对数表实际以 $1/e$ 为底——$e$ 的影子第一次掠过数学史，只是当时无人识得。</p>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-year">1683</div>
+        <p><b>雅各布·伯努利</b>研究连续复利：年利率 100%，若把一年分成 $n$ 段计息，本息和为 $(1+\tfrac{1}{n})^n$。他发现当 $n\to\infty$ 时结果不会无限增大，而是停在 2 与 3 之间的某个数上。</p>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-year">1690</div>
+        <p><b>莱布尼茨</b>在给惠更斯的信中，首次用字母 $b$ 表示这个常数——它开始有了名字。</p>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-year">1727 – 1731</div>
+        <p><b>欧拉</b>（Leonhard Euler）开始用字母 $e$ 表示它。有人说这是 "exponential"（指数）的首字母，也有人说只是他名字的首字母——无论哪种，从此它就叫 $e$ 了。</p>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-year">1748</div>
+        <p>欧拉出版《无穷分析引论》，系统给出 $e$ 的级数展开、连分数，并算出小数点后 18 位。他还写下 $e^{i\theta}=\cos\theta+i\sin\theta$，把指数与三角函数缝在了一起。</p>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-year">1873</div>
+        <p><b>埃尔米特</b>（Charles Hermite）证明 $e$ 是超越数，彻底回答了这个数"有多无理"。</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ 演示 1 ============ -->
+  <section class="card">
+    <h2>今生 · 复利：e 的诞生现场</h2>
+    <p>年利率 100%，1 元本金：一年计息一次得 $2$ 元；每半年计息一次得 $(1+\tfrac12)^2=2.25$ 元；每季一次得 $(1+\tfrac14)^4\approx2.441$ 元……</p>
+    <p>拖动滑块增加计息次数 $n$，看结果如何一步步逼近 $e$：</p>
+
+    <div class="viz">
+      <canvas id="cv1" class="cv"></canvas>
+      <div class="slider-row">
+        <span>一年中的计息次数 n</span>
+        <span><b id="nv1">1</b> 次</span>
+      </div>
+      <input id="s1" type="range" min="1" max="100" value="1" step="1">
+      <div class="readout" id="o1"></div>
+    </div>
+  </section>
+
+  <!-- ============ 演示 2 ============ -->
+  <section class="card">
+    <h2>今生 · 导数等于自身</h2>
+    <p>在 $y=e^{x}$ 上任取一点，作切线。你会发现：<b>切线的斜率，恰好等于该点的高度</b>。这正是 $e$ 被称为"自然"的底的原因——它让增长速率与当前的量成正比。</p>
+
+    <div class="viz">
+      <canvas id="cv2" class="cv"></canvas>
+      <div class="slider-row">
+        <span>切点横坐标 x₀</span>
+        <span><b id="nv2">0.00</b></span>
+      </div>
+      <input id="s2" type="range" min="-1.5" max="1.5" value="0" step="0.01">
+      <div class="readout" id="o2"></div>
+    </div>
+  </section>
+
+  <!-- ============ 演示 3 ============ -->
+  <section class="card">
+    <h2>今生 · 面积恰好等于 1</h2>
+    <p>曲线 $y=\dfrac{1}{x}$ 从 $1$ 到 $e$ 下方的面积，正好是 $1$。这就是自然对数的定义：</p>
+    <div class="formula">$$\ln t=\int_{1}^{t}\frac{1}{x}\,\mathrm{d}x,\qquad \ln e=1$$</div>
+    <p>把右端点拖到 $e$ 的位置，看看绿色面积是不是刚好等于 1：</p>
+
+    <div class="viz">
+      <canvas id="cv3" class="cv"></canvas>
+      <div class="slider-row">
+        <span>积分上限 t</span>
+        <span><b id="nv3">2.00</b></span>
+      </div>
+      <input id="s3" type="range" min="1" max="5.5" value="2" step="0.01">
+      <div class="readout" id="o3"></div>
+    </div>
+  </section>
+
+  <!-- ============ 演示 4 ============ -->
+  <section class="card">
+    <h2>今生 · 欧拉公式在转圈</h2>
+    <div class="formula">$$e^{i\theta}=\cos\theta+i\sin\theta$$</div>
+    <p>当 $\theta$ 从 $0$ 转到 $2\pi$，点 $e^{i\theta}$ 就沿着单位圆走完整整一圈。$\theta=\pi$ 时，它落在 $-1$ 上，于是有了那条被费曼称为"数学中最非凡的公式"：</p>
+    <div class="formula">$$e^{i\pi}+1=0$$</div>
+
+    <div class="viz">
+      <canvas id="cv4" class="cv tall"></canvas>
+      <div class="readout" id="o4"></div>
+    </div>
+  </section>
+
+  <!-- ============ 应用 ============ -->
+  <section class="card">
+    <h2>e 的足迹 · 无处不在</h2>
+    <div class="grid2">
+
+      <div class="mini">
+        <div class="mini-t">复利与自然增长</div>
+        <p>连续复利公式 $A=P\,e^{rt}$；人口增长、细菌繁殖、放射性衰变，都遵循 $N=N_0e^{kt}$。</p>
+      </div>
+
+      <div class="mini">
+        <div class="mini-t">正态分布</div>
+        <p>钟形曲线的核心就是 $e^{-x^{2}/2}$：$\displaystyle \varphi(x)=\frac{1}{\sqrt{2\pi}}e^{-\frac{x^{2}}{2}}$。</p>
+      </div>
+
+      <div class="mini">
+        <div class="mini-t">素数定理</div>
+        <p>不超过 $x$ 的素数个数约为 $\dfrac{x}{\ln x}$——$e$ 悄悄藏在素数的分布里。</p>
+      </div>
+
+      <div class="mini">
+        <div class="mini-t">1/e 法则</div>
+        <p>最优停止问题（"秘书问题"）的最佳策略：先观察前 $1/e\approx36.8\%$ 的候选者，之后果断选择第一个更好的。</p>
+      </div>
+
+      <div class="mini">
+        <div class="mini-t">错排概率</div>
+        <p>把一副牌随机打乱，一张都不在原来位置的概率，当牌数很多时趋于 $1/e\approx0.3679$。</p>
+      </div>
+
+      <div class="mini">
+        <div class="mini-t">悬链线与最优设计</div>
+        <p>悬链线方程 $y=a\cosh\dfrac{x}{a}=\dfrac{a}{2}\left(e^{x/a}+e^{-x/a}\right)$。</p>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>e ≈ 2.7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274…</footer>
+
+</main>
+
+<script>
+(function(){
+  'use strict';
+
+  const COL = {
+    cyan:  '#4cc9f0',
+    gold:  '#ffd166',
+    pink:  '#f72585',
+    green: '#7bf1a8',
+    violet:'#b388ff',
+    grid:  'rgba(255,255,255,0.08)',
+    axis:  'rgba(255,255,255,0.30)',
+    label: 'rgba(255,255,255,0.45)'
+  };
+  const FONT = '600 11px ui-sans-serif, system-ui, sans-serif';
+
+  /* ---------- 通用：画布自适应 ---------- */
+  function attachCanvas(canvas, drawFn){
+    let ctx = null, W = 0, H = 0, ready = false;
+
+    function render(){
+      if(!ctx) return;
+      ctx.clearRect(0, 0, W, H);
+      drawFn(ctx, W, H);
+    }
+    function resize(){
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const r = canvas.getBoundingClientRect();
+      const w = Math.round(r.width), h = Math.round(r.height);
+      if(!w || !h) return;
+      if(ready && w === W && h === H) return;
+      W = w; H = h; ready = true;
+      canvas.width  = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      render();
+    }
+
+    if(window.ResizeObserver){
+      new ResizeObserver(resize).observe(canvas);
+    }
+    window.addEventListener('resize', resize);
+    requestAnimationFrame(resize);
+
+    return { render, resize };
+  }
+
+  /* =========================================================
+     演示 1：复利 —— (1 + 1/n)^n → e
+     ========================================================= */
+  (function(){
+    const canvas  = document.getElementById('cv1');
+    const slider  = document.getElementById('s1');
+    const readout = document.getElementById('o1');
+    const numTag  = document.getElementById('nv1');
+
+    const P = { l: 46, r: 16, t: 16, b: 30 };
+    const xMin = 1, xMax = 100, yMin = 1.95, yMax = 2.80;
+
+    function draw(ctx, W, H){
+      const plotW = W - P.l - P.r;
+      const plotH = H - P.t - P.b;
+      const X = n => P.l + (n - xMin) / (xMax - xMin) * plotW;
+      const Y = v => P.t + (yMax - v) / (yMax - yMin) * plotH;
+
+      const n = +slider.value;
+      const val = Math.pow(1 + 1 / n, n);
+
+      // 网格 + y 轴刻度
+      ctx.font = FONT;
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.lineWidth = 1;
+      for(let v = 2.0; v <= 2.8001; v += 0.2){
+        const y = Y(v);
+        ctx.strokeStyle = COL.grid;
+        ctx.beginPath(); ctx.moveTo(P.l, y); ctx.lineTo(W - P.r, y); ctx.stroke();
+        ctx.fillStyle = COL.label;
+        ctx.fillText(v.toFixed(1), P.l - 8, y);
+      }
+
+      // x 轴
+      ctx.strokeStyle = COL.axis;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(P.l, H - P.b);
+      ctx.lineTo(W - P.r, H - P.b);
+      ctx.stroke();
+
+      // e 的水平虚线
+      ctx.save();
+      ctx.setLineDash([7, 6]);
+      ctx.strokeStyle = 'rgba(255,209,102,0.9)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(P.l, Y(Math.E));
+      ctx.lineTo(W - P.r, Y(Math.E));
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.fillStyle = COL.gold;
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'bottom';
+      ctx.font = '700 12px ui-sans-serif, system-ui, sans-serif';
+      ctx.fillText('e ≈ 2.71828', W - P.r - 2, Y(Math.E) - 5);
+
+      // 曲线 y = (1+1/x)^x
+      ctx.beginPath();
+      for(let i = 0; i <= 200; i++){
+        const xx = xMin + (xMax - xMin) * i / 200;
+        const yy = Math.pow(1 + 1 / xx, xx);
+        const px = X(xx), py = Y(yy);
+        i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+      }
+      ctx.strokeStyle = COL.cyan;
+      ctx.lineWidth = 3;
+      ctx.lineJoin = 'round';
+      ctx.shadowColor = 'rgba(76,201,240,0.85)';
+      ctx.shadowBlur = 14;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // 当前点
+      const px = X(n), py = Y(val);
+
+      ctx.save();
+      ctx.setLineDash([4, 5]);
+      ctx.strokeStyle = 'rgba(247,37,133,0.55)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, H - P.b); ctx.stroke();
+      ctx.restore();
+
+      ctx.beginPath(); ctx.arc(px, py, 9, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(247,37,133,0.30)'; ctx.fill();
+
+      ctx.beginPath(); ctx.arc(px, py, 5.5, 0, Math.PI * 2);
+      ctx.fillStyle = COL.pink;
+      ctx.shadowColor = COL.pink; ctx.shadowBlur = 18;
+      ctx.fill(); ctx.shadowBlur = 0;
+
+      ctx.beginPath(); ctx.arc(px, py, 2.2, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff'; ctx.fill();
+
+      // x 轴刻度
+      ctx.fillStyle = COL.label;
+      ctx.font = FONT;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      [1, 25, 50, 75, 100].forEach(t => ctx.fillText(t, X(t), H - P.b + 7));
+    }
+
+    const ctl = attachCanvas(canvas, draw);
+
+    function update(){
+      const n = +slider.value;
+      const v = Math.pow(1 + 1 / n, n);
+      const diff = Math.E - v;
+
+      numTag.textContent = n;
+      readout.innerHTML =
+        'n = <b>' + n + '</b>　' +
+        '(1 + 1/' + n + ')<sup>' + n + '</sup> = <b>' + v.toFixed(9) + '</b>' +
+        '　|　与 e 相差 ' + diff.toFixed(9);
+
+      ctl.render();
+    }
+
+    slider.addEventListener('input', update);
+    update();
+  })();
+
+  /* =========================================================
+     演示 2：y = e^x 的切线斜率
+     ========================================================= */
+  (function(){
+    const canvas  = document.getElementById('cv2');
+    const slider  = document.getElementById('s2');
+    const readout = document.getElementById('o2');
+    const numTag  = document.getElementById('nv2');
+
+    const P = { l: 42, r: 18, t: 16, b: 28 };
+    const xMin = -1.8, xMax = 1.8, yMin = -0.7, yMax = 6.6;
+
+    function draw(ctx, W, H){
+      const plotW = W - P.l - P.r;
+      const plotH = H - P.t - P.b;
+      const X = x => P.l + (x - xMin) / (xMax - xMin) * plotW;
+      const Y = y => P.t + (yMax - y) / (yMax - yMin) * plotH;
+
+      const x0 = parseFloat(slider.value);
+      const y0 = Math.exp(x0);
+      const k  = y0;                 // 斜率 = 函数值
+
+      // 网格
+      ctx.font = FONT;
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = COL.grid;
+
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      for(let v = 0; v <= 6; v += 1){
+        const y = Y(v);
+        ctx.beginPath(); ctx.moveTo(P.l, y); ctx.lineTo(W - P.r, y); ctx.stroke();
+        if(v > 0){
+          ctx.fillStyle = COL.label;
+          ctx.fillText(v, P.l - 7, y);
+        }
+      }
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      [-1, 0, 1].forEach(v => {
+        const x = X(v);
+        ctx.beginPath(); ctx.moveTo(x, P.t); ctx.lineTo(x, H - P.b); ctx.stroke();
+        ctx.fillStyle = COL.label;
+        ctx.fillText(v, x, H - P.b + 6);
+      });
+
+      // 坐标轴
+      ctx.strokeStyle = COL.axis;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(P.l, Y(0)); ctx.lineTo(W - P.r, Y(0)); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(X(0), P.t); ctx.lineTo(X(0), H - P.b); ctx.stroke();
+
+      // 曲线 y = e^x
+      ctx.beginPath();
+      for(let i = 0; i <= 240; i++){
+        const x = xMin + (xMax - xMin) * i / 240;
+        const px = X(x), py = Y(Math.exp(x));
+        i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+      }
+      ctx.strokeStyle = COL.cyan;
+      ctx.lineWidth = 3;
+      ctx.lineJoin = 'round';
+      ctx.shadowColor = 'rgba(76,201,240,0.85)';
+      ctx.shadowBlur = 14;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // 切线（裁剪到绘图区）
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(P.l, P.t, plotW, plotH);
+      ctx.clip();
+
+      const dx = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(X(x0 - dx), Y(y0 - k * dx));
+      ctx.lineTo(X(x0 + dx), Y(y0 + k * dx));
+      ctx.strokeStyle = COL.gold;
+      ctx.lineWidth = 2.5;
+      ctx.shadowColor = 'rgba(255,209,102,0.85)';
+      ctx.shadowBlur = 12;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.restore();
+
+      // 切点垂足投影
+      const px = X(x0), py = Y(y0);
+      ctx.save();
+      ctx.setLineDash([4, 5]);
+      ctx.strokeStyle = 'rgba(247,37,133,0.55)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, Y(0)); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(X(0), py); ctx.stroke();
+      ctx.restore();
+
+      // 切点
+      ctx.beginPath(); ctx.arc(px, py, 9, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,209,102,0.28)'; ctx.fill();
+      ctx.beginPath(); ctx.arc(px, py, 5.5, 0, Math.PI * 2);
+      ctx.fillStyle = COL.gold;
+      ctx.shadowColor = COL.gold; ctx.shadowBlur = 16;
+      ctx.fill(); ctx.shadowBlur = 0;
+      ctx.beginPath(); ctx.arc(px, py, 2.2, 0, Math.PI * 2);
+      ctx.fillStyle = '#3a2a00'; ctx.fill();
+    }
+
+    const ctl = attachCanvas(canvas, draw);
+
+    function update(){
+      const x0 = parseFloat(slider.value);
+      const y0 = Math.exp(x0);
+
+      numTag.textContent = x0.toFixed(2);
+      readout.innerHTML =
+        'x₀ = <b>' + x0.toFixed(2) + '</b>　' +
+        '函数值 e<sup>x₀</sup> = <b>' + y0.toFixed(5) + '</b>' +
+        '　|　切线斜率 k = <b>' + y0.toFixed(5) + '</b>　✓ 两者相等';
+
+      ctl.render();
+    }
+
+    slider.addEventListener('input', update);
+    update();
+  })();
+
+  /* =========================================================
+     演示 3：∫₁ᵗ (1/x) dx = ln t
+     ========================================================= */
+  (function(){
+    const canvas  = document.getElementById('cv3');
+    const slider  = document.getElementById('s3');
+    const readout = document.getElementById('o3');
+    const numTag  = document.getElementById('nv3');
+
+    const P = { l: 44, r: 18, t: 16, b: 30 };
+    const xMin = 1, xMax = 5.6, yMin = 0, yMax = 1.15;
+
+    function draw(ctx, W, H){
+      const plotW = W - P.l - P.r;
+      const plotH = H - P.t - P.b;
+      const X = x => P.l + (x - xMin) / (xMax - xMin) * plotW;
+      const Y = y => P.t + (yMax - y) / (yMax - yMin) * plotH;
+
+      const t = parseFloat(slider.value);
+
+      // 网格
+      ctx.font = FONT;
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = COL.grid;
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      for(let v = 0.2; v <= 1.0001; v += 0.2){
+        const y = Y(v);
+        ctx.beginPath(); ctx.moveTo(P.l, y); ctx.lineTo(W - P.r, y); ctx.stroke();
+        ctx.fillStyle = COL.label;
+        ctx.fillText(v.toFixed(1), P.l - 7, y);
+      }
+
+      // 坐标轴
+      ctx.strokeStyle = COL.axis;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(P.l, Y(0)); ctx.lineTo(W - P.r, Y(0)); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(P.l, P.t); ctx.lineTo(P.l, Y(0)); ctx.stroke();
+
+      // 面积填充
+      if(t > 1.002){
+        ctx.beginPath();
+        ctx.moveTo(X(1), Y(0));
+        for(let i = 0; i <= 120; i++){
+          const x = 1 + (t - 1) * i / 120;
+          ctx.lineTo(X(x), Y(1 / x));
+        }
+        ctx.lineTo(X(t), Y(0));
+        ctx.closePath();
+
+        const g = ctx.createLinearGradient(0, P.t, 0, Y(0));
+        g.addColorStop(0, 'rgba(123,241,168,0.50)');
+        g.addColorStop(1, 'rgba(123,241,168,0.05)');
+        ctx.fillStyle = g;
+        ctx.fill();
+      }
+
+      // x = e 的虚线
+      ctx.save();
+      ctx.setLineDash([6, 5]);
+      ctx.strokeStyle = 'rgba(255,209,102,0.85)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(X(Math.E), P.t);
+      ctx.lineTo(X(Math.E), Y(0));
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.fillStyle = COL.gold;
+      ctx.font = '700 12px ui-sans-serif, system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('e', X(Math.E), P.t + 14);
+
+      // 曲线 y = 1/x
+      ctx.beginPath();
+      for(let i = 0; i <= 200; i++){
+        const x = xMin + (xMax - xMin) * i / 200;
+        const px = X(x), py = Y(1 / x);
+        i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+      }
+      ctx.strokeStyle = COL.green;
+      ctx.lineWidth = 3;
+      ctx.lineJoin = 'round';
+      ctx.shadowColor = 'rgba(123,241,168,0.85)';
+      ctx.shadowBlur = 14;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // 右端点竖线 + 点
+      if(t > 1.002){
+        ctx.save();
+        ctx.strokeStyle = 'rgba(247,37,133,0.8)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(X(t), Y(0));
+        ctx.lineTo(X(t), Y(1 / t));
+        ctx.stroke();
+        ctx.restore();
+
+        const px = X(t), py = Y(1 / t);
+        ctx.beginPath(); ctx.arc(px, py, 5.5, 0, Math.PI * 2);
+        ctx.fillStyle = COL.pink;
+        ctx.shadowColor = COL.pink; ctx.shadowBlur = 16;
+        ctx.fill(); ctx.shadowBlur = 0;
+      }
+
+      // x 轴刻度
+      ctx.fillStyle = COL.label;
+      ctx.font = FONT;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      [1, 2, 3, 4, 5].forEach(v => ctx.fillText(v, X(v), Y(0) + 7));
+    }
+
+    const ctl = attachCanvas(canvas, draw);
+
+    function update(){
+      const t = parseFloat(slider.value);
+      const area = Math.log(t);
+
+      numTag.textContent = t.toFixed(2);
+      readout.innerHTML =
+        't = <b>' + t.toFixed(2) + '</b>　' +
+        '绿色面积 = ln t = <b>' + area.toFixed(5) + '</b>' +
+        (Math.abs(area - 1) < 0.005 ? '　🎯 面积正好等于 1！' : '');
+
+      ctl.render();
+    }
+
+    slider.addEventListener('input', update);
+    update();
+  })();
+
+  /* =========================================================
+     演示 4：e^{iθ} 在单位圆上转圈
+     ========================================================= */
+  (function(){
+    const canvas  = document.getElementById('cv4');
+    const readout = document.getElementById('o4');
+
+    let theta = 0;
+
+    function draw(ctx, W, H){
+      const cx = W / 2;
+      const cy = H / 2;
+      const R = Math.min(W, H) / 2 - 26;
+
+      const px = cx + R * Math.cos(theta);
+      const py = cy - R * Math.sin(theta);
+
+      // 单位圆
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(179,136,255,0.45)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // 坐标轴
+      ctx.strokeStyle = COL.axis;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(cx - R - 16, cy); ctx.lineTo(cx + R + 16, cy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx, cy - R - 16); ctx.lineTo(cx, cy + R + 16); ctx.stroke();
+
+      // 角弧
+      ctx.beginPath();
+      ctx.arc(cx, cy, Math.min(R * 0.32, 34), 0, -theta, true);
+      ctx.strokeStyle = 'rgba(76,201,240,0.85)';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      // 半径向量
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(px, py);
+      ctx.strokeStyle = COL.pink;
+      ctx.lineWidth = 3;
+      ctx.shadowColor = 'rgba(247,37,133,0.85)';
+      ctx.shadowBlur = 14;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // 投影虚线
+      ctx.save();
+      ctx.setLineDash([5, 5]);
+      ctx.strokeStyle = 'rgba(255,209,102,0.75)';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, cy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(cx, py); ctx.stroke();
+      ctx.restore();
+
+      // 实部 / 虚部点
+      ctx.beginPath(); ctx.arc(px, cy, 4, 0, Math.PI * 2);
+      ctx.fillStyle = COL.gold; ctx.fill();
+      ctx.beginPath(); ctx.arc(cx, py, 4, 0, Math.PI * 2);
+      ctx.fillStyle = COL.gold; ctx.fill();
+
+      // 动点
+      ctx.beginPath(); ctx.arc(px, py, 11, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(76,201,240,0.22)'; ctx.fill();
+
+      ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2);
+      ctx.fillStyle = COL.cyan;
+      ctx.shadowColor = COL.cyan; ctx.shadowBlur = 18;
+      ctx.fill(); ctx.shadowBlur = 0;
+
+      ctx.beginPath(); ctx.arc(px, py, 2.4, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff'; ctx.fill();
+    }
+
+    const ctl = attachCanvas(canvas, draw);
+
+    let last = 0;
+    function frame(ts){
+      if(!last) last = ts;
+      const dt = Math.min(ts - last, 64);
+      last = ts;
+
+      theta = (theta + dt * 0.0011) % (Math.PI * 2);
+
+      ctl.render();
+
+      const c = Math.cos(theta);
+      const s = Math.sin(theta);
+      readout.textContent =
+        'θ = ' + theta.toFixed(3) + ' rad (' + (theta * 180 / Math.PI).toFixed(1) + '°)' +
+        '　e^(iθ) = ' + (c >= 0 ? ' ' : '') + c.toFixed(4) + ' + ' + (s >= 0 ? ' ' : '') + s.toFixed(4) + ' i';
+
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  })();
+
+})();
+</script>
+</body>
+</html>
