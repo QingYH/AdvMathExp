@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>反函数求导法则 · 动态图解</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{
+    margin:0; padding:16px 14px 60px;
+    background:#eef2f7;
+    color:#0f172a;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:18px; line-height:1.8;
+  }
+  .wrap{ max-width:1180px; margin:0 auto; }
+  h1{ font-size:1.5em; margin:0 0 .2em; letter-spacing:.02em; }
+  h2{ font-size:1.22em; margin:1.6em 0 .5em; color:#1e293b; }
+  p{ margin:.55em 0; }
+  .lead{ color:#475569; font-size:.95em; }
+  .card{
+    background:#fff; border-radius:16px; padding:12px;
+    box-shadow:0 2px 12px rgba(15,23,42,.08);
+    margin-bottom:14px;
+  }
+  .grid3{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(290px,1fr));
+    gap:14px;
+    align-items:start;
+  }
+  figure{ margin:0; }
+  canvas{
+    display:block; width:100%; aspect-ratio:1/1;
+    border-radius:10px; background:#fff; touch-action:pan-y;
+  }
+  figcaption{
+    text-align:center; font-size:.88em; color:#475569;
+    margin-top:8px; font-weight:600;
+  }
+  .controls{ display:flex; align-items:center; gap:10px; margin-top:8px; }
+  button{
+    font:inherit; font-size:.85em; font-weight:700;
+    padding:8px 16px; border-radius:12px; border:none;
+    background:#2563eb; color:#fff; cursor:pointer;
+    touch-action:manipulation; white-space:nowrap;
+    box-shadow:0 2px 8px rgba(37,99,235,.3);
+  }
+  button:active{ transform:scale(.96); }
+  input[type=range]{
+    -webkit-appearance:none; appearance:none;
+    flex:1; min-width:50px; height:8px; border-radius:4px;
+    background:#dbeafe; outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:26px; height:26px; border-radius:50%;
+    background:#2563eb; border:3px solid #fff;
+    box-shadow:0 1px 6px rgba(0,0,0,.3); cursor:pointer;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:26px; height:26px; border-radius:50%;
+    background:#2563eb; border:3px solid #fff;
+    box-shadow:0 1px 6px rgba(0,0,0,.3); cursor:pointer;
+  }
+  .readout{ display:grid; gap:8px; margin-top:14px; }
+  .row{
+    display:flex; justify-content:space-between; align-items:center;
+    gap:10px; background:#f8fafc; border-radius:10px;
+    padding:9px 14px; font-size:.92em;
+  }
+  .row span:first-child{ color:#475569; }
+  .val{ font-weight:700; font-variant-numeric:tabular-nums; }
+  .blue{ color:#2563eb; } .orange{ color:#ea580c; }
+  .hint{
+    font-size:.85em; color:#64748b; margin-top:8px; text-align:center;
+  }
+  .formula{
+    background:#fff; border-radius:14px; padding:6px 10px;
+    overflow-x:auto; margin:10px 0;
+  }
+  .legend{
+    display:flex; flex-wrap:wrap; gap:6px 18px;
+    justify-content:center; font-size:.85em; color:#475569;
+    margin-top:6px;
+  }
+  .legend i{
+    display:inline-block; width:14px; height:14px; border-radius:4px;
+    margin-right:5px; vertical-align:-2px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>反函数求导法则</h1>
+  <p class="lead">下面用动态图形说明：为什么反函数的导数等于原函数导数的倒数。</p>
+
+  <!-- ================= 第一部分 ================= -->
+  <h2>一、反函数与原函数的关系</h2>
+  <p>把 $y=f(x)$ 中的 $x$ 与 $y$ <b>互换</b>，就得到反函数 $y=f^{-1}(x)$。几何上，这相当于把整幅图关于直线 $y=x$ 翻折，也就是<b>把横轴与纵轴互换</b>。</p>
+
+  <div class="grid3">
+    <figure class="card">
+      <canvas id="c1"></canvas>
+      <figcaption>① 原函数 $y=f(x)$</figcaption>
+    </figure>
+
+    <figure class="card">
+      <canvas id="c2"></canvas>
+      <figcaption>② 坐标轴旋转互换 → 反函数</figcaption>
+      <div class="controls">
+        <button id="play2">▶ 播放</button>
+        <input type="range" id="slider2" min="0" max="1" step="0.001" value="0">
+      </div>
+    </figure>
+
+    <figure class="card">
+      <canvas id="c3"></canvas>
+      <figcaption>③ 同一坐标系中的 $f$ 与 $f^{-1}$</figcaption>
+    </figure>
+  </div>
+
+  <p class="hint">红色 = 原来的 $x$ 轴，绿色 = 原来的 $y$ 轴。先沿 $x$ 轴翻折，再逆时针旋转 90° 后，两条轴恰好交换了位置。</p>
+
+  <!-- ================= 第二部分 ================= -->
+  <h2>二、两个函数的导数互为倒数</h2>
+  <p>设 $y=f(x)$，反函数记作 $x=f^{-1}(y)$，则</p>
+
+  <div class="formula">
+    $$\frac{dx}{dy}=\frac{1}{\ \dfrac{dy}{dx}\ },\qquad y=f(x)$$
+  </div>
+
+  <p>下面三幅图都<b>同时给出</b>两个增量之比：$\dfrac{\Delta y}{\Delta x}$（原函数导数）与它的倒数 $\dfrac{\Delta x}{\Delta y}$（反函数导数）。</p>
+
+  <div class="card">
+    <div class="grid3">
+      <figure>
+        <canvas id="c4"></canvas>
+        <figcaption>① 原函数：两个倾斜角 α、β</figcaption>
+      </figure>
+
+      <figure>
+        <canvas id="c5"></canvas>
+        <figcaption>② 坐标轴旋转 → 三角形互换</figcaption>
+        <div class="controls">
+          <button id="play5">▶ 播放</button>
+          <input type="range" id="slider5" min="0" max="1" step="0.001" value="0">
+        </div>
+      </figure>
+
+      <figure>
+        <canvas id="c6"></canvas>
+        <figcaption>③ 两个三角形在同一图中对比</figcaption>
+      </figure>
+    </div>
+
+    <div class="legend">
+      <span><i style="background:#2563eb"></i>原函数 $y=f(x)$ 及其三角形</span>
+      <span><i style="background:#ea580c"></i>反函数 $y=f^{-1}(x)$ 及其三角形</span>
+      <span><i style="background:#94a3b8"></i>对应关系（虚线箭头）</span>
+      <span><i style="background:#ef4444"></i>原 $x$ 轴</span>
+      <span><i style="background:#10b981"></i>原 $y$ 轴</span>
+    </div>
+
+    <div class="controls">
+      <span style="font-size:.9em;white-space:nowrap;color:#475569">拖动选点：</span>
+      <input type="range" id="slider4" min="0.6" max="2.2" step="0.01" value="1.5">
+    </div>
+
+    <div class="readout">
+      <div class="row"><span>切点横坐标 $a$</span><span class="val blue"><span id="oax">1.50</span></span></div>
+      <div class="row"><span>增量之比 $\dfrac{\Delta y}{\Delta x}=f'(a)$</span><span class="val blue"><span id="oslope">1.500</span></span></div>
+      <div class="row"><span>其倒数 $\dfrac{\Delta x}{\Delta y}=g'(b)$</span><span class="val orange"><span id="orslope">0.667</span></span></div>
+      <div class="row"><span>乘积 $\dfrac{\Delta y}{\Delta x}\cdot\dfrac{\Delta x}{\Delta y}$</span><span class="val"><span id="oprod">1.000</span></span></div>
+    </div>
+    <div class="hint">左图中 α 是切线与 x 轴的夹角，β 是切线与 y 轴的夹角，α + β = 90°；tan α = Δy/Δx，tan β = Δx/Δy，二者互为倒数。</div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ================= 数学部分 ================= */
+  const f  = x => x * x / 2;
+  const fp = x => x;
+  const g  = y => Math.sqrt(Math.max(0, 2 * y));
+
+  const VMIN = -3.2, VMAX = 3.2;    // 第一部分视口
+  const V2MIN = -0.5, V2MAX = 3.5;  // 第二部分 ①③ 视口
+  const V3MIN = -3.1, V3MAX = 3.1;  // 第二部分 ② 视口
+
+  const AX1 = 2.7;   // 第一部分坐标轴半长
+  const AX2 = 2.5;   // 第二部分坐标轴半长
+
+  const BLUE_RGB   = [37, 99, 235];
+  const ORANGE_RGB = [234, 88, 12];
+
+  const BLUE   = '#2563eb';
+  const ORANGE = '#ea580c';
+  const GREY   = '#94a3b8';
+  const SLATE  = '#475569';
+
+  const FONT_S = 'bold 15px -apple-system, system-ui, sans-serif';
+  const FONT_M = 'bold 17px -apple-system, system-ui, sans-serif';
+
+  const cv = {};
+
+  /* ================= 颜色工具 ================= */
+  function mixRgb(c1, c2, k){
+    k = Math.max(0, Math.min(1, k));
+    const r = Math.round(c1[0] + (c2[0] - c1[0]) * k);
+    const g = Math.round(c1[1] + (c2[1] - c1[1]) * k);
+    const b = Math.round(c1[2] + (c2[2] - c1[2]) * k);
+    return `rgb(${r},${g},${b})`;
+  }
+  function rgbaStr(rgbStr, alpha){
+    const m = rgbStr.match(/\d+/g);
+    if(!m) return rgbStr;
+    return `rgba(${m[0]},${m[1]},${m[2]},${alpha})`;
+  }
+
+  /* ================= 画布工具 ================= */
+  function initCanvas(id){
+    const el = document.getElementById(id);
+    if(!el) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const rect = el.getBoundingClientRect();
+    const w = Math.max(rect.width, 10);
+    const h = Math.max(rect.height, 10);
+    el.width  = Math.round(w * dpr);
+    el.height = Math.round(h * dpr);
+    const ctx = el.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cv[id] = { el, ctx, w, h };
+  }
+
+  function T_(w, h, vmin, vmax){
+    const lo = (vmin === undefined) ? VMIN : vmin;
+    const hi = (vmax === undefined) ? VMAX : vmax;
+    const sx = w / (hi - lo);
+    const sy = h / (hi - lo);
+    return {
+      sx, sy, w, h, vmin: lo, vmax: hi,
+      X: x => (x - lo) * sx,
+      Y: y => h - (y - lo) * sy,
+      invX: px => px / sx + lo
+    };
+  }
+
+  function roundRect(ctx, x, y, w, h, r){
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  /* ---------- 基础绘图 ---------- */
+  function grid(ctx, T){
+    ctx.save();
+    ctx.strokeStyle = '#e9eef6';
+    ctx.lineWidth = 1;
+    for(let i = Math.ceil(T.vmin); i <= Math.floor(T.vmax); i++){
+      ctx.beginPath(); ctx.moveTo(T.X(i), 0); ctx.lineTo(T.X(i), T.h); ctx.stroke();
+    }
+    for(let j = Math.ceil(T.vmin); j <= Math.floor(T.vmax); j++){
+      ctx.beginPath(); ctx.moveTo(0, T.Y(j)); ctx.lineTo(T.w, T.Y(j)); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function arrowHead(ctx, px, py, angle, color, size){
+    const s = size || 9;
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.rotate(angle);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(-s, s * 0.55);
+    ctx.lineTo(-s, -s * 0.55);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function axes(ctx, T){
+    const lo = T.vmin + 0.25, hi = T.vmax - 0.25;
+    ctx.save();
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(T.X(lo), T.Y(0));
+    ctx.lineTo(T.X(hi), T.Y(0));
+    ctx.moveTo(T.X(0), T.Y(lo));
+    ctx.lineTo(T.X(0), T.Y(hi));
+    ctx.stroke();
+    arrowHead(ctx, T.X(hi), T.Y(0), 0, '#94a3b8', 10);
+    arrowHead(ctx, T.X(0), T.Y(hi), -Math.PI / 2, '#94a3b8', 10);
+    ctx.restore();
+  }
+
+  function drawColoredAxes(ctx, T, x1, x2, y1, y2){
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineWidth = 3;
+
+    ctx.strokeStyle = '#ef4444';
+    ctx.beginPath();
+    ctx.moveTo(T.X(x1[0]), T.Y(x1[1]));
+    ctx.lineTo(T.X(x2[0]), T.Y(x2[1]));
+    ctx.stroke();
+
+    ctx.strokeStyle = '#10b981';
+    ctx.beginPath();
+    ctx.moveTo(T.X(y1[0]), T.Y(y1[1]));
+    ctx.lineTo(T.X(y2[0]), T.Y(y2[1]));
+    ctx.stroke();
+    ctx.restore();
+
+    const angX = Math.atan2(T.Y(x2[1]) - T.Y(x1[1]), T.X(x2[0]) - T.X(x1[0]));
+    const angY = Math.atan2(T.Y(y2[1]) - T.Y(y1[1]), T.X(y2[0]) - T.X(y1[0]));
+    arrowHead(ctx, T.X(x2[0]), T.Y(x2[1]), angX, '#ef4444', 11);
+    arrowHead(ctx, T.X(y2[0]), T.Y(y2[1]), angY, '#10b981', 11);
+
+    axisTag(ctx, T, x2, 'x', '#ef4444');
+    axisTag(ctx, T, y2, 'y', '#10b981');
+  }
+
+  function axisTag(ctx, T, p, text, color){
+    const px = T.X(p[0]), py = T.Y(p[1]);
+    const ox = T.X(0), oy = T.Y(0);
+    let dx = px - ox, dy = py - oy;
+    const d = Math.hypot(dx, dy) || 1;
+    dx /= d; dy /= d;
+    const x = px + dx * 16;
+    const y = py + dy * 16;
+
+    ctx.save();
+    ctx.font = FONT_M;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = '#ffffff';
+    ctx.strokeText(text, x, y);
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
+    ctx.restore();
+  }
+
+  function drawCurve(ctx, T, fn, x0, x1, color, lw){
+    ctx.save();
+    ctx.beginPath();
+    const N = 300;
+    for(let i = 0; i <= N; i++){
+      const x = x0 + (x1 - x0) * i / N;
+      const px = T.X(x), py = T.Y(fn(x));
+      i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lw;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function dot(ctx, T, x, y, color, r){
+    ctx.beginPath();
+    ctx.arc(T.X(x), T.Y(y), r || 6, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+  }
+
+  function label(ctx, T, x, y, text, color, font, align){
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.font = font || FONT_M;
+    ctx.textAlign = align || 'left';
+    ctx.textBaseline = 'middle';
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = '#ffffff';
+    ctx.strokeText(text, T.X(x), T.Y(y));
+    ctx.fillText(text, T.X(x), T.Y(y));
+    ctx.restore();
+  }
+
+  function dashedLine(ctx, T, x1, y1, x2, y2, color, dash, lw){
+    ctx.save();
+    ctx.setLineDash(dash || [6, 5]);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lw || 2;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(T.X(x1), T.Y(y1));
+    ctx.lineTo(T.X(x2), T.Y(y2));
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function dashedArrow(ctx, T, x1, y1, x2, y2, color, dash, lw){
+    dashedLine(ctx, T, x1, y1, x2, y2, color, dash, lw);
+    const p1x = T.X(x1), p1y = T.Y(y1), p2x = T.X(x2), p2y = T.Y(y2);
+    const ang = Math.atan2(p2y - p1y, p2x - p1x);
+    arrowHead(ctx, p2x, p2y, ang, color, 8);
+  }
+
+  function tangentLine(ctx, T, p, m, color, lw, dash){
+    const L = 1.0;
+    const d = Math.sqrt(1 + m * m);
+    const dx = L / d, dy = m * L / d;
+    ctx.save();
+    if(dash) ctx.setLineDash(dash);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lw || 2;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(T.X(p[0] - dx), T.Y(p[1] - dy));
+    ctx.lineTo(T.X(p[0] + dx), T.Y(p[1] + dy));
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function tri(ctx, T, P, Q, R, fill, stroke){
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(T.X(P[0]), T.Y(P[1]));
+    ctx.lineTo(T.X(Q[0]), T.Y(Q[1]));
+    ctx.lineTo(T.X(R[0]), T.Y(R[1]));
+    ctx.closePath();
+    ctx.fillStyle = fill;
+    ctx.fill();
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  /* ---------- 核心变换：先沿 x 轴翻折，再逆时针旋转 90° ---------- */
+  function flipRotate(t, x, y){
+    if(t <= 0.5){
+      const c = Math.cos(Math.PI * (t / 0.5));
+      return [x, y * c];
+    }
+    const yf = -y;
+    const th = ((t - 0.5) / 0.5) * (Math.PI / 2);
+    const c = Math.cos(th), s = Math.sin(th);
+    return [c * x - s * yf, s * x + c * yf];
+  }
+
+  /* ---------- 分式绘制 ---------- */
+  function fracWidth(ctx, num, den, size){
+    const f = size || 12;
+    ctx.save();
+    ctx.font = `bold ${f}px -apple-system, system-ui, sans-serif`;
+    const w = Math.max(ctx.measureText(num).width, ctx.measureText(den).width) + 6;
+    ctx.restore();
+    return w;
+  }
+
+  function drawFrac(ctx, x, midY, num, den, color, size){
+    const f = size || 12;
+    ctx.save();
+    ctx.font = `bold ${f}px -apple-system, system-ui, sans-serif`;
+    const fw = fracWidth(ctx, num, den, f);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.6;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(x, midY);
+    ctx.lineTo(x + fw, midY);
+    ctx.stroke();
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText(num, x + fw / 2, midY - 3);
+    ctx.textBaseline = 'top';
+    ctx.fillText(den, x + fw / 2, midY + 3);
+    ctx.restore();
+    return fw;
+  }
+
+  function ratioRowWidth(ctx, num, den, eq, size){
+    const f = size || 12;
+    ctx.save();
+    ctx.font = `bold ${f}px -apple-system, system-ui, sans-serif`;
+    const w = fracWidth(ctx, num, den, f) + ctx.measureText(' = ' + eq).width;
+    ctx.restore();
+    return w;
+  }
+
+  function drawRatioRow(ctx, x, midY, num, den, eq, color, size){
+    const f = size || 12;
+    const fw = drawFrac(ctx, x, midY, num, den, color, f);
+    ctx.save();
+    ctx.font = `bold ${f}px -apple-system, system-ui, sans-serif`;
+    ctx.fillStyle = color;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(' = ' + eq, x + fw, midY);
+    ctx.restore();
+  }
+
+  function drawInfoCard(ctx, x, y, rows, size, rowH){
+    const f = size || 12;
+    const rh = rowH || 30;
+    const padX = 9, padY = 7;
+    const FONT = `bold ${f}px -apple-system, system-ui, sans-serif`;
+
+    let maxW = 0;
+    rows.forEach(r => {
+      if(r.num){
+        maxW = Math.max(maxW, ratioRowWidth(ctx, r.num, r.den, r.eq, f));
+      } else {
+        ctx.save();
+        ctx.font = FONT;
+        maxW = Math.max(maxW, ctx.measureText(r.text).width);
+        ctx.restore();
+      }
+    });
+
+    const cardW = maxW + padX * 2;
+    const cardH = rows.length * rh + padY * 2 - 6;
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,0.94)';
+    ctx.strokeStyle = '#dbe3ee';
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, x, y, cardW, cardH, 10);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    rows.forEach((r, i) => {
+      const cy = y + padY + rh * i + (rh - 6) / 2;
+      if(r.num){
+        drawRatioRow(ctx, x + padX, cy, r.num, r.den, r.eq, r.color, f);
+      } else {
+        ctx.save();
+        ctx.fillStyle = r.color;
+        ctx.font = FONT;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(r.text, x + padX, cy);
+        ctx.restore();
+      }
+    });
+  }
+
+  /* ---------- 倾斜角弧线绘制 ---------- */
+  function drawAngleLabel(ctx, x, y, text, color){
+    ctx.save();
+    ctx.font = 'bold 15px -apple-system, system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = '#ffffff';
+    ctx.strokeText(text, x, y);
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
+    ctx.restore();
+  }
+
+  // 在 P 点画两条弧：α 为切线与 x 轴夹角，β 为切线与 y 轴夹角
+  function drawAngleArcs(ctx, T, P, hx, dy){
+    const px = T.X(P[0]);
+    const py = T.Y(P[1]);
+
+    // 切线方向在 canvas 坐标系中的角度（向上为负）
+    const dxC = hx * T.sx;
+    const dyC = -dy * T.sy;
+    const angT = Math.atan2(dyC, dxC);
+
+    const rA = 36;   // α 弧半径
+    const rB = 26;   // β 弧半径
+
+    // α 弧：从水平向右（0）到切线方向
+    ctx.save();
+    ctx.strokeStyle = '#2563eb';
+    ctx.lineWidth = 2.2;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(px, py, rA, 0, angT, true);
+    ctx.stroke();
+    ctx.restore();
+
+    // β 弧：从切线方向到竖直向上（-π/2）
+    ctx.save();
+    ctx.strokeStyle = '#ea580c';
+    ctx.lineWidth = 2.2;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(px, py, rB, angT, -Math.PI / 2, true);
+    ctx.stroke();
+    ctx.restore();
+
+    // α 标签
+    const midA = angT / 2;
+    drawAngleLabel(
+      ctx,
+      px + (rA + 15) * Math.cos(midA),
+      py + (rA + 15) * Math.sin(midA),
+      'α', '#2563eb'
+    );
+
+    // β 标签
+    const midB = (angT - Math.PI / 2) / 2;
+    drawAngleLabel(
+      ctx,
+      px + (rB + 15) * Math.cos(midB),
+      py + (rB + 15) * Math.sin(midB),
+      'β', '#ea580c'
+    );
+  }
+
+  /* ================= ① 原函数 ================= */
+  function draw1(){
+    if(!cv.c1) return;
+    const { ctx, w, h } = cv.c1;
+    ctx.clearRect(0, 0, w, h);
+    const T = T_(w, h);
+
+    grid(ctx, T);
+    axes(ctx, T);
+    drawCurve(ctx, T, f, 0, 2.4, BLUE, 4.5);
+
+    dot(ctx, T, 0, 0, BLUE, 4);
+    dot(ctx, T, 2.4, f(2.4), BLUE, 5);
+
+    label(ctx, T, 0.55, 2.75, 'y = f(x)', BLUE, FONT_M);
+    label(ctx, T, -0.55, -0.42, 'O', GREY, '14px -apple-system, system-ui, sans-serif', 'center');
+  }
+
+  /* ================= ② 坐标轴旋转互换（第一部分） ================= */
+  function draw2(t){
+    if(!cv.c2) return;
+    const { ctx, w, h } = cv.c2;
+    ctx.clearRect(0, 0, w, h);
+    const T = T_(w, h);
+
+    grid(ctx, T);
+
+    const x1 = flipRotate(t, -AX1, 0), x2 = flipRotate(t, AX1, 0);
+    const y1 = flipRotate(t, 0, -AX1), y2 = flipRotate(t, 0, AX1);
+    drawColoredAxes(ctx, T, x1, x2, y1, y2);
+
+    const k = Math.max(0, (t - 0.5) / 0.5);
+    const curveColor = mixRgb(BLUE_RGB, ORANGE_RGB, k);
+
+    ctx.save();
+    ctx.beginPath();
+    const N = 220;
+    for(let i = 0; i <= N; i++){
+      const u = 2.4 * i / N;
+      const p = flipRotate(t, u, f(u));
+      const px = T.X(p[0]), py = T.Y(p[1]);
+      i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+    }
+    ctx.strokeStyle = curveColor;
+    ctx.lineWidth = 4.5;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.save();
+    ctx.font = 'bold 13px -apple-system, system-ui, sans-serif';
+    ctx.fillStyle = GREY;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    const stage = t <= 0.001 ? '初始：原函数'
+                : t < 0.5     ? '步骤 1：沿 x 轴翻折'
+                : t < 0.999   ? '步骤 2：逆时针旋转 90°'
+                : '完成：坐标轴互换，得到反函数';
+    ctx.fillText(stage, 10, 10);
+    ctx.restore();
+  }
+
+  /* ================= ③ 同一坐标系 ================= */
+  function draw3(){
+    if(!cv.c3) return;
+    const { ctx, w, h } = cv.c3;
+    ctx.clearRect(0, 0, w, h);
+    const T = T_(w, h);
+
+    grid(ctx, T);
+
+    dashedLine(ctx, T, T.vmin + 0.25, T.vmin + 0.25,
+                      T.vmax - 0.25, T.vmax - 0.25, '#c3cddb', [7,6], 2);
+
+    axes(ctx, T);
+
+    drawCurve(ctx, T, f, 0, 2.4,  BLUE,   4);
+    drawCurve(ctx, T, g, 0, 2.88, ORANGE, 4);
+
+    label(ctx, T, 0.75, 2.65, 'y = f(x)', BLUE, FONT_S);
+    label(ctx, T, 2.45, 0.55, 'y = f⁻¹(x)', ORANGE, FONT_S);
+    label(ctx, T, -2.85, -2.85, 'y = x', GREY, 'bold 14px -apple-system, system-ui, sans-serif');
+  }
+
+  /* ================= 第二部分：增量三角形 ================= */
+  const state = { a: 1.5, dragging: false };
+
+  function getTriangle(a){
+    const b = f(a);
+    const sl = fp(a);
+    const hx = Math.min(0.55, 0.85 / sl);
+    const dy = sl * hx;
+    return { a, b, sl, hx, dy };
+  }
+
+  function norm2(dx, dy){
+    const d = Math.hypot(dx, dy) || 1;
+    return [dx / d, dy / d];
+  }
+
+  function offsetLabel(ctx, T, m, dir, away, dist, text, color, font){
+    let nx = -dir[1], ny = dir[0];
+    const tx = away[0] - m[0], ty = away[1] - m[1];
+    if(nx * tx + ny * ty > 0){ nx = -nx; ny = -ny; }
+    label(ctx, T, m[0] + nx * dist, m[1] + ny * dist, text, color, font, 'center');
+  }
+
+  /* ================= ④ 原函数：增量三角形 + 两个倾斜角 ================= */
+  function draw4(){
+    if(!cv.c4) return;
+    const { ctx, w, h } = cv.c4;
+    ctx.clearRect(0, 0, w, h);
+    const T = T_(w, h, V2MIN, V2MAX);
+
+    grid(ctx, T);
+    axes(ctx, T);
+    drawCurve(ctx, T, f, 0, 2.4, BLUE, 4);
+
+    const { a, b, sl, hx, dy } = getTriangle(state.a);
+    const P  = [a, b];
+    const A1 = [a + hx, b];
+    const A2 = [a + hx, b + dy];
+
+    tangentLine(ctx, T, P, sl, 'rgba(37,99,235,.35)', 2, [5, 4]);
+    tri(ctx, T, P, A1, A2, 'rgba(37,99,235,.14)', 'rgba(37,99,235,.55)');
+
+    dashedArrow(ctx, T, P[0],  P[1],  A1[0], A1[1], BLUE, [6,5], 2.2);
+    dashedArrow(ctx, T, A1[0], A1[1], A2[0], A2[1], BLUE, [6,5], 2.2);
+
+    offsetLabel(ctx, T,
+      [(P[0] + A1[0]) / 2, (P[1] + A1[1]) / 2],
+      norm2(A1[0] - P[0], A1[1] - P[1]),
+      A2, 0.20, 'Δx', BLUE, FONT_S);
+
+    offsetLabel(ctx, T,
+      [(A1[0] + A2[0]) / 2, (A1[1] + A2[1]) / 2],
+      norm2(A2[0] - A1[0], A2[1] - A1[1]),
+      P, 0.20, 'Δy', BLUE, FONT_S);
+
+    // 从 P 点引出的水平 / 竖直参考射线
+    dashedLine(ctx, T, P[0], P[1], P[0] + 0.75, P[1], 'rgba(100,116,139,.45)', [4,4], 1.5);
+    dashedLine(ctx, T, P[0], P[1], P[0], P[1] + 0.75, 'rgba(100,116,139,.45)', [4,4], 1.5);
+
+    // 两个倾斜角
+    drawAngleArcs(ctx, T, P, hx, dy);
+
+    dot(ctx, T, P[0], P[1], BLUE, 7);
+    label(ctx, T, P[0] - 0.28, P[1] + 0.26, 'P', BLUE, FONT_M);
+
+    drawInfoCard(ctx, 8, 8, [
+      { num: 'Δy', den: 'Δx', eq: 'tan α = ' + sl.toFixed(3),       color: BLUE   },
+      { num: 'Δx', den: 'Δy', eq: 'tan β = ' + (1/sl).toFixed(3),   color: ORANGE }
+    ], 12, 30);
+
+    // 底部说明
+    ctx.save();
+    ctx.font = 'bold 12px -apple-system, system-ui, sans-serif';
+    ctx.fillStyle = '#64748b';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText('α + β = 90°   tan α = Δy/Δx   tan β = Δx/Δy', w / 2, h - 8);
+    ctx.restore();
+  }
+
+  /* ================= ⑤ 坐标轴旋转互换（第二部分） ================= */
+  function draw5(t){
+    if(!cv.c5) return;
+    const { ctx, w, h } = cv.c5;
+    ctx.clearRect(0, 0, w, h);
+    const T = T_(w, h, V3MIN, V3MAX);
+
+    grid(ctx, T);
+
+    const x1 = flipRotate(t, -AX2, 0), x2 = flipRotate(t, AX2, 0);
+    const y1 = flipRotate(t, 0, -AX2), y2 = flipRotate(t, 0, AX2);
+    drawColoredAxes(ctx, T, x1, x2, y1, y2);
+
+    const k = Math.max(0, (t - 0.5) / 0.5);
+    const curveColor = mixRgb(BLUE_RGB, ORANGE_RGB, k);
+
+    ctx.save();
+    ctx.beginPath();
+    const N = 240;
+    for(let i = 0; i <= N; i++){
+      const u = 2.4 * i / N;
+      const p = flipRotate(t, u, f(u));
+      const px = T.X(p[0]), py = T.Y(p[1]);
+      i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+    }
+    ctx.strokeStyle = curveColor;
+    ctx.lineWidth = 4;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.stroke();
+    ctx.restore();
+
+    const { a, b, sl, hx, dy } = getTriangle(state.a);
+    const P  = flipRotate(t, a, b);
+    const A1 = flipRotate(t, a + hx, b);
+    const A2 = flipRotate(t, a + hx, b + dy);
+
+    tri(ctx, T, P, A1, A2,
+      rgbaStr(curveColor, 0.14), rgbaStr(curveColor, 0.55));
+
+    dashedArrow(ctx, T, P[0],  P[1],  A1[0], A1[1], curveColor, [6,5], 2.2);
+    dashedArrow(ctx, T, A1[0], A1[1], A2[0], A2[1], curveColor, [6,5], 2.2);
+
+    offsetLabel(ctx, T,
+      [(P[0] + A1[0]) / 2, (P[1] + A1[1]) / 2],
+      norm2(A1[0] - P[0], A1[1] - P[1]),
+      A2, 0.22, 'Δx', curveColor, FONT_S);
+
+    offsetLabel(ctx, T,
+      [(A1[0] + A2[0]) / 2, (A1[1] + A2[1]) / 2],
+      norm2(A2[0] - A1[0], A2[1] - A1[1]),
+      P, 0.22, 'Δy', curveColor, FONT_S);
+
+    dot(ctx, T, P[0], P[1], curveColor, 7);
+
+    drawInfoCard(ctx, 8, 8, [
+      { num: 'Δy', den: 'Δx', eq: 'tan α = ' + sl.toFixed(3),       color: BLUE   },
+      { num: 'Δx', den: 'Δy', eq: 'tan β = ' + (1/sl).toFixed(3),   color: ORANGE }
+    ], 12, 30);
+
+    ctx.save();
+    ctx.font = 'bold 13px -apple-system, system-ui, sans-serif';
+    ctx.fillStyle = t < 0.01 ? BLUE : (t > 0.99 ? ORANGE : SLATE);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    const stage = t < 0.01 ? '原函数：tan α = Δy / Δx'
+                : t < 0.5  ? '沿 x 轴翻折（横纵未互换）'
+                : t < 0.99 ? '旋转坐标轴 90°…'
+                : '反函数：tan β = Δx / Δy';
+    ctx.fillText(stage, w / 2, h - 8);
+    ctx.restore();
+  }
+
+  /* ================= ⑥ 两个三角形同图对比 ================= */
+  function draw6(){
+    if(!cv.c6) return;
+    const { ctx, w, h } = cv.c6;
+    ctx.clearRect(0, 0, w, h);
+    const T = T_(w, h, V2MIN, V2MAX);
+
+    grid(ctx, T);
+
+    dashedLine(ctx, T, T.vmin + 0.25, T.vmin + 0.25,
+                      T.vmax - 0.25, T.vmax - 0.25, '#c9d2de', [7,6], 2);
+
+    axes(ctx, T);
+
+    drawCurve(ctx, T, f, 0, 2.4, BLUE,   3.4);
+    drawCurve(ctx, T, g, 0, 2.9, ORANGE, 3.4);
+
+    const { a, b, sl, hx, dy } = getTriangle(state.a);
+
+    const P = [a, b];
+    const Q = [b, a];
+
+    const A1 = [a + hx, b];
+    const A2 = [a + hx, b + dy];
+    tri(ctx, T, P, A1, A2, 'rgba(37,99,235,.13)', 'rgba(37,99,235,.5)');
+    dashedArrow(ctx, T, P[0],  P[1],  A1[0], A1[1], BLUE, [6,5], 2);
+    dashedArrow(ctx, T, A1[0], A1[1], A2[0], A2[1], BLUE, [6,5], 2);
+    offsetLabel(ctx, T,
+      [(P[0] + A1[0]) / 2, (P[1] + A1[1]) / 2],
+      norm2(A1[0] - P[0], A1[1] - P[1]),
+      A2, 0.20, 'Δx', BLUE, FONT_S);
+    offsetLabel(ctx, T,
+      [(A1[0] + A2[0]) / 2, (A1[1] + A2[1]) / 2],
+      norm2(A2[0] - A1[0], A2[1] - A1[1]),
+      P, 0.20, 'Δy', BLUE, FONT_S);
+
+    const B1 = [b + dy, a];
+    const B2 = [b + dy, a + hx];
+    tri(ctx, T, Q, B1, B2, 'rgba(234,88,12,.13)', 'rgba(234,88,12,.5)');
+    dashedArrow(ctx, T, Q[0],  Q[1],  B1[0], B1[1], ORANGE, [6,5], 2);
+    dashedArrow(ctx, T, B1[0], B1[1], B2[0], B2[1], ORANGE, [6,5], 2);
+    offsetLabel(ctx, T,
+      [(Q[0] + B1[0]) / 2, (Q[1] + B1[1]) / 2],
+      norm2(B1[0] - Q[0], B1[1] - Q[1]),
+      B2, 0.20, 'Δy', ORANGE, FONT_S);
+    offsetLabel(ctx, T,
+      [(B1[0] + B2[0]) / 2, (B1[1] + B2[1]) / 2],
+      norm2(B2[0] - B1[0], B2[1] - B1[1]),
+      Q, 0.20, 'Δx', ORANGE, FONT_S);
+
+    tangentLine(ctx, T, P, sl,     'rgba(37,99,235,.35)', 2, [5, 4]);
+    tangentLine(ctx, T, Q, 1 / sl, 'rgba(234,88,12,.35)', 2, [5, 4]);
+
+    dashedArrow(ctx, T, P[0], P[1], Q[0], Q[1], GREY, [5,5], 2);
+
+    dot(ctx, T, P[0], P[1], BLUE,   7);
+    dot(ctx, T, Q[0], Q[1], ORANGE, 7);
+    label(ctx, T, P[0] - 0.30, P[1] + 0.28, 'P', BLUE,   FONT_M);
+    label(ctx, T, Q[0] - 0.34, Q[1] + 0.28, 'Q', ORANGE, FONT_M);
+
+    drawInfoCard(ctx, 8, 8, [
+      { num: 'Δy', den: 'Δx', eq: 'tan α = ' + sl.toFixed(3),       color: BLUE   },
+      { num: 'Δx', den: 'Δy', eq: 'tan β = ' + (1/sl).toFixed(3),   color: ORANGE },
+      { text: '两者乘积 = 1.000', color: SLATE }
+    ], 12, 28);
+  }
+
+  function updateReadout(){
+    const a  = state.a;
+    const sl = fp(a);
+    const rs = 1 / sl;
+    const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+    set('oax',    a.toFixed(2));
+    set('oslope', sl.toFixed(3));
+    set('orslope', rs.toFixed(3));
+    set('oprod',  (sl * rs).toFixed(3));
+  }
+
+  /* ================= 动画状态 ================= */
+  let t2 = 0, playing2 = false, last2 = 0;
+  let t3 = 0, playing3 = false, last3 = 0;
+
+  function tick(ts){
+    if(playing2){
+      if(!last2) last2 = ts;
+      const dt = (ts - last2) / 1000;
+      last2 = ts;
+      t2 = Math.min(1, t2 + dt / 2.8);
+      const sl = document.getElementById('slider2');
+      if(sl) sl.value = t2;
+      draw2(t2);
+      if(t2 >= 1){
+        playing2 = false; last2 = 0;
+        const btn = document.getElementById('play2');
+        if(btn) btn.textContent = '↻ 重播';
+      }
+    }
+    if(playing3){
+      if(!last3) last3 = ts;
+      const dt = (ts - last3) / 1000;
+      last3 = ts;
+      t3 = Math.min(1, t3 + dt / 2.8);
+      const sl = document.getElementById('slider5');
+      if(sl) sl.value = t3;
+      draw5(t3);
+      if(t3 >= 1){
+        playing3 = false; last3 = 0;
+        const btn = document.getElementById('play5');
+        if(btn) btn.textContent = '↻ 重播';
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  /* ================= 交互 ================= */
+  function bindControls(){
+    const btn2 = document.getElementById('play2');
+    const sl2  = document.getElementById('slider2');
+
+    if(btn2) btn2.addEventListener('click', () => {
+      if(playing2){
+        playing2 = false; last2 = 0;
+        btn2.textContent = '▶ 继续';
+        return;
+      }
+      if(t2 >= 1) t2 = 0;
+      playing2 = true; last2 = 0;
+      btn2.textContent = '⏸ 暂停';
+    });
+
+    if(sl2) sl2.addEventListener('input', e => {
+      playing2 = false; last2 = 0;
+      if(btn2) btn2.textContent = '▶ 播放';
+      t2 = parseFloat(e.target.value) || 0;
+      draw2(t2);
+    });
+
+    const btn3 = document.getElementById('play5');
+    const sl3  = document.getElementById('slider5');
+
+    if(btn3) btn3.addEventListener('click', () => {
+      if(playing3){
+        playing3 = false; last3 = 0;
+        btn3.textContent = '▶ 继续';
+        return;
+      }
+      if(t3 >= 1) t3 = 0;
+      playing3 = true; last3 = 0;
+      btn3.textContent = '⏸ 暂停';
+    });
+
+    if(sl3) sl3.addEventListener('input', e => {
+      playing3 = false; last3 = 0;
+      if(btn3) btn3.textContent = '▶ 播放';
+      t3 = parseFloat(e.target.value) || 0;
+      draw5(t3);
+    });
+
+    const sl4 = document.getElementById('slider4');
+    if(sl4) sl4.addEventListener('input', e => {
+      state.a = parseFloat(e.target.value);
+      draw4(); draw5(t3); draw6(); updateReadout();
+    });
+
+    ['c4', 'c5', 'c6'].forEach(id => {
+      const el = document.getElementById(id);
+      if(!el) return;
+
+      const pick = clientX => {
+        const rect = el.getBoundingClientRect();
+        const w = rect.width || 1;
+        const h = rect.height || w;
+        const vmin = (id === 'c5') ? V3MIN : V2MIN;
+        const vmax = (id === 'c5') ? V3MAX : V2MAX;
+        const T = T_(w, h, vmin, vmax);
+        const a = T.invX(clientX - rect.left);
+        return Math.max(0.6, Math.min(2.2, a));
+      };
+
+      const apply = a => {
+        state.a = a;
+        if(sl4) sl4.value = a;
+        draw4(); draw5(t3); draw6(); updateReadout();
+      };
+
+      el.addEventListener('pointerdown', e => {
+        state.dragging = true;
+        apply(pick(e.clientX));
+        if(el.setPointerCapture){ try{ el.setPointerCapture(e.pointerId); }catch(_){} }
+      });
+      el.addEventListener('pointermove', e => {
+        if(!state.dragging) return;
+        apply(pick(e.clientX));
+      });
+      const stop = () => { state.dragging = false; };
+      el.addEventListener('pointerup', stop);
+      el.addEventListener('pointercancel', stop);
+      el.addEventListener('pointerleave', stop);
+    });
+  }
+
+  /* ================= 初始化 ================= */
+  function resizeAll(){
+    ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'].forEach(initCanvas);
+    draw1();
+    draw2(t2);
+    draw3();
+    draw4();
+    draw5(t3);
+    draw6();
+    updateReadout();
+  }
+
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resizeAll, 150);
+  });
+
+  function boot(){
+    bindControls();
+    resizeAll();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 60));
+  } else {
+    setTimeout(boot, 60);
+  }
+  window.addEventListener('load', () => setTimeout(resizeAll, 80));
+
+  requestAnimationFrame(tick);
+
+})();
+</script>
+</body>
+</html>
