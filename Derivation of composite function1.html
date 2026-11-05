@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
+<title>复合函数求导 · 链式法则</title>
+
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$','$'],['\\(','\\)']],
+    displayMath: [['$$','$$'],['\\[','\\]']]
+  },
+  chtml: { scale: 1.05 },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{font-size:17px}
+  @media (min-width:620px){html{font-size:18px}}
+
+  body{
+    margin:0;
+    padding:16px 14px 64px;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+    background:radial-gradient(circle at 15% 0%,#e9edff 0%,#f5f7fc 42%,#eef2fa 100%);
+    color:#1c2233;
+    line-height:1.75;
+  }
+  .wrap{max-width:760px;margin:0 auto}
+
+  header{text-align:center;padding:10px 0 4px}
+  h1{
+    font-size:clamp(1.35rem,5.4vw,1.85rem);
+    line-height:1.32;margin:0 0 6px;letter-spacing:.5px;
+    background:linear-gradient(100deg,#4f46e5,#0ea5e9);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .sub{margin:0;color:#64748b;font-size:.95rem}
+
+  .card{
+    background:#fff;border-radius:18px;padding:18px 16px;margin:16px 0;
+    box-shadow:0 6px 24px rgba(60,80,140,.08);
+    border:1px solid rgba(90,110,180,.08);
+  }
+  h2{
+    font-size:clamp(1.08rem,4.3vw,1.3rem);margin:0 0 12px;
+    display:flex;align-items:center;gap:9px;line-height:1.4;
+  }
+  h2::before{
+    content:"";width:6px;height:1.1em;border-radius:3px;flex:0 0 auto;
+    background:linear-gradient(#6366f1,#22d3ee);
+  }
+  p{margin:.6em 0}
+  .note{color:#5b6478;font-size:.93rem}
+
+  .formula{
+    background:linear-gradient(135deg,#eef2ff,#ecfeff);
+    border:1px dashed #a5b4fc;border-radius:14px;
+    padding:8px 10px;margin:12px 0;text-align:center;overflow-x:auto;
+  }
+
+  .machine{
+    display:flex;align-items:center;justify-content:center;
+    gap:2px;flex-wrap:wrap;margin:16px 0 8px;
+  }
+  .box{
+    padding:7px 13px;border-radius:12px;font-weight:700;font-size:1.02rem;
+    white-space:nowrap;box-shadow:0 2px 10px rgba(80,100,180,.12);
+  }
+  .box.in{background:#e0f2fe;color:#0369a1}
+  .box.mid{background:#fef3c7;color:#b45309}
+  .box.out{background:#dcfce7;color:#15803d}
+  .arrow{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    font-size:.72rem;color:#64748b;line-height:1.1;padding:0 3px;
+  }
+  .arrow b{font-weight:600;color:#94a3b8}
+  .arrow span{font-size:1.05rem;color:#818cf8}
+
+  #gearCanvas{
+    width:100%;height:185px;display:block;border-radius:14px;
+    background:linear-gradient(180deg,#fbfcff,#f2f5ff);
+    border:1px solid #e8edf9;
+  }
+  .gear-caption{
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    flex-wrap:wrap;margin-top:10px;font-size:.9rem;font-weight:700;color:#475569;
+  }
+  .gc-arrow{color:#94a3b8;font-weight:800}
+
+  .chain-struct{
+    display:flex;align-items:center;justify-content:center;gap:4px;
+    margin:14px 0 6px;flex-wrap:wrap;
+  }
+  .cs-node{
+    padding:8px 15px;border-radius:12px;font-weight:800;font-size:1.05rem;
+    box-shadow:0 2px 10px rgba(80,100,180,.12);
+  }
+  .cs-node.in{background:#dbeafe;color:#1d4ed8}
+  .cs-node.mid{background:#fef3c7;color:#b45309}
+  .cs-node.out{background:#dcfce7;color:#15803d}
+  .cs-arrow{
+    display:flex;flex-direction:column;align-items:center;
+    padding:0 5px;min-width:52px;
+  }
+  .cs-arrow .fn{font-weight:700;color:#4338ca;font-size:.82rem;margin-bottom:2px}
+  .cs-arrow .line{
+    width:100%;min-width:34px;height:2px;background:#c7d2fe;position:relative;
+  }
+  .cs-arrow .line::after{
+    content:'';position:absolute;right:-1px;top:50%;transform:translateY(-50%);
+    border-left:7px solid #818cf8;border-top:4px solid transparent;border-bottom:4px solid transparent;
+  }
+  .cs-arrow .der{font-size:.72rem;color:#64748b;margin-top:3px;white-space:nowrap}
+
+  .peel-flow{margin:14px 0}
+  .peel-step{
+    display:flex;align-items:center;gap:10px;
+    background:#f8faff;border-radius:12px;padding:10px 12px;
+    border-left:5px solid var(--c);
+  }
+  .peel-badge{
+    flex:0 0 auto;font-size:.72rem;font-weight:800;color:#fff;
+    background:var(--c);padding:3px 8px;border-radius:8px;white-space:nowrap;
+  }
+  .peel-body{flex:1 1 auto;min-width:0}
+  .peel-expr{font-weight:700;font-size:1rem;color:#1e293b;overflow-x:auto}
+  .peel-der{font-size:.82rem;color:#64748b;margin-top:1px}
+  .peel-down{
+    text-align:center;font-size:.8rem;color:#94a3b8;
+    padding:5px 0;font-weight:600;
+  }
+  .peel-result{
+    text-align:center;font-size:1.05rem;font-weight:800;color:#4338ca;
+    background:linear-gradient(135deg,#eef2ff,#e0f2fe);
+    border-radius:12px;padding:12px;margin-top:6px;overflow-x:auto;
+  }
+
+  .func-chain{
+    display:flex;flex-wrap:wrap;align-items:center;justify-content:center;
+    gap:6px 4px;background:#f8faff;border-radius:12px;padding:10px 8px;
+    margin:4px 0 10px;border:1px solid #e6ebf8;
+  }
+  .fc-item{
+    background:#fff;border-radius:8px;padding:4px 10px;
+    border:1px solid #e0e7f5;font-weight:600;color:#334155;
+    font-size:.93rem;line-height:1.5;
+  }
+  .fc-in{background:#dbeafe;color:#1d4ed8;border-color:#bfdbfe;font-weight:800}
+  .fc-arrow{color:#94a3b8;font-weight:800;font-size:.9rem}
+
+  .tabs{
+    display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;margin-bottom:6px;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  }
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{
+    flex:0 0 auto;padding:7px 14px;border-radius:999px;
+    border:1.5px solid #dbe2f0;background:#fff;color:#475569;
+    font-size:.93rem;font-weight:600;font-family:inherit;cursor:pointer;
+    transition:all .18s ease;
+  }
+  .tab.active{
+    background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;
+    border-color:transparent;box-shadow:0 4px 14px rgba(99,102,241,.35);
+  }
+
+  .hint{font-size:.9rem;color:#6366f1;font-weight:600;margin:2px 0 8px;min-height:1.3em}
+
+  canvas{
+    width:100%;height:290px;display:block;border-radius:14px;
+    background:linear-gradient(180deg,#fbfcff,#f2f5ff);
+    border:1px solid #e8edf9;
+  }
+  @media (max-width:480px){canvas{height:235px}}
+
+  #chainCanvas{height:270px}
+  #triCanvas{height:250px}
+  @media (max-width:480px){
+    #chainCanvas{height:232px}
+    #triCanvas{height:216px}
+  }
+
+  input[type=range]{
+    width:100%;height:34px;margin:8px 0 2px;
+    accent-color:#6366f1;cursor:pointer;
+  }
+
+  .sliders{margin:10px 0 4px}
+  .slider-row{display:flex;align-items:center;gap:10px;margin:5px 0}
+  .slider-row .slabel{
+    flex:0 0 62px;font-size:.86rem;color:#64748b;font-weight:600;
+  }
+  .slider-row input[type=range]{flex:1 1 auto;margin:0}
+  .slider-row .sval{
+    flex:0 0 52px;text-align:right;font-variant-numeric:tabular-nums;
+    font-weight:700;color:#4338ca;font-size:.92rem;
+  }
+
+  .readout{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));
+    gap:8px;margin-top:10px;
+  }
+  .ro{
+    background:#f6f8fe;border-radius:12px;padding:8px 5px;text-align:center;
+    border:1px solid #e6ebf8;
+  }
+  .ro .k{display:block;font-size:.72rem;color:#7c89a3;letter-spacing:.3px;line-height:1.3}
+  .ro .v{
+    display:block;font-size:1.12rem;font-weight:800;color:#1e293b;
+    font-variant-numeric:tabular-nums;line-height:1.35;
+  }
+  .ro.hl{
+    grid-column:1 / -1;
+    background:linear-gradient(135deg,#eef2ff,#e0f2fe);
+    border-color:#c7d2fe;
+  }
+  .ro.hl .v{color:#4338ca;font-size:1.32rem}
+
+  .scale-bars{
+    background:#f8faff;border-radius:12px;padding:10px 12px;margin:10px 0 6px;
+    border:1px solid #e6ebf8;
+  }
+  .sb-row{display:flex;align-items:center;gap:8px;margin:5px 0}
+  .sb-name{
+    flex:0 0 34px;font-size:.82rem;font-weight:700;text-align:right;
+  }
+  .sb-track{
+    flex:1 1 auto;height:14px;background:#eef2fb;border-radius:7px;
+    overflow:hidden;position:relative;
+  }
+  .sb-fill{height:100%;border-radius:7px;transition:width .15s ease}
+  .sb-val{
+    flex:0 0 54px;font-size:.82rem;font-weight:700;color:#334155;
+    text-align:right;font-variant-numeric:tabular-nums;
+  }
+  .der-line{
+    font-size:.84rem;color:#64748b;text-align:center;
+    margin:2px 0 4px;font-variant-numeric:tabular-nums;font-weight:600;
+  }
+
+  .step{
+    background:#f8faff;border-left:4px solid #a5b4fc;
+    border-radius:0 12px 12px 0;padding:9px 13px;margin:10px 0;
+  }
+  .step-t{font-weight:700;color:#4338ca;font-size:.95rem;margin-bottom:2px}
+  .step-m{overflow-x:auto}
+
+  .layer{
+    display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+    margin:8px 0;font-size:.95rem;color:#475569;
+  }
+  .chip{
+    background:#eef2ff;color:#4338ca;border-radius:8px;
+    padding:2px 9px;font-weight:600;font-size:.9rem;
+  }
+
+  .wrong,.right{
+    border-radius:12px;padding:9px 13px;margin:9px 0;font-size:.95rem;
+  }
+  .wrong{background:#fef2f2;border-left:4px solid #f87171;color:#991b1b}
+  .right{background:#f0fdf4;border-left:4px solid #4ade80;color:#166534}
+
+  .slogan{
+    text-align:center;font-size:clamp(1rem,4vw,1.15rem);font-weight:800;
+    color:#4338ca;background:linear-gradient(135deg,#eef2ff,#ecfeff);
+    border-radius:14px;padding:14px 10px;margin:10px 0 0;
+    letter-spacing:1px;
+  }
+  ul{padding-left:1.2em;margin:.5em 0}
+  li{margin:.25em 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>一元复合函数求导 · 链式法则</h1>
+    <p class="sub">层层剥开，环环相乘</p>
+  </header>
+
+  <section class="card">
+    <h2>什么是复合函数？</h2>
+    <p>把一个函数的输出，喂给另一个函数，就得到<b>复合函数</b>：</p>
+    <div class="formula">$$y=f\big(g(x)\big)$$</div>
+    <div class="machine">
+      <div class="box in">x</div>
+      <div class="arrow"><b>内层 g</b><span>→</span></div>
+      <div class="box mid">u = g(x)</div>
+      <div class="arrow"><b>外层 f</b><span>→</span></div>
+      <div class="box out">y = f(u)</div>
+    </div>
+    <p class="note">中间的 <b>u</b> 叫「中间变量」。求导的关键，就是先把复合函数拆成这两层，分别处理。</p>
+  </section>
+
+  <section class="card">
+    <h2>链式法则</h2>
+    <div class="formula">
+      $$\frac{dy}{dx}=\frac{dy}{du}\cdot\frac{du}{dx}=f'(u)\cdot g'(x)$$
+    </div>
+    <p>大白话版本：</p>
+    <p><b>x 变一点点 → 先被内层放大 $g'(x)$ 倍 → 再被外层放大 $f'(u)$ 倍 → 总放大倍数 = 两者相乘。</b></p>
+  </section>
+
+  <section class="card">
+    <h2>齿轮传动：为什么是「相乘」？</h2>
+    <p>链式法则就像齿轮组：每一级都把转动放大一次，总放大倍数就是各级倍数相乘。</p>
+    <canvas id="gearCanvas"></canvas>
+    <div class="gear-caption">
+      <span>大齿轮 1 圈</span>
+      <span class="gc-arrow">→</span>
+      <span>中齿轮 3 圈</span>
+      <span class="gc-arrow">→</span>
+      <span>小齿轮 2 圈</span>
+    </div>
+    <div class="formula" style="margin-top:10px">
+      总传动比 = 3 × 2 = 6
+    </div>
+    <p class="note">大齿轮转 1 圈，中齿轮被带着转 3 圈；中齿轮转 1 圈，小齿轮又被带着转 2 圈。所以大齿轮转 1 圈，小齿轮总共转 6 圈。复合函数求导同理：内层放大 $g'(x)$ 倍，外层再放大 $f'(u)$ 倍，总倍数就是两者相乘。</p>
+  </section>
+
+  <section class="card">
+    <h2>链式法则：从外到内，逐层剥开</h2>
+    <p>先弄清函数结构：<b>$x$ 先经过内层 $g$，再经过外层 $f$。</b></p>
+
+    <div class="chain-struct">
+      <div class="cs-node in">x</div>
+      <div class="cs-arrow">
+        <span class="fn">内层 g</span>
+        <div class="line"></div>
+        <span class="der">求导得 g′(x)</span>
+      </div>
+      <div class="cs-node mid">u</div>
+      <div class="cs-arrow">
+        <span class="fn">外层 f</span>
+        <div class="line"></div>
+        <span class="der">求导得 f′(u)</span>
+      </div>
+      <div class="cs-node out">y</div>
+    </div>
+
+    <p style="margin-top:16px">求导时，<b>从最外层开始，一层一层往里剥</b>，每剥开一层就乘上这一层的「变化率」，直到最里面的自变量 $x$ 为止。</p>
+
+    <div class="peel-flow">
+      <div class="peel-step" style="--c:#f59e0b">
+        <div class="peel-badge">第 1 层 · 最外</div>
+        <div class="peel-body">
+          <div class="peel-expr">$y = f(u)$</div>
+          <div class="peel-der">对中间变量 $u$ 求导 → $f'(u)$</div>
+        </div>
+      </div>
+      <div class="peel-down">↓ 剥开外层，进入下一层</div>
+
+      <div class="peel-step" style="--c:#3b82f6">
+        <div class="peel-badge">第 2 层</div>
+        <div class="peel-body">
+          <div class="peel-expr">$u = g(x)$</div>
+          <div class="peel-der">对自变量 $x$ 求导 → $g'(x)$</div>
+        </div>
+      </div>
+      <div class="peel-down">↓ 到达最里层</div>
+
+      <div class="peel-step" style="--c:#10b981">
+        <div class="peel-badge">最内层</div>
+        <div class="peel-body">
+          <div class="peel-expr">$x$</div>
+          <div class="peel-der">自变量，停止剥开</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="peel-result">
+      $\dfrac{dy}{dx} = f'(u)\cdot g'(x)$
+    </div>
+
+    <p class="note">形象记忆：像<b>剥洋葱</b>（也像拆俄罗斯套娃）——最外面是 $f$，里面包着 $g$，最里面是 $x$。从外往里剥，每层的变化率都要乘上，剥到 $x$ 就停手。如果有三层、四层，就继续往下剥、继续乘。</p>
+  </section>
+
+  <section class="card">
+    <h2>动手玩：切线斜率从哪来？</h2>
+    <div class="tabs" id="tabs"></div>
+    <div class="hint" id="hint"></div>
+
+    <canvas id="plot"></canvas>
+
+    <div>
+      <input type="range" id="xrange" min="-1.5" max="1" step="0.01" value="0.2">
+    </div>
+
+    <div class="readout">
+      <div class="ro"><span class="k">x</span><span class="v" id="ro-x">0</span></div>
+      <div class="ro"><span class="k">u = g(x)</span><span class="v" id="ro-u">0</span></div>
+      <div class="ro"><span class="k">du/dx = g′(x)</span><span class="v" id="ro-dg">0</span></div>
+      <div class="ro"><span class="k">dy/du = f′(u)</span><span class="v" id="ro-df">0</span></div>
+      <div class="ro hl"><span class="k">dy/dx = f′(u) · g′(x) = 切线斜率</span><span class="v" id="ro-dy">0</span></div>
+    </div>
+
+    <p class="note" style="margin-top:10px">
+      橙色直线是曲线在该点的<b>切线</b>，它的斜率就是 $\frac{dy}{dx}$。拖动滑块，观察内外层导数如何「相乘」出总斜率。
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>动态演示：Δx 是怎样被逐层放大的</h2>
+    <p>当前复合函数拆成两层，<b>左侧是内层 $u=g(x)$，右侧是外层 $y=f(u)$</b>。让 $x$ 变化一丁点 $\Delta x$，它会先被内层放大成 $\Delta u$，再被外层放大成 $\Delta y$。</p>
+
+    <div class="func-chain" id="funcChain"></div>
+    <canvas id="chainCanvas"></canvas>
+
+    <div class="sliders">
+      <div class="slider-row">
+        <span class="slabel">位置 x₀</span>
+        <input type="range" id="chainX" min="-1.5" max="1" step="0.01" value="0.2">
+        <span class="sval" id="chainXVal">0.20</span>
+      </div>
+      <div class="slider-row">
+        <span class="slabel">步长 Δx</span>
+        <input type="range" id="chainDx" min="0.03" max="0.6" step="0.01" value="0.15">
+        <span class="sval" id="chainDxVal">0.15</span>
+      </div>
+    </div>
+
+    <div id="chainReadout"></div>
+
+    <p class="note" style="margin-top:10px">
+      <b>同色边代表同一个量，且长度一致：</b>左图的橙色 $\Delta u$ 就是右图的橙色 $\Delta u$。左右两图对 $\Delta u$ 使用相同的比例尺，所以同一增量在两图中的像素长度完全相等。
+      蓝色 $\Delta x$ 被内层放大成橙色 $\Delta u$，橙色 $\Delta u$ 又被外层放大成红色 $\Delta y$。
+      每个面板右上角的「×」是该层的放大倍数（即该层导数）。拖动「位置」看三角形在曲线上滑动，拖动「步长」看三角形变宽变窄。
+      把 $\Delta x$ 调小，有限差商会越来越接近导数之积。
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>进阶：三层复合怎么办？</h2>
+    <p>例：$y=\sin^2(3x)$，可以拆成三层。拖动滑块看看颜色链条如何逐层传递：</p>
+
+    <div class="func-chain" id="triFuncChain"></div>
+    <canvas id="triCanvas"></canvas>
+
+    <div class="sliders">
+      <div class="slider-row">
+        <span class="slabel">位置 x₀</span>
+        <input type="range" id="triX" min="-1.2" max="1.2" step="0.01" value="0.4">
+        <span class="sval" id="triXVal">0.40</span>
+      </div>
+      <div class="slider-row">
+        <span class="slabel">步长 Δx</span>
+        <input type="range" id="triDx" min="0.03" max="0.5" step="0.01" value="0.15">
+        <span class="sval" id="triDxVal">0.15</span>
+      </div>
+    </div>
+
+    <div id="triReadout"></div>
+
+    <p>只要一层一层乘下去，有几层就乘几次：</p>
+    <div class="formula">
+      $$\frac{dy}{dx}=\frac{dy}{du}\cdot\frac{du}{dv}\cdot\frac{dv}{dx}
+      =2u\cdot\cos v\cdot 3$$
+    </div>
+    <p>把 $u=\sin(3x)$、$v=3x$ 代回：</p>
+    <div class="formula">
+      $$y'=2\sin(3x)\cdot\cos(3x)\cdot 3=3\sin(6x)$$
+    </div>
+    <p class="note">规律：<b>外层求导 → 往里走一层 → 再求导 → … → 一直走到 x，全部相乘。</b></p>
+  </section>
+
+  <section class="card">
+    <h2>四步拆解（跟着上面的例子变）</h2>
+    <div id="steps"></div>
+  </section>
+
+  <section class="card">
+    <h2>最容易踩的两个坑</h2>
+
+    <div class="wrong">
+      ✗ 忘记乘内层导数：<br>
+      $\big((3x+1)^2\big)'=2(3x+1)$ &nbsp;—&nbsp; 少了因子 3
+    </div>
+    <div class="right">
+      ✓ 正确：$\big((3x+1)^2\big)'=2(3x+1)\cdot 3=6(3x+1)$
+    </div>
+
+    <div class="wrong" style="margin-top:14px">
+      ✗ 把「先求导再乘」搞成「先乘再求导」：<br>
+      $\big(\sin(2x)\big)' \neq \sin\cdot(2x)'$
+    </div>
+    <div class="right">
+      ✓ 正确：外层 $\sin$ 求导得 $\cos(2x)$，内层 $2x$ 求导得 $2$，相乘得 $2\cos(2x)$
+    </div>
+
+    <p class="note" style="margin-top:12px">
+      记住：<b>外层求导时，内层要原封不动地照抄</b>，绝对不能先拆开。
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>一句话记住</h2>
+    <div class="slogan">外层求导，内层照抄，再乘内层导数</div>
+    <p class="note" style="margin-top:12px">
+      写成公式就是 $f(g(x))' = f'(g(x))\cdot g'(x)$，而 $\frac{dy}{dx}=\frac{dy}{du}\cdot\frac{du}{dx}$ 只是它的另一种写法。
+    </p>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const LAYER_COLORS = ['#3b82f6', '#f59e0b', '#ef4444', '#a855f7'];
+
+  function fmt(v){
+    if (!isFinite(v)) return '—';
+    if (v !== 0 && (Math.abs(v) >= 10000 || Math.abs(v) < 0.001)) {
+      return v.toExponential(1);
+    }
+    return v.toFixed(2);
+  }
+  function fmtTick(v){
+    if (Math.abs(v) < 1e-9) return '0';
+    return String(Math.round(v * 100) / 100);
+  }
+  function typeset(el, n){
+    n = n || 0;
+    if (window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise([el]).catch(function(){});
+      return;
+    }
+    if (n > 60) return;
+    setTimeout(function(){ typeset(el, n + 1); }, 200);
+  }
+  function roundRectPath(c, x, y, w, h, r){
+    r = Math.min(r, w/2, h/2);
+    c.beginPath();
+    c.moveTo(x + r, y);
+    c.arcTo(x + w, y, x + w, y + h, r);
+    c.arcTo(x + w, y + h, x, y + h, r);
+    c.arcTo(x, y + h, x, y, r);
+    c.arcTo(x, y, x + w, y, r);
+    c.closePath();
+  }
+  function dot(c, x, y, r, color){
+    c.beginPath();
+    c.arc(x, y, r, 0, Math.PI * 2);
+    c.fillStyle = color;
+    c.fill();
+  }
+
+  function updateFuncChain(el, layers){
+    let html = '<span class="fc-item fc-in">x</span>';
+    for (let i = 0; i < layers.length; i++){
+      html += '<span class="fc-arrow">→</span>';
+      html += '<span class="fc-item">$' + layers[i].expr + '$</span>';
+    }
+    el.innerHTML = html;
+    typeset(el);
+  }
+
+  /* =========================================================
+     例题数据
+     ========================================================= */
+  const examples = [
+    {
+      label: "(3x+1)²",
+      desc: "外层：平方 u²　内层：一次函数 3x+1",
+      g:  x => 3*x + 1,
+      f:  u => u*u,
+      dg: x => 3,
+      df: u => 2*u,
+      xmin: -1.5, xmax: 1.0, x0: 0.2,
+      gLabel: "u = 3x+1",  fLabel: "y = u²",
+      gExpr:  "u = 3x+1",  fExpr:  "y = u^2",
+      steps: [
+        ["① 设中间变量", "u=3x+1,\\qquad y=u^2"],
+        ["② 内层求导",   "\\dfrac{du}{dx}=3"],
+        ["③ 外层求导（内层照抄）", "\\dfrac{dy}{du}=2u=2(3x+1)"],
+        ["④ 两者相乘",   "\\dfrac{dy}{dx}=2(3x+1)\\cdot 3=6(3x+1)"]
+      ]
+    },
+    {
+      label: "sin(2x)",
+      desc: "外层：正弦 sin u　内层：2x",
+      g:  x => 2*x,
+      f:  u => Math.sin(u),
+      dg: x => 2,
+      df: u => Math.cos(u),
+      xmin: -Math.PI, xmax: Math.PI, x0: 0.6,
+      gLabel: "u = 2x",   fLabel: "y = sin u",
+      gExpr:  "u = 2x",   fExpr:  "y = \\sin u",
+      steps: [
+        ["① 设中间变量", "u=2x,\\qquad y=\\sin u"],
+        ["② 内层求导",   "\\dfrac{du}{dx}=2"],
+        ["③ 外层求导（内层照抄）", "\\dfrac{dy}{du}=\\cos u=\\cos(2x)"],
+        ["④ 两者相乘",   "\\dfrac{dy}{dx}=\\cos(2x)\\cdot 2=2\\cos(2x)"]
+      ]
+    },
+    {
+      label: "√(x²+1)",
+      desc: "外层：根号 √u　内层：x²+1",
+      g:  x => x*x + 1,
+      f:  u => Math.sqrt(u),
+      dg: x => 2*x,
+      df: u => 0.5/Math.sqrt(u),
+      xmin: -3, xmax: 3, x0: 1.0,
+      gLabel: "u = x²+1", fLabel: "y = √u",
+      gExpr:  "u = x^2+1", fExpr: "y = \\sqrt{u}",
+      steps: [
+        ["① 设中间变量", "u=x^2+1,\\qquad y=\\sqrt{u}"],
+        ["② 内层求导",   "\\dfrac{du}{dx}=2x"],
+        ["③ 外层求导（内层照抄）", "\\dfrac{dy}{du}=\\dfrac{1}{2\\sqrt{u}}=\\dfrac{1}{2\\sqrt{x^2+1}}"],
+        ["④ 两者相乘",   "\\dfrac{dy}{dx}=\\dfrac{1}{2\\sqrt{x^2+1}}\\cdot 2x=\\dfrac{x}{\\sqrt{x^2+1}}"]
+      ]
+    },
+    {
+      label: "e^(−x²)",
+      desc: "外层：指数 eᵘ　内层：−x²",
+      g:  x => -x*x,
+      f:  u => Math.exp(u),
+      dg: x => -2*x,
+      df: u => Math.exp(u),
+      xmin: -2.5, xmax: 2.5, x0: 0.8,
+      gLabel: "u = −x²",  fLabel: "y = eᵘ",
+      gExpr:  "u = -x^2", fExpr:  "y = e^u",
+      steps: [
+        ["① 设中间变量", "u=-x^2,\\qquad y=e^u"],
+        ["② 内层求导",   "\\dfrac{du}{dx}=-2x"],
+        ["③ 外层求导（内层照抄）", "\\dfrac{dy}{du}=e^u=e^{-x^2}"],
+        ["④ 两者相乘",   "\\dfrac{dy}{dx}=e^{-x^2}\\cdot(-2x)=-2xe^{-x^2}"]
+      ]
+    }
+  ];
+
+  /* =========================================================
+     齿轮动画
+     ========================================================= */
+  const gearCanvas = document.getElementById('gearCanvas');
+  const gctx = gearCanvas.getContext('2d');
+
+  function drawGearShape(c, r, teeth, fill, stroke){
+    const depth = Math.max(r * 0.30, 3);
+    const rOut = r + depth / 2;
+    const rIn = Math.max(r - depth / 2, 1);
+    const step = Math.PI * 2 / teeth;
+
+    c.beginPath();
+    for (let i = 0; i < teeth; i++){
+      const a0 = i * step;
+      const a1 = a0 + step * 0.16;
+      const a2 = a0 + step * 0.34;
+      const a3 = a0 + step * 0.5;
+      const a4 = a0 + step * 0.84;
+      if (i === 0) c.moveTo(Math.cos(a0) * rIn, Math.sin(a0) * rIn);
+      else c.lineTo(Math.cos(a0) * rIn, Math.sin(a0) * rIn);
+      c.lineTo(Math.cos(a1) * rOut, Math.sin(a1) * rOut);
+      c.lineTo(Math.cos(a2) * rOut, Math.sin(a2) * rOut);
+      c.lineTo(Math.cos(a3) * rIn, Math.sin(a3) * rIn);
+      c.lineTo(Math.cos(a4) * rIn, Math.sin(a4) * rIn);
+    }
+    c.closePath();
+    c.fillStyle = fill;
+    c.fill();
+    c.strokeStyle = stroke;
+    c.lineWidth = 1.5;
+    c.stroke();
+
+    c.beginPath();
+    c.arc(0, 0, Math.max(rIn * 0.62, 1.5), 0, Math.PI * 2);
+    c.fillStyle = '#ffffff';
+    c.fill();
+    c.strokeStyle = stroke;
+    c.lineWidth = 1.5;
+    c.stroke();
+
+    c.beginPath();
+    c.arc(0, 0, Math.max(rIn * 0.20, 1.2), 0, Math.PI * 2);
+    c.fillStyle = stroke;
+    c.fill();
+
+    c.strokeStyle = stroke;
+    c.lineWidth = Math.max(rIn * 0.10, 1);
+    for (let k = 0; k < 4; k++){
+      const a = k * Math.PI / 2 + Math.PI / 4;
+      c.beginPath();
+      c.moveTo(Math.cos(a) * rIn * 0.24, Math.sin(a) * rIn * 0.24);
+      c.lineTo(Math.cos(a) * rIn * 0.58, Math.sin(a) * rIn * 0.58);
+      c.stroke();
+    }
+  }
+
+  function drawGears(t){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const W = Math.max(gearCanvas.clientWidth, 10);
+    const H = Math.max(gearCanvas.clientHeight, 10);
+    if (gearCanvas.width !== Math.round(W * dpr) || gearCanvas.height !== Math.round(H * dpr)){
+      gearCanvas.width  = Math.round(W * dpr);
+      gearCanvas.height = Math.round(H * dpr);
+    }
+    gctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    gctx.clearRect(0, 0, W, H);
+
+    const rA = Math.min(56, W * 0.16);
+    const rB = rA / 3;
+    const rC = rB / 2;
+    const teethA = 24, teethB = 8, teethC = 4;
+
+    const totalW = 2 * (rA + rB + rC);
+    const startX = (W - totalW) / 2;
+    const cy = H / 2;
+
+    const ax = startX + rA;
+    const bx = ax + rA + rB;
+    const cx = bx + rB + rC;
+
+    const stepB = Math.PI * 2 / teethB;
+    const stepC = Math.PI * 2 / teethC;
+    const phaseB = Math.PI - 0.5 * stepB;
+    const phaseC = Math.PI - 0.5 * stepC;
+
+    const angA = t;
+    const angB = -3 * t + phaseB;
+    const angC = -2 * angB + phaseC;
+
+    gctx.save();
+    gctx.translate(ax, cy);
+    gctx.rotate(angA);
+    drawGearShape(gctx, rA, teethA, '#818cf8', '#4338ca');
+    gctx.restore();
+
+    gctx.save();
+    gctx.translate(bx, cy);
+    gctx.rotate(angB);
+    drawGearShape(gctx, rB, teethB, '#fbbf24', '#b45309');
+    gctx.restore();
+
+    gctx.save();
+    gctx.translate(cx, cy);
+    gctx.rotate(angC);
+    drawGearShape(gctx, rC, teethC, '#34d399', '#047857');
+    gctx.restore();
+  }
+
+  let gearLast = 0;
+  let gearAngle = 0;
+  function gearLoop(now){
+    if (!gearLast) gearLast = now;
+    let dt = (now - gearLast) / 1000;
+    gearLast = now;
+    if (dt > 0.1) dt = 0.1;
+    gearAngle += dt * 0.85;
+    if (gearAngle > Math.PI * 200) gearAngle -= Math.PI * 200;
+    drawGears(gearAngle);
+    requestAnimationFrame(gearLoop);
+  }
+  requestAnimationFrame(gearLoop);
+
+  /* =========================================================
+     主图（曲线 + 切线）
+     ========================================================= */
+  const canvas  = document.getElementById('plot');
+  const ctx     = canvas.getContext('2d');
+  const tabsEl  = document.getElementById('tabs');
+  const hintEl  = document.getElementById('hint');
+  const slider  = document.getElementById('xrange');
+  const stepsEl = document.getElementById('steps');
+  const roX  = document.getElementById('ro-x');
+  const roU  = document.getElementById('ro-u');
+  const roDG = document.getElementById('ro-dg');
+  const roDF = document.getElementById('ro-df');
+  const roDY = document.getElementById('ro-dy');
+
+  let cur  = 0;
+  let xVal = examples[0].x0;
+
+  function yRangeOf(ex){
+    let lo = Infinity, hi = -Infinity;
+    const N = 200;
+    for (let i = 0; i <= N; i++){
+      const x = ex.xmin + (ex.xmax - ex.xmin) * i / N;
+      let y;
+      try { y = ex.f(ex.g(x)); } catch(e){ continue; }
+      if (isFinite(y)){
+        if (y < lo) lo = y;
+        if (y > hi) hi = y;
+      }
+    }
+    if (!isFinite(lo)) { lo = -1; hi = 1; }
+    if (hi - lo < 1e-9) hi = lo + 1;
+    const pad = (hi - lo) * 0.18;
+    return [lo - pad, hi + pad];
+  }
+
+  function draw(){
+    const ex = examples[cur];
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const W = Math.max(canvas.clientWidth, 10);
+    const H = Math.max(canvas.clientHeight, 10);
+
+    if (canvas.width !== Math.round(W * dpr) || canvas.height !== Math.round(H * dpr)){
+      canvas.width  = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+
+    const padL = 40, padR = 14, padT = 14, padB = 26;
+    const pw = W - padL - padR;
+    const ph = H - padT - padB;
+    if (pw <= 10 || ph <= 10) return;
+
+    const xmin = ex.xmin, xmax = ex.xmax;
+    const yr = yRangeOf(ex);
+    const ymin = yr[0], ymax = yr[1];
+
+    const sx = x => padL + (x - xmin) / (xmax - xmin) * pw;
+    const sy = y => padT + (ymax - y) / (ymax - ymin) * ph;
+
+    ctx.strokeStyle = '#e8edf9';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 6; i++){
+      const px = padL + pw * i / 6;
+      ctx.beginPath(); ctx.moveTo(px, padT); ctx.lineTo(px, padT + ph); ctx.stroke();
+    }
+    for (let j = 0; j <= 4; j++){
+      const py = padT + ph * j / 4;
+      ctx.beginPath(); ctx.moveTo(padL, py); ctx.lineTo(padL + pw, py); ctx.stroke();
+    }
+
+    ctx.strokeStyle = '#c3cde3';
+    ctx.lineWidth = 1.5;
+    if (ymin < 0 && ymax > 0){
+      const py = sy(0);
+      ctx.beginPath(); ctx.moveTo(padL, py); ctx.lineTo(padL + pw, py); ctx.stroke();
+    }
+    if (xmin < 0 && xmax > 0){
+      const px = sx(0);
+      ctx.beginPath(); ctx.moveTo(px, padT); ctx.lineTo(px, padT + ph); ctx.stroke();
+    }
+
+    ctx.fillStyle = '#9aa6bd';
+    ctx.font = '11px -apple-system, system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    for (let i = 0; i <= 4; i++){
+      const xv = xmin + (xmax - xmin) * i / 4;
+      ctx.fillText(fmtTick(xv), sx(xv), padT + ph + 7);
+    }
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(padL, padT, pw, ph);
+    ctx.clip();
+
+    ctx.beginPath();
+    let started = false;
+    const N = 480;
+    for (let i = 0; i <= N; i++){
+      const x = xmin + (xmax - xmin) * i / N;
+      const y = ex.f(ex.g(x));
+      if (!isFinite(y)) { started = false; continue; }
+      const px = sx(x), py = sy(y);
+      if (!started){ ctx.moveTo(px, py); started = true; }
+      else ctx.lineTo(px, py);
+    }
+    ctx.strokeStyle = '#4f46e5';
+    ctx.lineWidth = 3;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    const y0 = ex.f(ex.g(xVal));
+    if (isFinite(y0)){
+      const m = ex.df(ex.g(xVal)) * ex.dg(xVal);
+      const px0 = sx(xVal), py0 = sy(y0);
+
+      if (ymin < 0 && ymax > 0){
+        ctx.setLineDash([4, 4]);
+        ctx.strokeStyle = '#c7d2fe';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(px0, sy(0));
+        ctx.lineTo(px0, py0);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      if (isFinite(m)){
+        const pxPerUnit = pw / (xmax - xmin);
+        const dx = 80 / pxPerUnit;
+        ctx.beginPath();
+        ctx.moveTo(sx(xVal - dx), sy(y0 - m * dx));
+        ctx.lineTo(sx(xVal + dx), sy(y0 + m * dx));
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+      }
+
+      ctx.beginPath();
+      ctx.arc(px0, py0, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#4f46e5';
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  function update(){
+    const ex = examples[cur];
+    const x  = xVal;
+    const u  = ex.g(x);
+    const dgv = ex.dg(x);
+    const dfv = ex.df(u);
+    const dy  = dgv * dfv;
+
+    roX.textContent  = fmt(x);
+    roU.textContent  = fmt(u);
+    roDG.textContent = fmt(dgv);
+    roDF.textContent = fmt(dfv);
+    roDY.textContent = fmt(dy);
+
+    draw();
+  }
+
+  function renderSteps(){
+    const ex = examples[cur];
+    let html = '';
+    for (let i = 0; i < ex.steps.length; i++){
+      html += '<div class="step"><div class="step-t">' + ex.steps[i][0] +
+              '</div><div class="step-m">$$' + ex.steps[i][1] + '$$</div></div>';
+    }
+    stepsEl.innerHTML = html;
+    typeset(stepsEl);
+  }
+
+  /* =========================================================
+     增量传播图（共享比例尺，保证同色边等长）
+     ========================================================= */
+  const chainCanvas = document.getElementById('chainCanvas');
+  const chainXEl    = document.getElementById('chainX');
+  const chainDxEl   = document.getElementById('chainDx');
+  const chainXValEl = document.getElementById('chainXVal');
+  const chainDxValEl= document.getElementById('chainDxVal');
+  const chainReadout= document.getElementById('chainReadout');
+  const funcChainEl = document.getElementById('funcChain');
+
+  let chainPos  = 0.2;
+  let chainStep = 0.15;
+
+  function currentLayers(){
+    const ex = examples[cur];
+    return [
+      { fn: ex.g, dfn: ex.dg, from: 'x', to: 'u', label: ex.gLabel, expr: ex.gExpr },
+      { fn: ex.f, dfn: ex.df, from: 'u', to: 'y', label: ex.fLabel, expr: ex.fExpr }
+    ];
+  }
+
+  function chainState(layers, x0, dx){
+    const vals = [x0];
+    const deltas = [dx];
+    for (let i = 0; i < layers.length; i++){
+      const v = vals[i], d = deltas[i];
+      vals.push(layers[i].fn(v));
+      deltas.push(layers[i].fn(v + d) - layers[i].fn(v));
+    }
+    return { vals, deltas };
+  }
+
+  /* 计算各层变量的取值范围 */
+  function computeVarRanges(layers, xmin, xmax){
+    const N = layers.length;
+    const varRanges = [[xmin, xmax]];
+    for (let i = 1; i <= N; i++){
+      let lo = Infinity, hi = -Infinity;
+      for (let k = 0; k <= 400; k++){
+        let v = xmin + (xmax - xmin) * k / 400;
+        for (let j = 0; j < i; j++) v = layers[j].fn(v);
+        if (isFinite(v)){
+          if (v < lo) lo = v;
+          if (v > hi) hi = v;
+        }
+      }
+      if (!isFinite(lo)) { lo = -1; hi = 1; }
+      if (hi - lo < 1e-9) hi = lo + 1;
+      varRanges.push([lo, hi]);
+    }
+    return varRanges;
+  }
+
+  /* 绘制单个面板（使用传入的 range 和 info） */
+  function drawOnePanel(c, px, py, pw, ph, layer, t0, dt, range, info, inColor, outColor, mult){
+    const tlo = range.tlo, thi = range.thi;
+    const ylo = range.ylo, yhi = range.yhi;
+    const fn = layer.fn;
+
+    c.save();
+    roundRectPath(c, px, py, pw, ph, 12);
+    c.fillStyle = '#f9fbff';
+    c.fill();
+    c.strokeStyle = '#e4eaf7';
+    c.lineWidth = 1;
+    c.stroke();
+    roundRectPath(c, px, py, pw, ph, 12);
+    c.clip();
+
+    const fs = info.fs;
+    const padL = info.padL, padR = info.padR, padT = info.padT, padB = info.padB;
+    const iw = info.iw, ih = info.ih;
+    if (iw < 6 || ih < 6) { c.restore(); return; }
+
+    const mapX = t => px + padL + (t - tlo) / (thi - tlo) * iw;
+    const mapY = y => py + padT + (yhi - y) / (yhi - ylo) * ih;
+
+    /* 标题第一行：变量流向 */
+    c.fillStyle = '#9aa6bd';
+    c.font = '600 ' + fs + 'px -apple-system, system-ui, sans-serif';
+    c.textAlign = 'left';
+    c.textBaseline = 'top';
+    c.fillText(layer.from + ' → ' + layer.to, px + padL, py + 6);
+
+    /* 标题第二行：具体函数式 */
+    if (layer.label){
+      c.fillStyle = '#4338ca';
+      c.font = '800 ' + (fs + 1) + 'px -apple-system, system-ui, sans-serif';
+      c.fillText(layer.label, px + padL, py + 6 + fs + 5);
+    }
+
+    /* 右上角：该层放大倍数 */
+    if (isFinite(mult)){
+      c.fillStyle = outColor;
+      c.font = '800 ' + fs + 'px -apple-system, system-ui, sans-serif';
+      c.textAlign = 'right';
+      c.textBaseline = 'top';
+      c.fillText('×' + mult.toFixed(2), px + pw - padR, py + 6);
+    }
+
+    /* 坐标轴 */
+    c.strokeStyle = '#e0e7f5';
+    c.lineWidth = 1;
+    if (tlo < 0 && thi > 0){
+      const x0p = mapX(0);
+      c.beginPath(); c.moveTo(x0p, py + padT); c.lineTo(x0p, py + padT + ih); c.stroke();
+    }
+    if (ylo < 0 && yhi > 0){
+      const y0p = mapY(0);
+      c.beginPath(); c.moveTo(px + padL, y0p); c.lineTo(px + padL + iw, y0p); c.stroke();
+    }
+
+    /* 曲线 */
+    c.beginPath();
+    let started = false;
+    const M = 240;
+    for (let i = 0; i <= M; i++){
+      const t = tlo + (thi - tlo) * i / M;
+      let y;
+      try { y = fn(t); } catch(e){ y = NaN; }
+      if (!isFinite(y)) { started = false; continue; }
+      const X = mapX(t), Y = mapY(y);
+      if (!started){ c.moveTo(X, Y); started = true; }
+      else c.lineTo(X, Y);
+    }
+    c.strokeStyle = '#a5b4fc';
+    c.lineWidth = 2.4;
+    c.lineJoin = 'round';
+    c.lineCap = 'round';
+    c.stroke();
+
+    const yA = fn(t0);
+    const yB = fn(t0 + dt);
+
+    /* 当前位置竖虚线 */
+    if (isFinite(yA)){
+      const X0 = mapX(t0);
+      c.beginPath();
+      c.moveTo(X0, py + padT);
+      c.lineTo(X0, py + padT + ih);
+      c.strokeStyle = 'rgba(148,163,184,.45)';
+      c.lineWidth = 1.2;
+      c.setLineDash([3, 4]);
+      c.stroke();
+      c.setLineDash([]);
+    }
+
+    /* 切线 */
+    if (isFinite(yA)){
+      const h = 1e-5 * Math.max(1, Math.abs(t0));
+      const k = (fn(t0 + h) - fn(t0 - h)) / (2 * h);
+      if (isFinite(k)){
+        const yL = yA + k * (tlo - t0);
+        const yR = yA + k * (thi - t0);
+        c.beginPath();
+        c.moveTo(mapX(tlo), mapY(yL));
+        c.lineTo(mapX(thi), mapY(yR));
+        c.strokeStyle = 'rgba(99,102,241,.28)';
+        c.lineWidth = 1.6;
+        c.setLineDash([5, 4]);
+        c.stroke();
+        c.setLineDash([]);
+      }
+    }
+
+    /* 增量三角形 */
+    if (isFinite(yA) && isFinite(yB)){
+      const Ax = mapX(t0),        Ay = mapY(yA);
+      const Bx = mapX(t0 + dt),   By = mapY(yA);
+      const Cx = Bx,              Cy = mapY(yB);
+
+      c.beginPath();
+      c.moveTo(Ax, Ay);
+      c.lineTo(Bx, By);
+      c.strokeStyle = inColor;
+      c.lineWidth = 3.5;
+      c.lineCap = 'round';
+      c.stroke();
+
+      c.beginPath();
+      c.moveTo(Bx, By);
+      c.lineTo(Cx, Cy);
+      c.strokeStyle = outColor;
+      c.lineWidth = 3.5;
+      c.stroke();
+
+      dot(c, Ax, Ay, 3.2, inColor);
+      dot(c, Cx, Cy, 3.2, outColor);
+
+      c.font = '700 ' + (fs + 1) + 'px -apple-system, system-ui, sans-serif';
+      c.fillStyle = inColor;
+      c.textAlign = 'center';
+      c.textBaseline = 'top';
+      c.fillText('Δ' + layer.from, (Ax + Bx) / 2, Math.min(Ay, By) + 4);
+
+      c.fillStyle = outColor;
+      c.textBaseline = 'middle';
+      if (Cx + 32 > px + pw){
+        c.textAlign = 'right';
+        c.fillText('Δ' + layer.to, Cx - 4, (By + Cy) / 2);
+      } else {
+        c.textAlign = 'left';
+        c.fillText('Δ' + layer.to, Cx + 4, (By + Cy) / 2);
+      }
+    }
+
+    c.restore();
+  }
+
+  /* 绘制多面板链式图，内部计算共享比例尺 */
+  function drawChainPanels(cv, layers, xmin, xmax, x0, dx){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const W = Math.max(cv.clientWidth, 10);
+    const H = Math.max(cv.clientHeight, 10);
+
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)){
+      cv.width  = Math.round(W * dpr);
+      cv.height = Math.round(H * dpr);
+    }
+    const c = cv.getContext('2d');
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    c.clearRect(0, 0, W, H);
+
+    const N = layers.length;
+    const { vals, deltas } = chainState(layers, x0, dx);
+
+    const outer = 2;
+    const gap = W < 420 ? 9 : 14;
+    const pw = (W - outer * 2 - gap * (N - 1)) / N;
+    const ph = H - outer * 2;
+    if (pw < 24 || ph < 24) return;
+
+    /* 预计算每个面板的内部尺寸 */
+    const panelInfo = [];
+    for (let i = 0; i < N; i++){
+      const fs = pw < 120 ? 9 : 10;
+      const padL = 10, padR = 10;
+      const padT = 28 + fs + 4;
+      const padB = 22;
+      const iw = pw - padL - padR;
+      const ih = ph - padT - padB;
+      panelInfo.push({fs, padL, padR, padT, padB, iw, ih});
+    }
+
+    /* 变量值域 */
+    const varRanges = computeVarRanges(layers, xmin, xmax);
+
+    /* 共享比例尺：sc[i] 是变量 i 的比例尺（像素/单位） */
+    const sc = [];
+    sc[0] = Math.max(panelInfo[0].iw, 10) * 0.85 / (varRanges[0][1] - varRanges[0][0]);
+    for (let i = 1; i <= N; i++){
+      const w = varRanges[i][1] - varRanges[i][0];
+      let s = Infinity;
+      if (i - 1 >= 0 && i - 1 < N){
+        s = Math.min(s, panelInfo[i-1].ih * 0.85 / w);
+      }
+      if (i < N){
+        s = Math.min(s, panelInfo[i].iw * 0.85 / w);
+      }
+      sc[i] = s;
+    }
+    sc[N] = panelInfo[N-1].ih * 0.85 / (varRanges[N][1] - varRanges[N][0]);
+
+    /* 每个面板的显示窗口 */
+    const ranges = [];
+    for (let i = 0; i < N; i++){
+      const tw = panelInfo[i].iw / sc[i];
+      const tc = (varRanges[i][0] + varRanges[i][1]) / 2;
+      const yw = panelInfo[i].ih / sc[i+1];
+      const yc = (varRanges[i+1][0] + varRanges[i+1][1]) / 2;
+      ranges.push({
+        tlo: tc - tw/2, thi: tc + tw/2,
+        ylo: yc - yw/2, yhi: yc + yw/2
+      });
+    }
+
+    for (let i = 0; i < N; i++){
+      const mult = layers[i].dfn(vals[i]);
+      drawOnePanel(
+        c,
+        outer + i * (pw + gap), outer, pw, ph,
+        layers[i],
+        vals[i], deltas[i],
+        ranges[i],
+        panelInfo[i],
+        LAYER_COLORS[i], LAYER_COLORS[i + 1],
+        mult
+      );
+    }
+
+    for (let i = 0; i < N - 1; i++){
+      const gx = outer + (i + 1) * pw + i * gap + gap / 2;
+      const gy = outer + ph / 2;
+      c.fillStyle = LAYER_COLORS[i + 1];
+      c.font = '800 ' + Math.min(gap + 2, 15) + 'px -apple-system, system-ui, sans-serif';
+      c.textAlign = 'center';
+      c.textBaseline = 'middle';
+      c.fillText('›', gx, gy);
+    }
+  }
+
+  function updateChainReadout(el, layers, x0, dx){
+    const { vals, deltas } = chainState(layers, x0, dx);
+    const N = layers.length;
+    const names = [layers[0].from];
+    for (let i = 0; i < N; i++) names.push(layers[i].to);
+
+    const maxAbs = Math.max.apply(null, deltas.map(Math.abs).concat([1e-9]));
+
+    let html = '<div class="scale-bars">';
+    for (let i = 0; i <= N; i++){
+      const pct = Math.abs(deltas[i]) / maxAbs * 100;
+      html += '<div class="sb-row">' +
+        '<span class="sb-name" style="color:' + LAYER_COLORS[i] + '">Δ' + names[i] + '</span>' +
+        '<div class="sb-track"><div class="sb-fill" style="width:' + pct.toFixed(1) +
+        '%;background:' + LAYER_COLORS[i] + '"></div></div>' +
+        '<span class="sb-val">' + fmt(deltas[i]) + '</span>' +
+        '</div>';
+    }
+    html += '</div>';
+
+    const derParts = layers.map(function(L, i){
+      return 'd' + L.to + '/d' + L.from + ' = ' + fmt(L.dfn(vals[i]));
+    });
+    html += '<div class="der-line">' + derParts.join('　·　') + '</div>';
+
+    const finiteRatio = deltas[N] / deltas[0];
+
+    let prod = 1;
+    const parts = [];
+    for (let i = 0; i < N; i++){
+      const k = layers[i].dfn(vals[i]);
+      prod *= k;
+      parts.push(fmt(k));
+    }
+
+    html += '<div class="readout">';
+    html += '<div class="ro"><span class="k">Δ' + names[N] + ' / Δ' + names[0] +
+            '（有限差商）</span><span class="v">' + fmt(finiteRatio) + '</span></div>';
+    html += '<div class="ro hl"><span class="k">导数之积　' + parts.join(' × ') +
+            '</span><span class="v">' + fmt(prod) + '</span></div>';
+    html += '</div>';
+
+    el.innerHTML = html;
+  }
+
+  function redrawChain(){
+    const ex = examples[cur];
+    const layers = currentLayers();
+    drawChainPanels(chainCanvas, layers, ex.xmin, ex.xmax, chainPos, chainStep);
+    updateChainReadout(chainReadout, layers, chainPos, chainStep);
+  }
+
+  chainXEl.addEventListener('input', function(){
+    chainPos = parseFloat(chainXEl.value);
+    chainXValEl.textContent = fmt(chainPos);
+    redrawChain();
+  });
+  chainDxEl.addEventListener('input', function(){
+    chainStep = parseFloat(chainDxEl.value);
+    chainDxValEl.textContent = fmt(chainStep);
+    redrawChain();
+  });
+
+  /* =========================================================
+     三层复合交互
+     ========================================================= */
+  const triCanvas  = document.getElementById('triCanvas');
+  const triXEl     = document.getElementById('triX');
+  const triDxEl    = document.getElementById('triDx');
+  const triXValEl  = document.getElementById('triXVal');
+  const triDxValEl = document.getElementById('triDxVal');
+  const triReadout = document.getElementById('triReadout');
+  const triFuncChainEl = document.getElementById('triFuncChain');
+
+  const triLayers = [
+    { fn: t => 3 * t,       dfn: t => 3,           from: 'x', to: 'v',
+      label: 'v = 3x',      expr: 'v = 3x' },
+    { fn: t => Math.sin(t), dfn: t => Math.cos(t), from: 'v', to: 'u',
+      label: 'u = sin v',   expr: 'u = \\sin v' },
+    { fn: t => t * t,       dfn: t => 2 * t,       from: 'u', to: 'y',
+      label: 'y = u²',      expr: 'y = u^2' }
+  ];
+
+  function redrawTri(){
+    const x0 = parseFloat(triXEl.value);
+    const dx = parseFloat(triDxEl.value);
+    drawChainPanels(triCanvas, triLayers, -1.2, 1.2, x0, dx);
+    updateChainReadout(triReadout, triLayers, x0, dx);
+  }
+
+  triXEl.addEventListener('input', function(){
+    triXValEl.textContent = fmt(parseFloat(triXEl.value));
+    redrawTri();
+  });
+  triDxEl.addEventListener('input', function(){
+    triDxValEl.textContent = fmt(parseFloat(triDxEl.value));
+    redrawTri();
+  });
+
+  /* =========================================================
+     切换例题
+     ========================================================= */
+  function select(i){
+    cur = i;
+    const ex = examples[cur];
+
+    for (let k = 0; k < tabsEl.children.length; k++){
+      tabsEl.children[k].classList.toggle('active', k === i);
+    }
+
+    hintEl.textContent = ex.desc;
+
+    xVal = ex.x0;
+    slider.min  = ex.xmin;
+    slider.max  = ex.xmax;
+    slider.step = (ex.xmax - ex.xmin) / 400;
+    slider.value = xVal;
+
+    renderSteps();
+    update();
+
+    /* 同步增量传播图 */
+    chainPos = ex.x0;
+    chainXEl.min  = ex.xmin;
+    chainXEl.max  = ex.xmax;
+    chainXEl.step = (ex.xmax - ex.xmin) / 300;
+    chainXEl.value = chainPos;
+    chainXValEl.textContent = fmt(chainPos);
+
+    chainDxEl.value = chainStep;
+    chainDxValEl.textContent = fmt(chainStep);
+
+    updateFuncChain(funcChainEl, currentLayers());
+    redrawChain();
+  }
+
+  /* =========================================================
+     初始化
+     ========================================================= */
+  for (let i = 0; i < examples.length; i++){
+    (function(idx){
+      const b = document.createElement('button');
+      b.className = 'tab';
+      b.type = 'button';
+      b.textContent = examples[idx].label;
+      b.addEventListener('click', function(){ select(idx); });
+      tabsEl.appendChild(b);
+    })(i);
+  }
+
+  slider.addEventListener('input', function(){
+    xVal = parseFloat(slider.value);
+    update();
+  });
+
+  let resizeTimer = null;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function(){
+      draw();
+      redrawChain();
+      redrawTri();
+    }, 120);
+  });
+  window.addEventListener('orientationchange', function(){
+    setTimeout(function(){
+      draw();
+      redrawChain();
+      redrawTri();
+    }, 260);
+  });
+
+  select(0);
+  updateFuncChain(triFuncChainEl, triLayers);
+  redrawTri();
+
+  setTimeout(draw, 60);
+  setTimeout(function(){ draw(); redrawChain(); redrawTri(); }, 420);
+
+})();
+</script>
+</body>
+</html>
