@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>泰勒卷尺 · 交互式泰勒展开</title>
+    <!-- MathJax 配置 -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(145deg, #2b3a4b 0%, #1d2a36 100%);
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            color: #f0f4fa;
+        }
+        .container {
+            max-width: 720px;
+            width: 100%;
+            background: rgba(22, 34, 45, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 48px 48px 36px 36px;
+            box-shadow: 0 25px 40px -10px rgba(0, 0, 0, 0.7), inset 0 2px 4px rgba(255, 255, 255, 0.08);
+            padding: 20px 18px 25px;
+            border: 1px solid rgba(255, 215, 140, 0.25);
+        }
+        h1 {
+            font-size: 1.6rem;
+            text-align: center;
+            margin: 0 0 8px 0;
+            font-weight: 400;
+            letter-spacing: 2px;
+            color: #ffd98c;
+            text-shadow: 0 4px 10px rgba(255, 180, 40, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        h1 span {
+            font-size: 1.8rem;
+        }
+        .taylor-quote {
+            text-align: center;
+            font-size: 0.92rem;
+            color: #b9cdff;
+            margin: 0 5px 12px 5px;
+            padding: 8px 12px;
+            background: rgba(40, 70, 100, 0.5);
+            border-radius: 100px;
+            border-left: 4px solid #ffc55a;
+            line-height: 1.5;
+            font-style: italic;
+            backdrop-filter: blur(4px);
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.3);
+        }
+        /* 公式显示区（通用） */
+        .formula-box {
+            background: #1d2b38;
+            border-radius: 30px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            box-shadow: inset 0 6px 8px rgba(0,0,0,0.5), 0 2px 4px rgba(255,255,220,0.1);
+            border: 1px solid #3e5a6b;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: thin;
+            text-align: center;
+        }
+        .formula-box .math {
+            font-size: 1.05rem;
+            color: #e6eefc;
+        }
+        .formula-label {
+            font-size: 0.8rem;
+            color: #ffd966;
+            text-align: center;
+            margin: 2px 0 4px;
+            letter-spacing: 1px;
+        }
+        /* 图形画布区域 */
+        .canvas-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            margin: 4px 0 8px;
+            filter: drop-shadow(0 8px 10px rgba(0,0,0,0.5));
+        }
+        #taylorCanvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-width: 640px;
+            border-radius: 24px;
+            background: radial-gradient(circle at 20% 20%, #4e6b7e, #1e2e3a);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 6px 12px #00000055;
+            border: 2px solid #6d8fa0;
+        }
+        /* 卷尺画布区域 */
+        .tape-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            margin: 0 0 10px 0;
+            padding: 0 6px;
+            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.5));
+        }
+        #tapeCanvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-width: 640px;
+            border-radius: 40px;
+            background: #17222b;
+            cursor: grab;
+            touch-action: none;
+            box-shadow: inset 0 0 20px #00000080, 0 4px 10px #00000060;
+            border: 2px solid #6d8fa0;
+            transition: border 0.2s;
+        }
+        #tapeCanvas:active {
+            cursor: grabbing;
+        }
+        .control-panel {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 8px 5px 12px;
+            background: rgba(34, 52, 68, 0.7);
+            padding: 10px 16px;
+            border-radius: 60px;
+            backdrop-filter: blur(4px);
+            border: 1px solid #4d738b;
+            box-shadow: 0 6px 10px rgba(0,0,0,0.4);
+        }
+        .control-panel label {
+            font-size: 0.95rem;
+            color: #ffd98c;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .control-panel label i {
+            font-style: normal;
+            font-size: 1.2rem;
+        }
+        input[type=range] {
+            flex: 1;
+            height: 6px;
+            -webkit-appearance: none;
+            background: linear-gradient(to right, #fd9, #ffb347, #ffd966);
+            border-radius: 10px;
+            outline: none;
+            box-shadow: inset 0 1px 5px #00000088;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff7e6, #ffb347);
+            border: 2px solid #fff2d0;
+            box-shadow: 0 2px 10px #ffb347, 0 0 0 3px #1d2a36;
+            cursor: pointer;
+            transition: 0.05s;
+        }
+        input[type=range]::-webkit-slider-thumb:active {
+            transform: scale(1.1);
+            background: radial-gradient(circle at 30% 30%, #fff, #ffaa33);
+        }
+        .degree-badge {
+            font-size: 1.1rem;
+            font-weight: 700;
+            background: #2b4154;
+            padding: 6px 16px;
+            border-radius: 40px;
+            color: #ffd966;
+            box-shadow: inset 0 1px 5px #00000066, 0 4px 6px black;
+            border: 1px solid #b9a577;
+            min-width: 80px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+        .insight-text {
+            font-size: 0.9rem;
+            text-align: center;
+            margin: 8px 8px 0;
+            color: #b7d0e6;
+            background: #1c2b36b3;
+            padding: 10px 14px;
+            border-radius: 30px;
+            border: 1px dashed #6d9bb0;
+            backdrop-filter: blur(2px);
+            line-height: 1.5;
+        }
+        .marker-hint {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: #8aaec9;
+        }
+        .canvas-label {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #8ba9c2;
+            margin: 2px 0 0;
+            letter-spacing: 1px;
+        }
+        /* 缩放控制 */
+        .zoom-control {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 6px;
+            font-size: 0.85rem;
+            color: #b8d0e5;
+        }
+        .zoom-control button {
+            background: #2e465a;
+            border: 1px solid #6d9bb0;
+            color: #ffd966;
+            border-radius: 30px;
+            padding: 5px 14px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 4px 6px #00000055;
+            transition: 0.1s;
+        }
+        .zoom-control button:active {
+            background: #3f6078;
+            transform: scale(0.97);
+        }
+        /* 麦克劳林公式专用样式 */
+        .maclaurin-box {
+            background: #16222c;
+            border-radius: 20px;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            border: 1px solid #5a7d90;
+            box-shadow: inset 0 2px 6px #00000080;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .maclaurin-box .math {
+            font-size: 0.95rem;
+            color: #cfe6ff;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>
+        <span>📏</span> 泰勒卷尺 <span>📐</span>
+    </h1>
+    <div class="taylor-quote">
+        <span>“拉长卷尺，展开阶数越高，公式项数越多，尺子越贴近曲线”</span>
+    </div>
+
+    <!-- 上方：泰勒公式的一般形式 -->
+    <div class="formula-label">📌 泰勒公式（一般形式）</div>
+    <div class="formula-box">
+        <div class="math" id="generalFormula">
+            \[
+            f(x) = \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}(x-a)^k + R_n(x)
+            \]
+        </div>
+    </div>
+
+    <!-- 图形画布：函数与泰勒近似 -->
+    <div class="canvas-wrapper">
+        <canvas id="taylorCanvas" width="640" height="340"></canvas>
+    </div>
+    <div class="canvas-label">📈 函数曲线与泰勒多项式逼近（20阶完全重合）</div>
+
+    <!-- 缩放控制 -->
+    <div class="zoom-control">
+        <span>🔍 视野</span>
+        <button id="zoomOutBtn">拉远</button>
+        <button id="zoomInBtn">拉近</button>
+        <button id="resetZoomBtn">重置</button>
+    </div>
+
+    <!-- 下方：具体的麦克劳林公式（a=0） -->
+    <div class="formula-label">📐 麦克劳林公式（a=0，具体项数随阶数增加）</div>
+    <div class="maclaurin-box">
+        <div class="math" id="maclaurinDisplay">
+            \[
+            f(x) \approx 0 + 1.3x + 0x^2 + \cdots
+            \]
+        </div>
+    </div>
+
+    <!-- 卷尺画布（盒子旋转，卷尺直线拉出） -->
+    <div class="tape-wrapper">
+        <canvas id="tapeCanvas" width="640" height="140"></canvas>
+    </div>
+    <div class="canvas-label">👆 拖动卷尺拉长 · 盒子会旋转</div>
+
+    <!-- 控制条 -->
+    <div class="control-panel">
+        <label><i>🔽</i> 展开阶数</label>
+        <input type="range" id="degreeSlider" min="0" max="20" value="2" step="1">
+        <div class="degree-badge" id="degreeDisplay">n = 2</div>
+    </div>
+
+    <!-- 动态提示 (比喻语言) -->
+    <div class="insight-text" id="insightMessage">
+        <span>🐢 一阶近似：卷尺只拉出一小段，像“切线滑梯”</span>
+    </div>
+    <div class="marker-hint">
+        <span>🔹 卷尺刻度 = 阶数</span>
+        <span>🌀 盒子随拉出旋转</span>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ---------- 画布与上下文 ----------
+        const canvas = document.getElementById('taylorCanvas');
+        const ctx = canvas.getContext('2d');
+        const tapeCanvas = document.getElementById('tapeCanvas');
+        const tapeCtx = tapeCanvas.getContext('2d');
+
+        // ========== 数学函数定义 ==========
+        // f(x) = sin(x) + 0.3 * sin(3x)，泰勒级数到20阶可完全重合
+        function f(x) {
+            return Math.sin(x) + 0.3 * Math.sin(3 * x);
+        }
+
+        // 预先计算泰勒系数 (a=0) 到20阶
+        const MAX_DEGREE = 20;
+        const coeffs = [];
+        for (let n = 0; n <= MAX_DEGREE; n++) {
+            // sin(x) 部分
+            let sinPart = 0;
+            if (n % 2 === 1) {
+                const r = n % 4;
+                if (r === 1) sinPart = 1;
+                else if (r === 3) sinPart = -1;
+            }
+            // 0.3 sin(3x) 部分
+            let sin3Part = 0;
+            if (n % 2 === 1) {
+                const s = Math.sin(n * Math.PI / 2);
+                sin3Part = 0.3 * Math.pow(3, n) * s;
+            }
+            const deriv0 = sinPart + sin3Part;
+            let factorial = 1;
+            for (let i = 2; i <= n; i++) factorial *= i;
+            coeffs[n] = deriv0 / factorial;
+        }
+        for (let i = 0; i < coeffs.length; i++) {
+            if (Math.abs(coeffs[i]) < 1e-14) coeffs[i] = 0;
+        }
+
+        // 泰勒多项式计算
+        function taylor(x, degree) {
+            let sum = 0;
+            for (let k = 0; k <= degree; k++) {
+                sum += coeffs[k] * Math.pow(x, k);
+            }
+            return sum;
+        }
+
+        // ========== 图形坐标系与缩放 ==========
+        const baseXMin = -3.5, baseXMax = 3.5;
+        const baseYMin = -3.5, baseYMax = 3.5;
+        let zoomFactor = 1.0;
+
+        function getViewRange() {
+            const cx = (baseXMin + baseXMax) / 2;
+            const cy = (baseYMin + baseYMax) / 2;
+            const halfW = (baseXMax - baseXMin) / 2 / zoomFactor;
+            const halfH = (baseYMax - baseYMin) / 2 / zoomFactor;
+            return {
+                xMin: cx - halfW,
+                xMax: cx + halfW,
+                yMin: cy - halfH,
+                yMax: cy + halfH
+            };
+        }
+
+        function toCanvasX(x, view) {
+            return ((x - view.xMin) / (view.xMax - view.xMin)) * canvas.width;
+        }
+        function toCanvasY(y, view) {
+            return canvas.height - ((y - view.yMin) / (view.yMax - view.yMin)) * canvas.height;
+        }
+        function toMathX(cx, view) {
+            return view.xMin + (cx / canvas.width) * (view.xMax - view.xMin);
+        }
+
+        // ========== 卷尺绘制（盒子旋转 + 卷尺直线拉出） ==========
+        let currentDegree = 2;
+        let tapeLengthOffset = 0;
+        let boxAngleOffset = 0;
+
+        function drawTape(degree, lengthOffset, angleOffset) {
+            const w = tapeCanvas.width;
+            const h = tapeCanvas.height;
+            tapeCtx.clearRect(0, 0, w, h);
+
+            // 背景
+            const bgGrad = tapeCtx.createLinearGradient(0, 0, 0, h);
+            bgGrad.addColorStop(0, '#1e2b35');
+            bgGrad.addColorStop(1, '#0f171f');
+            tapeCtx.fillStyle = bgGrad;
+            tapeCtx.fillRect(0, 0, w, h);
+
+            // 细微装饰线
+            tapeCtx.strokeStyle = '#2d4252';
+            tapeCtx.lineWidth = 0.5;
+            tapeCtx.globalAlpha = 0.3;
+            for (let i = 0; i < w; i += 30) {
+                tapeCtx.beginPath();
+                tapeCtx.moveTo(i, 0);
+                tapeCtx.lineTo(i, h);
+                tapeCtx.stroke();
+            }
+            tapeCtx.globalAlpha = 1;
+
+            // 盒子位置
+            const boxX = 85;
+            const boxY = h / 2 + 5;
+            const boxRadius = 32;
+
+            // 盒子旋转角度
+            const baseBoxAngle = degree * 0.12;
+            const finalBoxAngle = baseBoxAngle + angleOffset * 0.5;
+
+            // 卷尺长度（直线水平）
+            const baseTapeLen = 30 + degree * 18;
+            const totalTapeLen = Math.max(20, Math.min(340, baseTapeLen + lengthOffset));
+            const tapeEndX = boxX + totalTapeLen;
+            const tapeEndY = boxY;
+
+            // 绘制卷尺
+            tapeCtx.save();
+            tapeCtx.shadowColor = '#000000cc';
+            tapeCtx.shadowBlur = 16;
+            tapeCtx.shadowOffsetY = 4;
+
+            const grad = tapeCtx.createLinearGradient(boxX, boxY, tapeEndX, boxY);
+            grad.addColorStop(0, '#f5e7b2');
+            grad.addColorStop(0.3, '#f7e6a8');
+            grad.addColorStop(0.6, '#e6c97a');
+            grad.addColorStop(1, '#c9a44b');
+
+            tapeCtx.beginPath();
+            tapeCtx.lineWidth = 20;
+            tapeCtx.lineCap = 'round';
+            tapeCtx.strokeStyle = grad;
+            tapeCtx.moveTo(boxX, boxY);
+            tapeCtx.lineTo(tapeEndX, tapeEndY);
+            tapeCtx.stroke();
+
+            // 高光线
+            tapeCtx.lineWidth = 5;
+            tapeCtx.strokeStyle = '#fffae0';
+            tapeCtx.globalAlpha = 0.5;
+            tapeCtx.beginPath();
+            tapeCtx.moveTo(boxX, boxY - 6);
+            tapeCtx.lineTo(tapeEndX, tapeEndY - 6);
+            tapeCtx.stroke();
+            tapeCtx.globalAlpha = 1;
+
+            // 下边缘暗线
+            tapeCtx.lineWidth = 3;
+            tapeCtx.strokeStyle = '#7a5e2e';
+            tapeCtx.beginPath();
+            tapeCtx.moveTo(boxX, boxY + 8);
+            tapeCtx.lineTo(tapeEndX, tapeEndY + 8);
+            tapeCtx.stroke();
+
+            // 刻度
+            const steps = 40;
+            for (let i = 0; i <= steps; i++) {
+                const t = i / steps;
+                const px = boxX + (tapeEndX - boxX) * t;
+                const py = boxY;
+                const isMajor = i % 2 === 0;
+                const len = isMajor ? 9 : 4;
+                tapeCtx.beginPath();
+                tapeCtx.lineWidth = isMajor ? 2.2 : 1.2;
+                tapeCtx.strokeStyle = isMajor ? '#3d2b12' : '#5e4a26';
+                tapeCtx.moveTo(px, py - len);
+                tapeCtx.lineTo(px, py + len);
+                tapeCtx.stroke();
+
+                if (isMajor && i/2 <= degree * 1.2) {
+                    const num = Math.round(i/2);
+                    tapeCtx.font = 'bold 10px "Segoe UI", monospace';
+                    tapeCtx.fillStyle = '#372a12';
+                    tapeCtx.shadowBlur = 3;
+                    tapeCtx.shadowColor = '#ffffff40';
+                    tapeCtx.fillText(num, px - 4, py + 22);
+                }
+            }
+
+            // 末端金属头
+            tapeCtx.shadowBlur = 10;
+            tapeCtx.beginPath();
+            tapeCtx.arc(tapeEndX, tapeEndY, 12, 0, Math.PI * 2);
+            tapeCtx.fillStyle = '#b69b5e';
+            tapeCtx.fill();
+            tapeCtx.shadowBlur = 4;
+            tapeCtx.beginPath();
+            tapeCtx.arc(tapeEndX - 2, tapeEndY - 2, 6, 0, Math.PI * 2);
+            tapeCtx.fillStyle = '#ebdbb2';
+            tapeCtx.fill();
+
+            // 阶数标签
+            tapeCtx.font = 'bold 15px "Segoe UI", sans-serif';
+            tapeCtx.fillStyle = '#fff3d1';
+            tapeCtx.shadowColor = '#000';
+            tapeCtx.shadowBlur = 10;
+            tapeCtx.fillText(`n=${degree}`, tapeEndX + 20, tapeEndY - 6);
+
+            // 绘制盒子
+            tapeCtx.shadowBlur = 16;
+            tapeCtx.shadowColor = '#000000aa';
+            tapeCtx.shadowOffsetY = 3;
+
+            tapeCtx.beginPath();
+            tapeCtx.arc(boxX, boxY, boxRadius, 0, Math.PI * 2);
+            const boxGrad = tapeCtx.createRadialGradient(boxX-10, boxY-8, 5, boxX, boxY, boxRadius+5);
+            boxGrad.addColorStop(0, '#c0b8a8');
+            boxGrad.addColorStop(0.5, '#8f846c');
+            boxGrad.addColorStop(1, '#5a4f3a');
+            tapeCtx.fillStyle = boxGrad;
+            tapeCtx.fill();
+
+            tapeCtx.lineWidth = 3;
+            tapeCtx.strokeStyle = '#4d4230';
+            tapeCtx.stroke();
+
+            // 盒子上的旋转纹路
+            tapeCtx.save();
+            tapeCtx.translate(boxX, boxY);
+            tapeCtx.rotate(finalBoxAngle);
+            tapeCtx.strokeStyle = '#3a3225';
+            tapeCtx.lineWidth = 2.5;
+            for (let r = 0; r < 3; r++) {
+                const angle = r * Math.PI * 2 / 3;
+                tapeCtx.beginPath();
+                tapeCtx.moveTo(Math.cos(angle) * 10, Math.sin(angle) * 10);
+                tapeCtx.lineTo(Math.cos(angle) * 22, Math.sin(angle) * 22);
+                tapeCtx.stroke();
+            }
+            tapeCtx.restore();
+
+            // 中心螺丝
+            tapeCtx.beginPath();
+            tapeCtx.arc(boxX, boxY, 8, 0, Math.PI * 2);
+            tapeCtx.fillStyle = '#5e5542';
+            tapeCtx.fill();
+            tapeCtx.beginPath();
+            tapeCtx.arc(boxX - 2, boxY - 2, 4, 0, Math.PI * 2);
+            tapeCtx.fillStyle = '#b8ad94';
+            tapeCtx.fill();
+
+            tapeCtx.restore();
+        }
+
+        // ========== 主图形绘制 ==========
+        function drawGraph(degree) {
+            const view = getViewRange();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 网格
+            ctx.save();
+            ctx.strokeStyle = '#3b566b';
+            ctx.lineWidth = 0.6;
+            ctx.globalAlpha = 0.3;
+            const stepX = (view.xMax - view.xMin) / 10;
+            for (let x = Math.ceil(view.xMin / stepX) * stepX; x <= view.xMax; x += stepX) {
+                const cx = toCanvasX(x, view);
+                ctx.beginPath();
+                ctx.moveTo(cx, 0);
+                ctx.lineTo(cx, canvas.height);
+                ctx.stroke();
+            }
+            const stepY = (view.yMax - view.yMin) / 10;
+            for (let y = Math.ceil(view.yMin / stepY) * stepY; y <= view.yMax; y += stepY) {
+                const cy = toCanvasY(y, view);
+                ctx.beginPath();
+                ctx.moveTo(0, cy);
+                ctx.lineTo(canvas.width, cy);
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            // 坐标轴
+            ctx.save();
+            ctx.strokeStyle = '#b0c7db';
+            ctx.lineWidth = 1.8;
+            ctx.shadowColor = '#c0d8ff';
+            ctx.shadowBlur = 6;
+            const y0 = toCanvasY(0, view);
+            ctx.beginPath();
+            ctx.moveTo(0, y0);
+            ctx.lineTo(canvas.width, y0);
+            ctx.stroke();
+            const x0 = toCanvasX(0, view);
+            ctx.beginPath();
+            ctx.moveTo(x0, 0);
+            ctx.lineTo(x0, canvas.height);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#b0c7db';
+            ctx.beginPath();
+            ctx.moveTo(canvas.width-10, y0-6);
+            ctx.lineTo(canvas.width, y0);
+            ctx.lineTo(canvas.width-10, y0+6);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(x0-6, 10);
+            ctx.lineTo(x0, 0);
+            ctx.lineTo(x0+6, 10);
+            ctx.fill();
+            ctx.font = '10px "Segoe UI", monospace';
+            ctx.fillStyle = '#aac3db';
+            ctx.shadowBlur = 4;
+            ctx.shadowColor = '#00000080';
+            const numTicksX = 8;
+            const tickStepX = (view.xMax - view.xMin) / numTicksX;
+            for (let i = 0; i <= numTicksX; i++) {
+                const x = view.xMin + i * tickStepX;
+                if (Math.abs(x) < 0.01) continue;
+                const cx = toCanvasX(x, view);
+                ctx.fillText(x.toFixed(1), cx-12, y0+16);
+            }
+            const numTicksY = 8;
+            const tickStepY = (view.yMax - view.yMin) / numTicksY;
+            for (let i = 0; i <= numTicksY; i++) {
+                const y = view.yMin + i * tickStepY;
+                if (Math.abs(y) < 0.01) continue;
+                const cy = toCanvasY(y, view);
+                ctx.fillText(y.toFixed(1), x0-24, cy+4);
+            }
+            ctx.restore();
+
+            // 真实函数曲线
+            ctx.save();
+            ctx.beginPath();
+            ctx.strokeStyle = '#ffd966';
+            ctx.lineWidth = 3.8;
+            ctx.shadowColor = '#ffb347';
+            ctx.shadowBlur = 14;
+            ctx.lineJoin = 'round';
+            let started = false;
+            const samples = canvas.width;
+            for (let px = 0; px <= samples; px++) {
+                const x = toMathX(px, view);
+                const y = f(x);
+                const cy = toCanvasY(y, view);
+                if (!started) {
+                    ctx.moveTo(px, cy);
+                    started = true;
+                } else {
+                    ctx.lineTo(px, cy);
+                }
+            }
+            ctx.stroke();
+            ctx.restore();
+
+            // 泰勒多项式曲线
+            ctx.save();
+            ctx.beginPath();
+            ctx.strokeStyle = '#6ee7ff';
+            ctx.lineWidth = 3;
+            ctx.shadowColor = '#00c8ff';
+            ctx.shadowBlur = 18;
+            ctx.setLineDash([8, 6]);
+            started = false;
+            for (let px = 0; px <= samples; px++) {
+                const x = toMathX(px, view);
+                const y = taylor(x, degree);
+                if (y > view.yMax + 1 || y < view.yMin - 1) {
+                    if (started) {
+                        ctx.stroke();
+                        ctx.beginPath();
+                        started = false;
+                    }
+                    continue;
+                }
+                const cy = toCanvasY(y, view);
+                if (!started) {
+                    ctx.moveTo(px, cy);
+                    started = true;
+                } else {
+                    ctx.lineTo(px, cy);
+                }
+            }
+            if (started) ctx.stroke();
+            ctx.restore();
+
+            // 原点标记
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(toCanvasX(0, view), toCanvasY(0, view), 7, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffd966';
+            ctx.shadowBlur = 16;
+            ctx.shadowColor = '#ffb347';
+            ctx.fill();
+            ctx.fillStyle = '#1e2e3a';
+            ctx.font = 'bold 13px "Segoe UI"';
+            ctx.shadowBlur = 0;
+            ctx.fillText('a', toCanvasX(0, view) + 12, toCanvasY(0, view) - 12);
+            ctx.restore();
+
+            // 图例
+            ctx.save();
+            ctx.font = '11px "Segoe UI"';
+            ctx.fillStyle = '#ffd966';
+            ctx.shadowBlur = 6;
+            ctx.fillText('f(x)', 20, 30);
+            ctx.fillStyle = '#6ee7ff';
+            ctx.fillText(`泰勒近似 (n=${degree})`, 20, 50);
+            ctx.restore();
+        }
+
+        // ========== 动态生成麦克劳林公式（a=0，带具体系数） ==========
+        function buildMaclaurinFormula(degree) {
+            // 格式化系数（保留4位有效数字，去除末尾0）
+            function fmt(val) {
+                if (Math.abs(val) < 1e-12) return '0';
+                let s = val.toFixed(4);
+                s = s.replace(/\.?0+$/, '');
+                if (s === '-0') s = '0';
+                return s;
+            }
+
+            let terms = [];
+            for (let k = 0; k <= degree; k++) {
+                const c = coeffs[k];
+                if (Math.abs(c) < 1e-12) continue; // 跳过零系数
+
+                const absC = Math.abs(c);
+                let coeffStr = fmt(absC);
+                // 如果系数为1且不是常数项，可省略
+                let showCoeff = true;
+                if (Math.abs(absC - 1) < 1e-10 && k > 0) showCoeff = false;
+
+                const sign = c < 0 ? '-' : (terms.length > 0 ? '+' : '');
+
+                // 变量部分 (麦克劳林: x^k)
+                let varPart = '';
+                if (k === 0) varPart = '';
+                else if (k === 1) varPart = 'x';
+                else varPart = `x^{${k}}`;
+
+                let term = '';
+                if (k === 0) {
+                    term = coeffStr;
+                } else {
+                    if (showCoeff) {
+                        term = coeffStr + varPart;
+                    } else {
+                        term = varPart;
+                    }
+                }
+
+                if (terms.length === 0) {
+                    if (c < 0) term = '-' + term;
+                } else {
+                    term = sign + ' ' + term;
+                }
+                terms.push(term);
+            }
+
+            if (terms.length === 0) return '0';
+            let body = terms.join(' ');
+            body = body.replace(/^\+ /, '');
+            return body;
+        }
+
+        // ========== UI 更新 ==========
+        const slider = document.getElementById('degreeSlider');
+        const degreeDisplay = document.getElementById('degreeDisplay');
+        const maclaurinDisplay = document.getElementById('maclaurinDisplay');
+        const generalFormula = document.getElementById('generalFormula');
+        const insightMessage = document.getElementById('insightMessage');
+
+        function updateUI(degree) {
+            degreeDisplay.textContent = `n = ${degree}`;
+
+            // 更新麦克劳林公式（具体系数，项数随阶数增加）
+            const body = buildMaclaurinFormula(degree);
+            maclaurinDisplay.innerHTML = `\\[ f(x) \\approx ${body} \\]`;
+            if (window.MathJax && MathJax.typesetPromise) {
+                MathJax.typesetPromise([maclaurinDisplay]).catch(e => console.log(e));
+            }
+
+            // 通用泰勒公式保持静态，但也可以加亮当前阶数？不需要。
+
+            // 提示语
+            const messages = [
+                '🐣 零阶近似：卷尺几乎没拉出，盒子静止，只是说：函数值就是f(a)！',
+                '📏 一阶近似：卷尺拉出一小段，盒子微转，像“切线滑梯”。',
+                '🌀 二阶近似：卷尺继续拉长，盒子转动，加上了“弯曲”修正。',
+                '✨ 三阶近似：卷尺拉出更多，盒子旋转明显，曲线开始贴合。',
+                '🔧 四阶近似：卷尺弯曲，盒子已转过一定角度，高阶项发力。',
+                '🎯 五阶近似：卷尺拉得很长，盒子转了大半圈，与真实曲线接近。',
+                '🏆 六阶近似：卷尺近乎完全展开，盒子旋转近90°，误差已很小。',
+                '🔥 七阶近似：卷尺几乎到达极限，盒子继续旋转，曲线几乎重合。',
+                '💎 八阶近似：卷尺完全拉长，盒子旋转到位，只在远处有微小差别。',
+                '🌟 九阶近似：卷尺完美展开，盒子角度到位，远处依然有一丝偏离。',
+                '👑 十阶近似：卷尺全力拉出，盒子旋转完成，终于完全贴合！',
+                '🚀 十一阶：卷尺继续伸展，盒子旋转更多，逼近更加完美。',
+                '⭐ 十二阶：卷尺几乎无限长，盒子已转过大半圈，误差几乎为零。',
+                '💫 十三阶：卷尺稳步拉出，盒子旋转流畅，曲线完美追随。',
+                '🌈 十四阶：卷尺拉出很长，盒子旋转到位，高阶项贡献显著。',
+                '⚡ 十五阶：卷尺充分展开，盒子旋转完成，逼近达到新高度。',
+                '🎨 十六阶：卷尺几乎到达尽头，盒子旋转精准，曲线完美贴合。',
+                '🏅 十七阶：卷尺稳定拉出，盒子旋转优雅，精度进一步提升。',
+                '💎 十八阶：卷尺接近极限，盒子旋转到位，误差微乎其微。',
+                '🌟 十九阶：卷尺全力拉出，盒子旋转完成，完美逼近！',
+                '🎉 二十阶：卷尺完全展开，盒子旋转到位，泰勒级数完美重合！'
+            ];
+            insightMessage.innerHTML = `<span>${messages[degree]}</span>`;
+        }
+
+        // 重绘所有
+        function redrawAll() {
+            drawGraph(currentDegree);
+            drawTape(currentDegree, tapeLengthOffset, boxAngleOffset);
+        }
+
+        // 滑块事件
+        slider.addEventListener('input', (e) => {
+            currentDegree = parseInt(e.target.value, 10);
+            tapeLengthOffset = 0;
+            boxAngleOffset = 0;
+            updateUI(currentDegree);
+            redrawAll();
+        });
+
+        // ========== 卷尺拖拽交互 ==========
+        let isDragging = false;
+        let dragStartX = 0, dragStartY = 0;
+        let startLengthOffset = 0, startAngleOffset = 0;
+
+        function getTapeCoords(clientX, clientY) {
+            const rect = tapeCanvas.getBoundingClientRect();
+            const scaleX = tapeCanvas.width / rect.width;
+            const scaleY = tapeCanvas.height / rect.height;
+            return {
+                x: (clientX - rect.left) * scaleX,
+                y: (clientY - rect.top) * scaleY
+            };
+        }
+
+        function onTapeStart(clientX, clientY) {
+            isDragging = true;
+            const { x, y } = getTapeCoords(clientX, clientY);
+            dragStartX = x;
+            dragStartY = y;
+            startLengthOffset = tapeLengthOffset;
+            startAngleOffset = boxAngleOffset;
+            tapeCanvas.style.cursor = 'grabbing';
+        }
+
+        function onTapeMove(clientX, clientY) {
+            if (!isDragging) return;
+            const { x, y } = getTapeCoords(clientX, clientY);
+            const dx = x - dragStartX;
+            const dy = y - dragStartY;
+
+            tapeLengthOffset = Math.min(120, Math.max(-60, startLengthOffset + dx * 1.2));
+            boxAngleOffset = Math.min(1.5, Math.max(-1.5, startAngleOffset + dy * 0.015));
+
+            drawTape(currentDegree, tapeLengthOffset, boxAngleOffset);
+        }
+
+        function onTapeEnd() {
+            isDragging = false;
+            tapeCanvas.style.cursor = 'grab';
+        }
+
+        // 鼠标事件
+        tapeCanvas.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            onTapeStart(e.clientX, e.clientY);
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                e.preventDefault();
+                onTapeMove(e.clientX, e.clientY);
+            }
+        });
+        window.addEventListener('mouseup', () => {
+            onTapeEnd();
+        });
+
+        // 触摸事件
+        tapeCanvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            onTapeStart(touch.clientX, touch.clientY);
+        }, { passive: false });
+        tapeCanvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (isDragging) {
+                const touch = e.touches[0];
+                onTapeMove(touch.clientX, touch.clientY);
+            }
+        }, { passive: false });
+        tapeCanvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            onTapeEnd();
+        }, { passive: false });
+        tapeCanvas.addEventListener('touchcancel', (e) => {
+            e.preventDefault();
+            onTapeEnd();
+        }, { passive: false });
+
+        // ========== 缩放控制 ==========
+        document.getElementById('zoomOutBtn').addEventListener('click', () => {
+            zoomFactor = Math.max(0.4, zoomFactor * 0.8);
+            drawGraph(currentDegree);
+        });
+        document.getElementById('zoomInBtn').addEventListener('click', () => {
+            zoomFactor = Math.min(3.0, zoomFactor * 1.25);
+            drawGraph(currentDegree);
+        });
+        document.getElementById('resetZoomBtn').addEventListener('click', () => {
+            zoomFactor = 1.0;
+            drawGraph(currentDegree);
+        });
+
+        // 初始化
+        updateUI(currentDegree);
+        redrawAll();
+
+        if (window.MathJax && MathJax.typesetPromise) {
+            MathJax.typesetPromise();
+        }
+    })();
+</script>
+</body>
+</html>
